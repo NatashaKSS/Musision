@@ -13,7 +13,7 @@ var data = [],
 		sampleRateHz = 44100,
 		
 		//Notes sequence, play with it ;)
-		notes = [62, 64, 66, 62, 62, 64, 66, 62],// 62, 64, 65, 67, 69, 71, 72, 60, 62, 63, 65, 67, 68, 70, 72],
+		notes = [62, 64, 66, 62, 62, 64, 66, 62],// initially 62, 64, 65, 67, 69, 71, 72, 60, 62, 63, 65, 67, 68, 70, 72],
 		
 		//Base Frequency based on the notes
 		baseFreq = function(index) {
