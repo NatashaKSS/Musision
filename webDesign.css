@@ -1,37 +1,85 @@
-
 body {
 	font-family: "Trebuchet MS", Verdana, sans-serif;
+	margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px
 }
 
-.taskbar {
-	list-style-type: none;
-	float: left;
-	
-	margin: 0 0 3em 0;
-	padding:0;
-	line-height: 2;
-	border-bottom: 1px solid #ccc;
-	border-top: 1px solid #ccc;
-	display: block;
-	zoom: 1;
-	
-	width: 100%;
-	
-	background: #4E4F4D;
-	color: white;
+/* Contains user workspace, timeline and everything else below top navbar */
+.content {
+    position: absolute;
+    left:2px; top:80px; right:0; bottom:0;
 }
 
-.taskbar li {
-	display: inline;
-	line-height: 2;
-	padding-left: 3em;
-	padding-right: 3em;
-	
-	background: #4E4F4D;
-	font-size: 1.5em;
+#timeline {
+	position: relative;
+	overflow: scroll;
+	overflow-y:hidden;
+	white-space:nowrap;
+    left:2px; top:0px; right:0; bottom:0;
+    height: 150px;
+    width: auto;
+    background-color: #ffffff;
+    border-top: solid 3px black;
 }
 
-.taskbar li a {
-	color: white;
-	text-decoration: none;
+.noteDefault {
+	position: relative;
+	display: inline-block;
+	height: 150px;
+	width: 100px;
+	background-color: grey;
+	border-left: dotted 1px black;
+	border-right: dotted 1px black;
 }
+
+.col-md-1 {
+	perspective: 400px;	
+	border: solid 1px black;
+	border-radius: 999px;
+	top: 2em;
+	text-align: center;
+	/* Animation */
+	transition: 0.5s;
+	transform-style: preserve-3d;
+	position: relative;
+}
+
+.col-md-1:hover {
+	transform: rotateY(180deg);
+}
+
+#play{
+	background: violet;    
+	color: black;
+}
+
+#pause {
+	background: green;
+	color: white;     
+}
+
+/* Some omitted code */
+/* Sidebar on left */
+/* Decided we don't really need a sidebar on the left yet 
+   with so much space on the top navbar
+.left-sidebar {
+    position:absolute;
+    left:0; top:80px; bottom: 0;
+    width: 120px;
+    background-color: #575757;
+    border: solid 2px black;
+}
+
+Top navigation bar already enabled by Bootstrap
+.top {
+    position:absolute;
+    left:0; right:0;
+    height: 80px;
+    background-color: #575757;
+    text-align: left;
+    font-size: 2em;
+    color: white;
+}
+*/
+
+
+
