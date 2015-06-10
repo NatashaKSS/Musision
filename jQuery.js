@@ -1,10 +1,118 @@
-//The notes sequence array is borrowed from
-//https://github.com/ValdemarOrn/valdemarorn.github.com/tree/master/Files/JSAudio 
-//Thanks! :)
+var context = new AudioContext();
 
-/*------------------------------------*/
-/*--------Document interaction--------*/
-/*------------------------------------*/
+/*-----------------------------------------------------------*/
+/*-------------------Sound Generation------------------------*/
+/*-----------------------------------------------------------*/
+// ADSR Envelope Generator
+var Envelope = (function applyEnvelope() {
+	
+	function Envelope() {
+		this.attackTime = 0.1;
+		this.releaseTime = 0.1;
+		this.duration = 0;
+	}
+	
+	Envelope.prototype.setAttackTime = function (attack) {
+		this.attackTime = attack;
+	};
+	
+	Envelope.prototype.setReleaseTime = function (release) {
+		this.releaseTime = release;
+	};
+	
+	Envelope.prototype.setSustainTime = function (sustain) {
+		this.sustainTime = sustain;
+	};
+	
+	Envelope.prototype.setSustainValue = function (sustain) {
+		this.sustainValue = sustain;
+	};
+	
+	Envelope.prototype.connect = function (param) {
+		this.param = param;
+	}
+	
+	Envelope.prototype.setDuration = function (dur) {
+		this.duration = dur;
+	}
+	
+	Envelope.prototype.trigger = function (startGainValue, endGainValue) {
+		var now = context.currentTime;
+		this.param.cancelScheduledValues(now);
+		this.param.setValueAtTime(startGainValue, now);
+		this.param.linearRampToValueAtTime(endGainValue, now + this.attackTime);
+		
+		this.startGainValue = startGainValue;
+		this.endGainValue = endGainValue;
+		
+		if (this.sustainValue > 0) {
+			this.param.setValueAtTime(this.sustainValue, now + this.attackTime);
+		}
+		
+		this.param.linearRampToValueAtTime(startGainValue, now + this.attackTime + this.sustainTime + this.releaseTime);
+		
+	}
+	
+	return Envelope;
+	
+})(context);
+
+//Sets the sinewave frequency of a certain source 
+//and returns the new source
+function sineWave(source, freq) {
+	source.type = 'sine';
+	source.frequency.value = freq;
+	
+	return source;
+}
+
+function midiToFreq(midiNum) {
+	return 440 * Math.pow(2,((midiNum - 69) / 12));
+}
+
+/*-----------------------------------------------------------*/
+/*-----------Setting up sound source & nodes-----------------*/
+/*-----------------------------------------------------------*/
+function playSound(midiNum) {
+	// Create Oscillator and gainNode
+	var oscillator = context.createOscillator();
+	var gainNode = context.createGain();
+
+	// Set up connections
+	oscillator.connect(gainNode);
+	gainNode.connect(context.destination);
+	
+	var mySound = piano(midiNum);
+	mySound.start(0);
+	
+	// Creates an ADSR envelope over the oscillator and 
+	// returns the new oscillator with the ADSR applied to it
+	function piano(midiNum) {
+		var envelope = new Envelope;
+		var source = sineWave(oscillator, midiToFreq(midiNum));
+		
+		// Set ADSR values here! Note: Decay not implemented yet.
+		envelope.setAttackTime(0.02);
+		envelope.setReleaseTime(0.3);
+		envelope.setSustainValue(1);
+		envelope.setSustainTime(0);
+		
+		envelope.connect(gainNode.gain);
+		
+		envelope.trigger(0, 1.5);
+
+		var duration = envelope.attackTime + envelope.releaseTime + envelope.sustainTime;
+		envelope.setDuration(duration);
+		console.log(duration);
+		console.log(midiToFreq(midiNum));
+		
+		return source;
+	}
+}
+
+/*------------------------------------------------*/
+/*--------Document interaction with JQuery--------*/
+/*------------------------------------------------*/
 $(document).ready(function() {
 	// Add a div inside the timeline
 	var count = 0;
@@ -14,21 +122,54 @@ $(document).ready(function() {
 		$("#timeline").append("<td class='noteDefault'> Note " + count + "</td>");
 	});
 	
-	// Gets the midi number which is stated as an attribute of the "col-md-1" 
-	// note buttons in index.html and plays the respective note on click.
-	$('.col-md-1').on('click', function() {
-		var midiNumber = parseInt($(this).attr('data-note'));
-		console.log(midiNumber + " inside "); 
-		// console.log for debugging: 
-		// To make sure you are using the correct MIDI number
-		playSound(midiNumber);
+	$(".col-md-1").on("click", function() {
+		playSound(parseInt($(this).attr('data-note')));
 	});
 	
+	/* Draggable
+	$("#sortable").sortable({
+		revert: true
+	});
+	
+	$("#draggable").draggable({
+		connectToSortable: "#sortable",
+		helper: "clone",
+		revert: "invalid"
+	});
+	
+	THINK NEED BUTTONS FOR NOTES TO BE ul
+	for loop to generate buttons.
+	for(var d=1;d<=31;d++)
+	{
+	    document.write("<option>"+d+"</option>");
+	}
+	</script>
+</select>
+	*/
 });
 
-/*----------------------------------*/
-/*--------Audio manipulation--------*/
-/*----------------------------------*/
+
+
+
+
+
+
+
+
+/* Unused code Section 1.1: riffwave.js implementation.
+ * 
+ * 
+//Gets the midi number which is stated as an attribute of the "col-md-1" 
+// note buttons in index.html and plays the respective note on click.
+$('.col-md-1').on('click', function() {
+	var midiNumber = parseInt($(this).attr('data-note'));
+	console.log(midiNumber + " inside "); 
+	// console.log for debugging: 
+	// To make sure you are using the correct MIDI number
+	playSound(midiNumber);
+});
+
+
 // Pre-cond: midiNumber must be a valid note within the valid frequency range
 // Post-cond: Plays a sound corresponding to the MIDI number
 // Description: Fills sound data with corresponding MIDI number and plays it
@@ -37,7 +178,7 @@ function playSound(midiNumber) {
 		sampleRateHz = 44100,
 		
 		//Notes sequence
-		notes = [midiNumber],
+		notes = [midiNumber, midiNumber],
 		
 		//Base Frequency based on the notes
 		baseFreq = function(index) {
@@ -62,3 +203,4 @@ function playSound(midiNumber) {
 	// Play sound immediately after filling audio object
 	audio.play();
 }
+*/
