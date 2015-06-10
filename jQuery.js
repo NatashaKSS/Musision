@@ -86,7 +86,8 @@ function playSound(midiNum) {
 	mySound.start(0);
 	
 	// Creates an ADSR envelope over the oscillator and 
-	// returns the new oscillator with the ADSR applied to it
+	// returns the new oscillator with the ADSR applied to its
+	// gainNode
 	function piano(midiNum) {
 		var envelope = new Envelope;
 		var source = sineWave(oscillator, midiToFreq(midiNum));
@@ -114,38 +115,25 @@ function playSound(midiNum) {
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
 $(document).ready(function() {
-	// Add a div inside the timeline
-	var count = 0;
-	
-	$(document).on('click', 'body', function() {
-		count++;
-		$("#timeline").append("<td class='noteDefault'> Note " + count + "</td>");
-	});
 	
 	$(".col-md-1").on("click", function() {
 		playSound(parseInt($(this).attr('data-note')));
 	});
 	
-	/* Draggable
-	$("#sortable").sortable({
-		revert: true
-	});
-	
-	$("#draggable").draggable({
-		connectToSortable: "#sortable",
-		helper: "clone",
-		revert: "invalid"
-	});
-	
-	THINK NEED BUTTONS FOR NOTES TO BE ul
-	for loop to generate buttons.
-	for(var d=1;d<=31;d++)
-	{
-	    document.write("<option>"+d+"</option>");
-	}
-	</script>
-</select>
-	*/
+	/* Draggable */
+	 $(function() {
+		 $( "#timeline" ).sortable({
+			 revert: true
+		 });
+		 
+		 $( ".col-md-1" ).draggable({
+			 connectToSortable: "#timeline",
+			 helper: "clone",
+			 revert: "invalid"
+		 });
+		 
+		 $("div").disableSelection();
+	 });
 });
 
 
@@ -204,3 +192,13 @@ function playSound(midiNumber) {
 	audio.play();
 }
 */
+
+/* Lab of experiments...
+ * var count = 0;
+	
+	$(document).on('click', 'body', function() {
+		count++;
+		$("#timeline").append("<td class='noteDefault'> Note " + count + "</td>");
+	});
+ *
+ */
