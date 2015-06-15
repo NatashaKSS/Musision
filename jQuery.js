@@ -1,4 +1,5 @@
 var context = new AudioContext();
+var arr = [];
 
 /*-----------------------------------------------------------*/
 /*-------------------Sound Generation------------------------*/
@@ -73,7 +74,8 @@ function midiToFreq(midiNum) {
 /*-----------------------------------------------------------*/
 /*-----------Setting up sound source & nodes-----------------*/
 /*-----------------------------------------------------------*/
-function playSound(midiNum) {
+
+function playSound(midiNum, time) {
 	// Create Oscillator and gainNode
 	var oscillator = context.createOscillator();
 	var gainNode = context.createGain();
@@ -83,7 +85,7 @@ function playSound(midiNum) {
 	gainNode.connect(context.destination);
 	
 	var mySound = piano(midiNum);
-	mySound.start(0);
+	mySound.start(time);
 	
 	// Creates an ADSR envelope over the oscillator and 
 	// returns the new oscillator with the ADSR applied to its
@@ -110,14 +112,36 @@ function playSound(midiNum) {
 		return source;
 	}
 }
+/*added notes to play all pressed notes in sequence*/
+function add(noteNum){
+	arr.push(noteNum);
+}
 
+
+function playAllSound(){//now it's playing all the notes at the same time >_<
+    for (i = 0; i < arr.length; i++){
+	    playSound(arr[i], context.currentTime + i * 1.50);
+		
+	}
+}
+function clearAllSound(){
+    arr = [];
+}
 /*------------------------------------------------*/
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
 $(document).ready(function() {
-	
 	$(".col-md-1").on("click", function() {
-		playSound(parseInt($(this).attr('data-note')));
+		playSound(parseInt($(this).attr('data-note')), context.currentTime);
+		add(parseInt($(this).attr('data-note'))); 
+	});
+	
+	$("#all").on("click", function() {
+		playAllSound();
+	});
+	
+	$("#clear").on("click", function() {
+		clearAllSound();
 	});
 	
 	/* Draggable */
