@@ -75,7 +75,7 @@ function midiToFreq(midiNum) {
 /*-----------Setting up sound source & nodes-----------------*/
 /*-----------------------------------------------------------*/
 
-function playSound(midiNum, time) {
+function playSound(midiNum) {
 	// Create Oscillator and gainNode
 	var oscillator = context.createOscillator();
 	var gainNode = context.createGain();
@@ -85,7 +85,7 @@ function playSound(midiNum, time) {
 	gainNode.connect(context.destination);
 	
 	var mySound = piano(midiNum);
-	mySound.start(time);
+	mySound.start(0);
 	
 	// Creates an ADSR envelope over the oscillator and 
 	// returns the new oscillator with the ADSR applied to its
@@ -120,7 +120,7 @@ function add(noteNum){
 
 function playAllSound(){//now it's playing all the notes at the same time >_<
     for (i = 0; i < arr.length; i++){
-	    playSound(arr[i], context.currentTime + i * 1.50);
+	    playSound(arr[i]);
 		
 	}
 }
