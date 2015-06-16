@@ -11,11 +11,11 @@ body {
 
 #timeline {
 	position: relative;
-	overflow: scroll;
+	overflow-x: scroll;
 	overflow-y:hidden;
 	white-space:nowrap;
     left:2px; top:0px; right:0; bottom:0;
-    height: 150px;
+    height: 7em;
     width: auto;
     background-color: #ffffff;
     border-top: solid 3px black;

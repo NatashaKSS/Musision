@@ -147,13 +147,14 @@ $(document).ready(function() {
 	/* Draggable */
 	 $(function() {
 		 $( "#timeline" ).sortable({
-			 revert: true
+			 scroll: 'true',
+			 revert: false
 		 });
 		 
 		 $( ".col-md-1" ).draggable({
 			 connectToSortable: "#timeline",
 			 helper: "clone",
-			 revert: "invalid"
+			 revert: false
 		 });
 		 
 		 $("div").disableSelection();
