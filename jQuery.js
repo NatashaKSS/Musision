@@ -1,9 +1,76 @@
+//-----------------------------------------------------------//
+//-------------------Sound Generation------------------------//
+//-----------------------------------------------------------//
+var notes = ["C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
+             "C1","C#1","D1","D#1","E1","F1","F#1","G1","G#1","A1","A#1","B1",
+             "C2","C#2","D2","D#2","E2","F2","F#2","G2","G#2","A2","A#2","B2",
+             "C3","C#3","D3","D#3","E3","F3","F#3","G3","G#3","A3","A#3","B3",
+             "C4","C#4","D4","D#4","E4","F4","F#4","G4","G#4","A4","A#4","B4",
+             "C5","C#5","D5","D#5","E5","F5","F#5","G5","G#5","A5","A#5","B5",
+             "C6","C#6","D6","D#6","E6","F6","F#6","G6","G#6","A6","A#6","B6",
+             "C7","C#7","D7","D#7","E7","F7","F#7","G7","G#7","A7","A#7","B7",
+             "C8","C#8","D8","D#8","E8","F8","F#8","G8","G#8","A8","A#8","B8",
+             "C9","C#9","D9","D#9","E9","F9","F#9","G9","G#9","A9","A#9","B9",
+             "C10","C#10","D10","D#10","E10","F10","F#10","G10"];
+// 128 notes, of which, the index of a single note in the array corresponds to
+// its own MIDI number
+
+var piano = new Wad({
+    source : 'sine', 
+    env : {
+    	volume: 1.0,
+        attack : .01, 
+        decay : .005, 
+        sustain : .2, 
+        hold : .015, 
+        release : .3
+    }
+});
+
+/*------------------------------------------------*/
+/*--------Document interaction with JQuery--------*/
+/*------------------------------------------------*/
+$(document).ready(function() {
+	$(".col-md-1").on("click", function() {
+		piano.play({ 
+			pitch : notes[parseInt($(this).attr('data-note'))] 
+		});
+	});
+	
+	/* Draggable */
+	 $(function() {
+		 $( "#timeline" ).sortable({
+			 scroll: 'true',
+			 revert: false
+		 });
+		 
+		 $( ".col-md-1" ).draggable({
+			 connectToSortable: "#timeline",
+			 helper: "clone",
+			 opacity: 0.7,
+			 revert: false,
+			 stop: function() {
+				 // When we have dropped the note, what do we do? 
+				 // Add to a note array possibly...
+				 // To be continued....
+			 }
+		 });
+		 
+		 $("div").disableSelection();
+	 });
+	 
+});
+
+
+
+
+
+
+
+/* Unused code Section 1.1: Web Audio ADSR implementation.
 var context = new AudioContext();
 var arr = [];
 
-/*-----------------------------------------------------------*/
-/*-------------------Sound Generation------------------------*/
-/*-----------------------------------------------------------*/
 // ADSR Envelope Generator
 var Envelope = (function applyEnvelope() {
 	
@@ -32,7 +99,7 @@ var Envelope = (function applyEnvelope() {
 	Envelope.prototype.connect = function (param) {
 		this.param = param;
 	}
-	
+
 	Envelope.prototype.setDuration = function (dur) {
 		this.duration = dur;
 	}
@@ -58,6 +125,11 @@ var Envelope = (function applyEnvelope() {
 	
 })(context);
 
+//-----------------------------------------------------------//
+//-------------------Sound Generation------------------------//
+//-----------------------------------------------------------//
+
+
 //Sets the sinewave frequency of a certain source 
 //and returns the new source
 function sineWave(source, freq) {
@@ -71,9 +143,12 @@ function midiToFreq(midiNum) {
 	return 440 * Math.pow(2,((midiNum - 69) / 12));
 }
 
-/*-----------------------------------------------------------*/
-/*-----------Setting up sound source & nodes-----------------*/
-/*-----------------------------------------------------------*/
+//-----------------------------------------------------------
+//-----------Setting up sound source & nodes-----------------
+//-----------------------------------------------------------
+function playSound(midiNum) {
+	playSound(midiNum, 0);
+}
 
 function playSound(midiNum) {
 	// Create Oscillator and gainNode
@@ -97,43 +172,44 @@ function playSound(midiNum) {
 		// Set ADSR values here! Note: Decay not implemented yet.
 		envelope.setAttackTime(0.02);
 		envelope.setReleaseTime(0.3);
-		envelope.setSustainValue(1);
+		envelope.setSustainValue(1); // There is no sustain for a piano key
 		envelope.setSustainTime(0);
 		
-		envelope.connect(gainNode.gain);
+		envelope.connect(gainNode.gain); // Envelope is applied on gainNode
 		
 		envelope.trigger(0, 1.5);
 
+		// Set duration of ADSR envelope
 		var duration = envelope.attackTime + envelope.releaseTime + envelope.sustainTime;
 		envelope.setDuration(duration);
-		console.log(duration);
 		console.log(midiToFreq(midiNum));
 		
 		return source;
 	}
 }
-/*added notes to play all pressed notes in sequence*/
+
+//added notes to play all pressed notes in sequence
 function add(noteNum){
 	arr.push(noteNum);
 }
 
 
-function playAllSound(){//now it's playing all the notes at the same time >_<
+function playAllSound(){
     for (i = 0; i < arr.length; i++){
 	    playSound(arr[i]);
-		
-	}
+    }
 }
+    
 function clearAllSound(){
     arr = [];
 }
-/*------------------------------------------------*/
-/*--------Document interaction with JQuery--------*/
-/*------------------------------------------------*/
+
+//------------------------------------------------/
+//--------Document interaction with JQuery--------/
+//------------------------------------------------/
 $(document).ready(function() {
 	$(".col-md-1").on("click", function() {
-		playSound(parseInt($(this).attr('data-note')), context.currentTime);
-		add(parseInt($(this).attr('data-note'))); 
+		playSound(parseInt($(this).attr('data-note')));
 	});
 	
 	$("#all").on("click", function() {
@@ -143,34 +219,13 @@ $(document).ready(function() {
 	$("#clear").on("click", function() {
 		clearAllSound();
 	});
-	
-	/* Draggable */
-	 $(function() {
-		 $( "#timeline" ).sortable({
-			 scroll: 'true',
-			 revert: false
-		 });
-		 
-		 $( ".col-md-1" ).draggable({
-			 connectToSortable: "#timeline",
-			 helper: "clone",
-			 revert: false
-		 });
-		 
-		 $("div").disableSelection();
-	 });
 });
 
 
+-End of Section 1.1-
 
-
-
-
-
-
-
-/* Unused code Section 1.1: riffwave.js implementation.
- * 
+-----------------------------------------------------------------------------------
+ * Unused code Section 1.2: riffwave.js implementation.
  * 
 //Gets the midi number which is stated as an attribute of the "col-md-1" 
 // note buttons in index.html and plays the respective note on click.
@@ -216,14 +271,12 @@ function playSound(midiNumber) {
 	// Play sound immediately after filling audio object
 	audio.play();
 }
-*/
 
-/* Lab of experiments...
- * var count = 0;
+ Lab of experiments...
+ var count = 0;
 	
 	$(document).on('click', 'body', function() {
 		count++;
 		$("#timeline").append("<td class='noteDefault'> Note " + count + "</td>");
 	});
- *
- */
+*/
