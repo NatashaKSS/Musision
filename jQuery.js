@@ -15,6 +15,32 @@ var notes = ["C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
 // 128 notes, of which, the index of a single note in the array corresponds to
 // its own MIDI number
 
+			 
+var arr = [];//array to store notes to play back
+
+
+//play notes consecutively at hard-coded intervals
+function playSequence(){
+    var count = 0;
+	while(count < arr.length){
+	    piano.play({ 
+	    	wait : count * 0.5,
+			pitch : arr[count] 
+		});
+		count = count + 1;
+    }
+}
+//empty the note array    
+function clearAllSound(){
+    arr = [];
+}
+//this one plays all notes together, for example a chord
+function playSimul(){
+    for(i = 0; i < arr.length; i++){
+	    piano.play({pitch: arr[i]});
+	}
+}
+
 var piano = new Wad({
     source : 'sine', 
     env : {
@@ -33,27 +59,56 @@ var piano = new Wad({
 $(document).ready(function() {
 	$(".col-md-1").on("click", function() {
 		piano.play({ 
-			pitch : notes[parseInt($(this).attr('data-note'))] 
+			pitch : notes[parseInt($(this).attr('data-note')) - 12] 
 		});
 	});
 	
+	$("#all").on("click", function() {
+		playSequence();
+	});
+	
+	$("#same").on("click", function() {
+		playSimul();
+	});
+	
+	$("#clear").on("click", function() {
+		clearAllSound();
+	});
+	
 	/* Draggable */
+	var inBox = false;
+	
 	 $(function() {
 		 $( "#timeline" ).sortable({
 			 scroll: 'true',
-			 revert: false
+			 revert: false,
+			 // Functions for deleting note from timeline
+			 // Just drag out of timeline area
+			 // Needs more work for manipulating the array itself
+			 over: function() { // If item is over timeline
+				 inBox = true;
+			 },
+			 
+			 out: function() { // If item is outside timeline
+				 inBox = false;
+			 },
+		
+			 beforeStop: function(event, ui) { // Before releasing dragging
+				 if (!inBox) {
+					 ui.item.remove();
+				 }
+			 }
 		 });
 		 
 		 $( ".col-md-1" ).draggable({
+			 cursor: "move",
 			 connectToSortable: "#timeline",
 			 helper: "clone",
 			 opacity: 0.7,
 			 revert: false,
 			 stop: function() {
-				 // When we have dropped the note, what do we do? 
-				 // Add to a note array possibly...
-				 // To be continued....
-			 }
+				 arr.push(notes[parseInt($(this).attr('data-note')) - 12]);
+		    }
 		 });
 		 
 		 $("div").disableSelection();
