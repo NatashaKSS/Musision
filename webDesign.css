@@ -3,43 +3,68 @@ body {
 	margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px
 }
 
-/* Contains user workspace, timeline and everything else below top navbar */
-.content {
-    position: absolute;
-    left:2px; top:80px; right:0; bottom:0;
-}
+/* Contains user workspace, timeline and everything else 
+   below top navbar */
 
 #timeline {
 	position: relative;
-	overflow-x: scroll;
-	overflow-y:hidden;
-	white-space:nowrap;
-    left:2px; top:0px; right:0; bottom:0;
-    height: 7em;
-    width: auto;
-    background-color: #ffffff;
+	overflow: auto;
+	white-space: nowrap;
+    left: 0px; top:0px; right:0; bottom:0;
+    background-color: none;
     border-top: solid 3px black;
+    border-bottom: solid 2px black;
 }
 
-/* My test note added to timeline. The boxes in grey */
-.noteDefault {
-	position: relative;
-	display: inline-block;
-	height: 150px;
+#timeline div {
+	height: 50px;
 	width: 100px;
-	background-color: grey;
-	border-left: dotted 1px black;
-	border-right: dotted 1px black;
+}
+
+#grid-system {
+	top: 74px;
+	left: 150px;
+	position: absolute;
+}
+
+/* Ensures the grid system and the timeline have equal
+	dimensions */
+.same-height-width {
+	position: absolute;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	/* Note to self: 
+		One note on timeline = 58px height (inclusive of margin-top and margin-bottom), 
+							   100px width */
+	height: 183px; /* Computation: (58px * 3) + (4px padding) + 
+					  (3px top border + 2px bottom border)*/
+	width: 1140px; /* Default width */
+}
+
+.grid-col {
+	position: relative;
+	float: left;
+}
+
+
+.grid-square { /* Represents every grid square*/
+	height: 50px; /* Default value that jQuery.js edits*/
+	width: 20px; /* Default value that jQuery.js edits*/
+	
+	position: relative;
+	border: dotted 1px #c0c0c0;
+	float: left;
 }
 
 .col-md-1 {
+	top: 0px;
 	padding-top:0.3em;
 	padding-bottom:0.1em;
-    margin-top:0.2em;
-    margin-bottom:0.2em;
+    margin-top:2px;
+    margin-bottom:2px;
     margin-left:auto;
     margin-right:auto;
-    position:relative;
+    position: relative;
     
     text-decoration:none;
     text-transform:uppercase;
@@ -58,21 +83,15 @@ body {
 }
 
 .col-md-1:active {
-    top:3px;
     box-shadow: inset 0px 1px 0px #2ab7ec, 
     			0px 2px 0px 0px #07526e, 
     			0px 5px 3px #999;
 }
 
 .col-md-1:hover {
+	top: 3px;
     background: #004080;
 }
-
-
-
-
-
-
 
 
 

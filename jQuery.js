@@ -77,43 +77,76 @@ $(document).ready(function() {
 	
 	/* Draggable */
 	var inBox = false;
+	// grid width and height dimensions are in pixels.
+	var noOfIntervals = 11; // Since you can fit 11 notes on the timeline
+	var gridWidth = 1140/11;
+	var gridHeight = 58;
+	// A gridHeight is 58px because one note is 58px 
+
+	for (i = 0; i < noOfIntervals; i++) {
+		$("#grid-reference").append("<div class='grid-col'></div>");
+		$(".grid-col").css("width", function() {
+			return gridWidth;
+		});
+	}
 	
-	 $(function() {
-		 $( "#timeline" ).sortable({
-			 scroll: 'true',
-			 revert: false,
-			 grid: [20, 10],
+	for(j = 0; j < 3; j++) { 
+		// j here is 3 since you can have up to 3 fully-filled rows of notes
+		
+		$(".grid-col").append("<div class='grid-square'>1</div>")
+		$(".grid-square").css({
+			"height": gridHeight + "",
+			"width": gridWidth + ""
+		});
+	}
+	
+	$(function() {
+		$( "#timeline" ).sortable({
+			scroll: true,
+			revert: false,
+			snap: false,
+			grid: [gridWidth, gridHeight],
 			 // Functions for deleting note from timeline
 			 // Just drag out of timeline area
 			 // Needs more work for manipulating the array itself
-			 over: function(event, ui) { // If item is over timeline
-				 inBox = true;
-			 },
+			over: function(event, ui) { // If item is over timeline
+				inBox = true;
+			},
 			 
-			 out: function(event, ui) { // If item is outside timeline
-				 inBox = false;
-			 },
+			out: function(event, ui) { // If item is outside timeline
+				inBox = false;
+			},
 		
-			 beforeStop: function(event, ui) { // Before releasing dragging
-				 if (!inBox) {
-					 ui.item.remove();
-				 }
-			 },
+			beforeStop: function(event, ui) { // Before releasing dragging
+				if (!inBox) {
+					ui.item.remove();
+				}
+			},
 			 
-			 receive: function(event, ui) { // Only when timeline receives the note
-				 arr.push(notes[parseInt(ui.item.attr('data-note')) - 12]); 
-			 }
-		 });
+			receive: function(event, ui) { // Only when timeline receives the note
+				arr.push(notes[parseInt(ui.item.attr('data-note')) - 12]);
+				$("#timeline div").css({
+					"height": gridHeight,
+					"width:": gridWidth,
+					"margin-top": "0px",
+					"margin-bottom": "0px",
+				    "margin-left": "0px",
+				    "margin-right": "0px",
+					"box-shadow": "none"
+				});
+			}
+		});
 		 
-		 $( ".col-md-1" ).draggable({
-			 cursor: "move",
-			 connectToSortable: "#timeline",
-			 helper: "clone",
-			 opacity: 0.7,
-			 revert: false,
-		 });
+		$( ".col-md-1" ).draggable({
+			cursor: "move",
+			connectToSortable: "#timeline",
+			helper: "clone",
+			opacity: 0.7,
+			revert: false
+		});
 		 
-		 $("div").disableSelection();
+		$("div").disableSelection();
+		
 	 });
 	 
 });
