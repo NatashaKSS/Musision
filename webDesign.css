@@ -14,46 +14,27 @@ body {
     background-color: none;
     border-top: solid 3px black;
     border-bottom: solid 2px black;
-}
-
-#timeline div {
-	height: 50px;
-	width: 100px;
+    height: 174px;
+    width: auto;
 }
 
 #grid-system {
-	top: 74px;
-	left: 150px;
 	position: absolute;
 }
 
-/* Ensures the grid system and the timeline have equal
-	dimensions */
-.same-height-width {
-	position: absolute;
-	padding-top: 2px;
-	padding-bottom: 2px;
-	/* Note to self: 
-		One note on timeline = 58px height (inclusive of margin-top and margin-bottom), 
-							   100px width */
-	height: 183px; /* Computation: (58px * 3) + (4px padding) + 
-					  (3px top border + 2px bottom border)*/
-	width: 1140px; /* Default width */
-}
-
-.grid-col {
+/* Note: grid-col-holder is only a reference for the 
+		 width of a note/size of division/column width 
+*/
+.grid-col-holder {
 	position: relative;
 	float: left;
+	width: 100px; /* Default width just in case */
 }
 
-
-.grid-square { /* Represents every grid square*/
-	height: 50px; /* Default value that jQuery.js edits*/
-	width: 20px; /* Default value that jQuery.js edits*/
-	
+.grid-square {
 	position: relative;
-	border: dotted 1px #c0c0c0;
-	float: left;
+	height: 56.3333333336px; /* Default height just in case */
+	border: solid 1px #e4e4e4;
 }
 
 .col-md-1 {
@@ -65,6 +46,7 @@ body {
     margin-left:auto;
     margin-right:auto;
     position: relative;
+    float: left;
     
     text-decoration:none;
     text-transform:uppercase;
@@ -80,6 +62,16 @@ body {
     box-shadow: inset 0px 1px 0px #2ab7ec, 
     			0px 5px 0px 0px #07526e, 
     			0px 10px 5px #999;
+    			
+    /* Chunk of code here prevents awkward 
+       highlighting when dragging*/
+    -webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;			
 }
 
 .col-md-1:active {

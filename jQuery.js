@@ -53,6 +53,24 @@ var piano = new Wad({
     }
 });
 
+//Takes in num of divs to generate and cssClass to associate
+// with each div and outputs a string of representing those divs
+function generateDivs(numOfDivs, cssClass, text) {
+	var divString = "";
+	
+	if (cssClass == "") {
+		for (n = 0; n < numOfDivs; n++) {
+			divString += "<div>" + text + "</div>";
+		}
+	} else {
+		for (n = 0; n < numOfDivs; n++) {
+			divString += "<div " + "class=" + cssClass + ">" + text + "</div>";
+		}
+	}
+	
+	return divString;
+}
+
 /*------------------------------------------------*/
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
@@ -75,37 +93,103 @@ $(document).ready(function() {
 		clearAllSound();
 	});
 	
-	/* Draggable */
-	var inBox = false;
-	// grid width and height dimensions are in pixels.
-	var noOfIntervals = 11; // Since you can fit 11 notes on the timeline
-	var gridWidth = 1140/11;
-	var gridHeight = 58;
-	// A gridHeight is 58px because one note is 58px 
+	/* Generate dynamic grid */
+	var scrollbarWidth = 20; 
+	// scrollbarWidth to debug instance where notes would fly to
+	// the bottom because scrollbar (usually 17px on all browsers) 
+	// takes up its space
+	
+	var timelineTop = $("#timeline").position().top;
+	
+	var timelineLeft = $("#timeline").position().left;
+	
+	var timelineHeight = $("#timeline").height() + 
+						 parseInt($("#timeline").css("border-top-width")) + 
+						 parseInt($("#timeline").css("border-bottom-width"));
+	// Includes timeline borders (actual timeline height)
+	
+	var timelineWidth = $("#timeline").width() - scrollbarWidth;
+	
+	//Each division possibly representing 1 tick/beat?? Unsure of dimensions yet!
+	var noOfDivisions = 8; // 8 is just a default number
 
-	for (i = 0; i < noOfIntervals; i++) {
-		$("#grid-reference").append("<div class='grid-col'></div>");
-		$(".grid-col").css("width", function() {
-			return gridWidth;
-		});
-	}
+	var noteWidth = timelineWidth/noOfDivisions;
 	
-	for(j = 0; j < 3; j++) { 
-		// j here is 3 since you can have up to 3 fully-filled rows of notes
+	var noteHeight = $("#timeline").height() / 3;
+	
+	// Generate initial grid
+	generateGrid(3, noOfDivisions);
+	
+	// Ensures timeline dimensions are always updated after resizing webpage
+	$(window).on("resize", function () {
+		$("#grid-system").empty();
 		
-		$(".grid-col").append("<div class='grid-square'>1</div>")
+		timelineTop = $("#timeline").position().top;
+		//console.log("timeline top: " + timelineTop);
+		
+		timelineLeft = $("#timeline").position().left;
+		//console.log("timeline left: " + timelineLeft);
+		
+		timelineHeight = $("#timeline").height() + 
+						 parseInt($("#timeline").css("border-top-width")) + 
+						 parseInt($("#timeline").css("border-bottom-width"));
+		//console.log("timeline height: " + timelineHeight);
+		
+		timelineWidth = $("#timeline").width() - scrollbarWidth;
+		//console.log("timeline width: " + timelineWidth);
+		
+		noteWidth = (timelineWidth/noOfDivisions);
+		//console.log("note width: " + noteWidth);
+		
+		noteHeight = $("#timeline").height() / 3;
+		//console.log("note height: " + noteHeight);
+		
+		generateGrid(3, noOfDivisions);
+		
+		$("#timeline div").css({
+			"height": noteHeight,
+			"width": noteWidth,
+		});
+		
+		//console.log("--End resize--");
+	});
+	
+	// Generates a grid for timeline
+	function generateGrid(numRows, numCols) {
+		// Generate columns
+		$("#grid-system").append(generateDivs(numCols, "grid-col-holder", ""));
+		
+		// Specify width of each column
+		$(".grid-col-holder").css({
+			"width": noteWidth
+		});
+		
+		// Generate rows per column (Note: columns have class "grid-col-holder")
+		$(".grid-col-holder").append(generateDivs(numRows, "grid-square", ""));
+		
+		// Specify entire grid's position and height. Note that width is already
+		// computed per division in grid-col-holder.
+		$("#grid-system").css({
+			"top" : timelineTop + 3 + "px", 
+			// top: Plus 3 because must exclude top border of timeline
+			"height": timelineHeight - 3  
+			// height: Minus 3 because must exclude width of top border of 
+			// timeline = 3px, since we shifted it down by 3px in "top" 
+		});
+		
 		$(".grid-square").css({
-			"height": gridHeight + "",
-			"width": gridWidth + ""
+			"height": noteHeight // height of each grid square
 		});
 	}
 	
+	/* Draggable events */
 	$(function() {
-		$( "#timeline" ).sortable({
+		var inBox = false;
+		
+		$("#timeline").sortable({
 			scroll: true,
 			revert: false,
 			snap: false,
-			grid: [gridWidth, gridHeight],
 			 // Functions for deleting note from timeline
 			 // Just drag out of timeline area
 			 // Needs more work for manipulating the array itself
@@ -126,18 +210,16 @@ $(document).ready(function() {
 			receive: function(event, ui) { // Only when timeline receives the note
 				arr.push(notes[parseInt(ui.item.attr('data-note')) - 12]);
 				$("#timeline div").css({
-					"height": gridHeight,
-					"width:": gridWidth,
+					"height": noteHeight,
+					"width": noteWidth,
+					"box-shadow": "none",
 					"margin-top": "0px",
-					"margin-bottom": "0px",
-				    "margin-left": "0px",
-				    "margin-right": "0px",
-					"box-shadow": "none"
+					"margin-bottom": "0px"
 				});
 			}
 		});
-		 
-		$( ".col-md-1" ).draggable({
+			 
+		$(".col-md-1").draggable({
 			cursor: "move",
 			connectToSortable: "#timeline",
 			helper: "clone",
@@ -147,8 +229,8 @@ $(document).ready(function() {
 		 
 		$("div").disableSelection();
 		
-	 });
-	 
+	});
+
 });
 
 
