@@ -82,14 +82,15 @@ $(document).ready(function() {
 		 $( "#timeline" ).sortable({
 			 scroll: 'true',
 			 revert: false,
+			 grid: [20, 10],
 			 // Functions for deleting note from timeline
 			 // Just drag out of timeline area
 			 // Needs more work for manipulating the array itself
-			 over: function() { // If item is over timeline
+			 over: function(event, ui) { // If item is over timeline
 				 inBox = true;
 			 },
 			 
-			 out: function() { // If item is outside timeline
+			 out: function(event, ui) { // If item is outside timeline
 				 inBox = false;
 			 },
 		
@@ -97,6 +98,10 @@ $(document).ready(function() {
 				 if (!inBox) {
 					 ui.item.remove();
 				 }
+			 },
+			 
+			 receive: function(event, ui) { // Only when timeline receives the note
+				 arr.push(notes[parseInt(ui.item.attr('data-note')) - 12]); 
 			 }
 		 });
 		 
@@ -106,9 +111,6 @@ $(document).ready(function() {
 			 helper: "clone",
 			 opacity: 0.7,
 			 revert: false,
-			 stop: function() {
-				 arr.push(notes[parseInt($(this).attr('data-note')) - 12]);
-		    }
 		 });
 		 
 		 $("div").disableSelection();
