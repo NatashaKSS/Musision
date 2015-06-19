@@ -23,10 +23,16 @@ var arr = [];//array to store notes to play back
 function playSequence(){
     var count = 0;
 	while(count < arr.length){
-	    piano.play({ 
-	    	wait : count * 0.5,
-			pitch : arr[count] 
-		});
+	    if(arr[count] != "silence"){
+		    piano.play({ 
+	    	    wait : count * 0.5,
+			    pitch : arr[count] 
+		    });
+		} else {
+		    quarterRest.play({
+			    wait : count * 0.5
+			});
+		}
 		count = count + 1;
     }
 }
@@ -37,7 +43,18 @@ function clearAllSound(){
 //this one plays all notes together, for example a chord
 function playSimul(){
     for(i = 0; i < arr.length; i++){
-	    piano.play({pitch: arr[i]});
+	    if(arr[i] != "silence"){
+		    piano.play({pitch: arr[i]});
+		}
+	}
+}
+
+//remove a note from the array
+function removeNote(noteName){
+    for (i = 0; i < arr.length; i++){
+	    if(arr[i] == noteName){
+		    arr.splice(i, 1);
+		}
 	}
 }
 
@@ -52,7 +69,18 @@ var piano = new Wad({
         release : .3
     }
 });
-
+//rest here. Quarter rest is just a name to say that it's one of the rests available
+var quarterRest = new Wad({
+    source : 'sine', 
+    env : {
+    	volume: 0.0,
+        attack : .00, 
+        decay : .000, 
+        sustain : 0.0, 
+        hold : .00, 
+        release : 0.0
+    }
+});
 //Takes in num of divs to generate and cssClass to associate
 // with each div and outputs a string of representing those divs
 function generateDivs(numOfDivs, cssClass, text) {
@@ -76,9 +104,12 @@ function generateDivs(numOfDivs, cssClass, text) {
 /*------------------------------------------------*/
 $(document).ready(function() {
 	$(".col-md-1").on("click", function() {
-		piano.play({ 
-			pitch : notes[parseInt($(this).attr('data-note')) - 12] 
-		});
+		
+		if(parseInt($(this).attr('data-note')) != 0){
+		    piano.play({ 
+			    pitch : notes[parseInt($(this).attr('data-note')) - 12] 
+		    });
+		}
 	});
 	
 	$("#all").on("click", function() {
@@ -204,11 +235,21 @@ $(document).ready(function() {
 			beforeStop: function(event, ui) { // Before releasing dragging
 				if (!inBox) {
 					ui.item.remove();
+					//change notes in array. Bug: still needs the "queue number"
+					if(parseInt(ui.item.attr('data-note')) > 12){//this now still has a bug: it removes everything that has the same name as the note dragged out
+					    removeNote(notes[parseInt(ui.item.attr('data-note')) - 12]);
+					} else {
+					    removeNote("silence");//the rest inserted here
+					}
 				}
 			},
 			 
 			receive: function(event, ui) { // Only when timeline receives the note
-				arr.push(notes[parseInt(ui.item.attr('data-note')) - 12]);
+				if(parseInt(ui.item.attr('data-note')) != 0){
+				    arr.push(notes[parseInt(ui.item.attr('data-note')) - 12]);
+				} else {
+				    arr.push("silence");
+				}
 				$("#timeline div").css({
 					"height": noteHeight,
 					"width": noteWidth,
