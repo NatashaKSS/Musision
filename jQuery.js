@@ -14,10 +14,8 @@ var notes = ["C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
              "C10","C#10","D10","D#10","E10","F10","F#10","G10"];
 // 128 notes, of which, the index of a single note in the array corresponds to
 // its own MIDI number
-
-			 
+	 
 var arr = [];//array to store notes to play back
-
 
 //play notes consecutively at hard-coded intervals
 function playSequence(){
@@ -36,10 +34,12 @@ function playSequence(){
 		count = count + 1;
     }
 }
+
 //empty the note array    
 function clearAllSound(){
     arr = [];
 }
+
 //this one plays all notes together, for example a chord
 function playSimul(){
     for(i = 0; i < arr.length; i++){
@@ -49,11 +49,13 @@ function playSimul(){
 	}
 }
 
-//remove a note from the array
+// Remove a note from the array 
+// (User drags note out of timeline)
 function removeNote(noteName){
     for (i = 0; i < arr.length; i++){
 	    if(arr[i] == noteName){
 		    arr.splice(i, 1);
+		    break;
 		}
 	}
 }
@@ -81,6 +83,8 @@ var quarterRest = new Wad({
         release : 0.0
     }
 });
+
+/* Utility Functions */
 //Takes in num of divs to generate and cssClass to associate
 // with each div and outputs a string of representing those divs
 function generateDivs(numOfDivs, cssClass, text) {
