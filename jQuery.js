@@ -55,7 +55,6 @@ function removeNote(noteName){
     for (i = 0; i < arr.length; i++){
 	    if(arr[i] == noteName){
 		    arr.splice(i, 1);
-		    break;
 		}
 	}
 }
