@@ -127,6 +127,9 @@ $(document).ready(function() {
 		clearAllSound();
 	});
 	
+	// numOfNotes on the timeline, initialized first
+	var numOfNotes = 0;
+	
 	/* Generate dynamic grid */
 	var scrollbarWidth = 20; 
 	// scrollbarWidth to debug instance where notes would fly to
@@ -152,7 +155,7 @@ $(document).ready(function() {
 	var noteHeight = $("#timeline").height() / 3;
 	
 	// Generate initial grid
-	generateGrid(3, noOfDivisions);
+	generateGrid(Math.round(numOfNotes / noOfDivisions) + 3, noOfDivisions);
 	
 	// Ensures timeline dimensions are always updated after resizing webpage
 	$(window).on("resize", function () {
@@ -178,7 +181,7 @@ $(document).ready(function() {
 		noteHeight = $("#timeline").height() / 3;
 		//console.log("note height: " + noteHeight);
 		
-		generateGrid(3, noOfDivisions);
+		generateGrid(Math.round(numOfNotes / noOfDivisions) + 3, noOfDivisions);
 		
 		$("#timeline div").css({
 			"height": noteHeight,
@@ -231,7 +234,7 @@ $(document).ready(function() {
 				inBox = true;
 			},
 			 
-			out: function(event, ui) { // If item is outside timeline
+			out: function(event, ui) { // If item is dragged outside timeline
 				inBox = false;
 			},
 		
@@ -241,18 +244,23 @@ $(document).ready(function() {
 					//change notes in array. Bug: still needs the "queue number"
 					if(parseInt(ui.item.attr('data-note')) > 12){//this now still has a bug: it removes everything that has the same name as the note dragged out
 					    removeNote(notes[parseInt(ui.item.attr('data-note')) - 12]);
+					    numOfNotes--;
 					} else {
 					    removeNote("silence");//the rest inserted here
 					}
 				}
 			},
 			 
-			receive: function(event, ui) { // Only when timeline receives the note
+			// When timeline receives the user-dragged note
+			receive: function(event, ui) { 
 				if(parseInt(ui.item.attr('data-note')) != 0){
 				    arr.push(notes[parseInt(ui.item.attr('data-note')) - 12]);
+				    numOfNotes++;
 				} else {
 				    arr.push("silence");
 				}
+				
+				// Change the look of a note on the timeline
 				$("#timeline div").css({
 					"height": noteHeight,
 					"width": noteWidth,
