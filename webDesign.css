@@ -8,9 +8,9 @@ body {
 
 #timeline {
 	position: relative;
-	overflow: auto;
 	white-space: nowrap;
     left: 0px; top:0px; right:0; bottom:0;
+    z-index: 0;
     background-color: none;
     border-top: solid 3px black;
     border-bottom: solid 2px black;
@@ -18,8 +18,23 @@ body {
     width: auto;
 }
 
+#notes-system {
+	position: absolute;
+	overflow: auto;
+	white-space: nowrap;
+    left: 0px; top:0px; right:0; bottom:0;
+    z-index: 1;
+    background-color: none;
+    height: 170px;
+    width: auto;
+}
+
 #grid-system {
 	position: absolute;
+	left: 0px; top:0px; right:0; bottom:0px;
+	z-index: -1;
+	height: 171px;
+	width: auto;
 }
 
 /* Note: grid-col-holder is only a reference for the 

@@ -107,7 +107,6 @@ function generateDivs(numOfDivs, cssClass, text) {
 /*------------------------------------------------*/
 $(document).ready(function() {
 	$(".col-md-1").on("click", function() {
-		
 		if(parseInt($(this).attr('data-note')) != 0){
 		    piano.play({ 
 			    pitch : notes[parseInt($(this).attr('data-note')) - 12] 
@@ -127,14 +126,17 @@ $(document).ready(function() {
 		clearAllSound();
 	});
 	
+	/*------------------------------------------------*/
+	/*------------- Generate dynamic grid-------------*/
+	/*------------------------------------------------*/
+	
 	// numOfNotes on the timeline, initialized first
 	var numOfNotes = 0;
 	
-	/* Generate dynamic grid */
 	var scrollbarWidth = 20; 
 	// scrollbarWidth to debug instance where notes would fly to
 	// the bottom because scrollbar (usually 17px on all browsers) 
-	// takes up its space
+	// takes up its space -- trust me LOL
 	
 	var timelineTop = $("#timeline").position().top;
 	
@@ -148,14 +150,15 @@ $(document).ready(function() {
 	var timelineWidth = $("#timeline").width() - scrollbarWidth;
 	
 	//Each division possibly representing 1 tick/beat?? Unsure of dimensions yet!
-	var noOfDivisions = 8; // 8 is just a default number
+	var numOfDivisions = 8; // 8 is just a default number
 
-	var noteWidth = timelineWidth/noOfDivisions;
+	var noteWidth = timelineWidth/numOfDivisions;
 	
 	var noteHeight = $("#timeline").height() / 3;
+	console.log("Initial: " + Math.round(numOfNotes / numOfDivisions) + 3);
 	
 	// Generate initial grid
-	generateGrid(Math.round(numOfNotes / noOfDivisions) + 3, noOfDivisions);
+	generateGrid(3, numOfDivisions);
 	
 	// Ensures timeline dimensions are always updated after resizing webpage
 	$(window).on("resize", function () {
@@ -175,15 +178,16 @@ $(document).ready(function() {
 		timelineWidth = $("#timeline").width() - scrollbarWidth;
 		//console.log("timeline width: " + timelineWidth);
 		
-		noteWidth = (timelineWidth/noOfDivisions);
+		noteWidth = (timelineWidth/numOfDivisions);
 		//console.log("note width: " + noteWidth);
 		
 		noteHeight = $("#timeline").height() / 3;
 		//console.log("note height: " + noteHeight);
 		
-		generateGrid(Math.round(numOfNotes / noOfDivisions) + 3, noOfDivisions);
+		generateGrid(Math.round(numOfNotes / numOfDivisions) + 3, numOfDivisions);
 		
-		$("#timeline div").css({
+		// Ensures the grid-system is not updated by this statement
+		$("#notes-system div").not(document.getElementById("grid-system")).css({
 			"height": noteHeight,
 			"width": noteWidth,
 		});
@@ -204,16 +208,7 @@ $(document).ready(function() {
 		// Generate rows per column (Note: columns have class "grid-col-holder")
 		$(".grid-col-holder").append(generateDivs(numRows, "grid-square", ""));
 		
-		// Specify entire grid's position and height. Note that width is already
-		// computed per division in grid-col-holder.
-		$("#grid-system").css({
-			"top" : timelineTop + 3 + "px", 
-			// top: Plus 3 because must exclude top border of timeline
-			"height": timelineHeight - 3  
-			// height: Minus 3 because must exclude width of top border of 
-			// timeline = 3px, since we shifted it down by 3px in "top" 
-		});
-		
+		// Specify height of each row
 		$(".grid-square").css({
 			"height": noteHeight // height of each grid square
 		});
@@ -223,7 +218,7 @@ $(document).ready(function() {
 	$(function() {
 		var inBox = false;
 		
-		$("#timeline").sortable({
+		$("#notes-system").sortable({
 			scroll: true,
 			revert: false,
 			snap: false,
@@ -256,12 +251,31 @@ $(document).ready(function() {
 				if(parseInt(ui.item.attr('data-note')) != 0){
 				    arr.push(notes[parseInt(ui.item.attr('data-note')) - 12]);
 				    numOfNotes++;
+				   
+				    // Procedurally generates more rows if the user has almost filled up timeline with
+				    // notes. 
+				    // ((numOfNotes == (3 * numOfDivisions - 1)) checks if the user has only 1 note left to
+				    // fully fill the timeline to generate 1 row.
+				    // ((numOfNotes > (3 * numOfDivisions)) && ((numOfNotes % numOfDivisions - 1) == 0))) checks
+				    // if the user, after filling up the first (3 * numOfDivisions) slots --> In this case it is the first 3 rows,
+				    // and everytime he almost fills up the next row, generate another row following that.
+				    if ((numOfNotes == (3 * numOfDivisions - 1)) ||
+				    	((numOfNotes > (3 * numOfDivisions)) && ((numOfNotes % numOfDivisions - 1) == 0))) {
+				    	// Append a row of grid-squares
+				    	$(".grid-col-holder").append(generateDivs(1, "grid-square", ""));
+				    	
+				    	// Ensure grid-squares are of correct height
+				    	$(".grid-square").css({
+							"height": noteHeight // height of each grid square
+						});
+				    }
+				   
 				} else {
 				    arr.push("silence");
 				}
 				
 				// Change the look of a note on the timeline
-				$("#timeline div").css({
+				$("#notes-system div").not(document.getElementById("grid-system")).css({
 					"height": noteHeight,
 					"width": noteWidth,
 					"box-shadow": "none",
@@ -269,17 +283,16 @@ $(document).ready(function() {
 					"margin-bottom": "0px"
 				});
 			}
-		});
+		}).disableSelection();
 			 
 		$(".col-md-1").draggable({
+			appendTo: "#notes-system",
 			cursor: "move",
-			connectToSortable: "#timeline",
+			connectToSortable: "#notes-system",
 			helper: "clone",
 			opacity: 0.7,
 			revert: false
 		});
-		 
-		$("div").disableSelection();
 		
 	});
 
