@@ -130,91 +130,41 @@ $(document).ready(function() {
 	/*------------- Generate dynamic grid-------------*/
 	/*------------------------------------------------*/
 	
-	// numOfNotes on the timeline, initialized first
 	var numOfNotes = 0;
+	// numOfNotes on the timeline, initialized first
 	
 	var scrollbarWidth = 20; 
 	// scrollbarWidth to debug instance where notes would fly to
 	// the bottom because scrollbar (usually 17px on all browsers) 
 	// takes up its space -- trust me LOL
 	
-	var timelineTop = $("#timeline").position().top;
-	
-	var timelineLeft = $("#timeline").position().left;
-	
+	var numOfDivisions = 8;
 	var timelineHeight = $("#timeline").height() + 
 						 parseInt($("#timeline").css("border-top-width")) + 
 						 parseInt($("#timeline").css("border-bottom-width"));
-	// Includes timeline borders (actual timeline height)
-	
 	var timelineWidth = $("#timeline").width() - scrollbarWidth;
-	
-	//Each division possibly representing 1 tick/beat?? Unsure of dimensions yet!
-	var numOfDivisions = 8; // 8 is just a default number
 
-	var noteWidth = timelineWidth/numOfDivisions;
-	
-	var noteHeight = $("#timeline").height() / 3;
-	console.log("Initial: " + Math.round(numOfNotes / numOfDivisions) + 3);
-	
+	var grid = new GridSystem(numOfNotes,
+							  scrollbarWidth,
+							  8,
+							  $("#timeline").position().top,
+							  $("#timeline").position().left,
+							  timelineHeight,
+							  timelineWidth,
+							  timelineWidth/numOfDivisions,
+							  $("#timeline").height() / 3);
+
 	// Generate initial grid
-	generateGrid(3, numOfDivisions);
+	grid.generateGrid(3, numOfDivisions);
 	
 	// Ensures timeline dimensions are always updated after resizing webpage
 	$(window).on("resize", function () {
-		$("#grid-system").empty();
-		
-		timelineTop = $("#timeline").position().top;
-		//console.log("timeline top: " + timelineTop);
-		
-		timelineLeft = $("#timeline").position().left;
-		//console.log("timeline left: " + timelineLeft);
-		
-		timelineHeight = $("#timeline").height() + 
-						 parseInt($("#timeline").css("border-top-width")) + 
-						 parseInt($("#timeline").css("border-bottom-width"));
-		//console.log("timeline height: " + timelineHeight);
-		
-		timelineWidth = $("#timeline").width() - scrollbarWidth;
-		//console.log("timeline width: " + timelineWidth);
-		
-		noteWidth = (timelineWidth/numOfDivisions);
-		//console.log("note width: " + noteWidth);
-		
-		noteHeight = $("#timeline").height() / 3;
-		//console.log("note height: " + noteHeight);
-		
-		generateGrid(Math.round(numOfNotes / numOfDivisions) + 3, numOfDivisions);
-		
-		// Ensures the grid-system is not updated by this statement
-		$("#notes-system div").not(document.getElementById("grid-system")).css({
-			"height": noteHeight,
-			"width": noteWidth,
-		});
-		
-		//console.log("--End resize--");
+		grid.resizeGrid();
 	});
 	
-	// Generates a grid for timeline
-	function generateGrid(numRows, numCols) {
-		// Generate columns
-		$("#grid-system").append(generateDivs(numCols, "grid-col-holder", ""));
-		
-		// Specify width of each column
-		$(".grid-col-holder").css({
-			"width": noteWidth
-		});
-		
-		// Generate rows per column (Note: columns have class "grid-col-holder")
-		$(".grid-col-holder").append(generateDivs(numRows, "grid-square", ""));
-		
-		// Specify height of each row
-		$(".grid-square").css({
-			"height": noteHeight // height of each grid square
-		});
-	}
-	
-	/* Draggable events */
+/*------------------------------------------------*/
+/*------------- Generate dynamic grid-------------*/
+/*------------------------------------------------*/
 	$(function() {
 		var inBox = false;
 		
@@ -266,7 +216,7 @@ $(document).ready(function() {
 				    	
 				    	// Ensure grid-squares are of correct height
 				    	$(".grid-square").css({
-							"height": noteHeight // height of each grid square
+							"height": grid.noteHeight // height of each grid square
 						});
 				    }
 				   
@@ -276,8 +226,8 @@ $(document).ready(function() {
 				
 				// Change the look of a note on the timeline
 				$("#notes-system div").not(document.getElementById("grid-system")).css({
-					"height": noteHeight,
-					"width": noteWidth,
+					"height": grid.noteHeight,
+					"width": grid.noteWidth,
 					"box-shadow": "none",
 					"margin-top": "0px",
 					"margin-bottom": "0px"
