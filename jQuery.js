@@ -23,7 +23,7 @@ function playSequence(){
 	while(count < arr.length){
 	    if(arr[count] != "silence"){
 		    piano.play({ 
-	    	    wait : count * 0.5,
+	    	    wait : count * 0.3,
 			    pitch : arr[count] 
 		    });
 		} else {
@@ -70,6 +70,7 @@ var piano = new Wad({
         release : .3
     }
 });
+
 //rest here. Quarter rest is just a name to say that it's one of the rests available
 var quarterRest = new Wad({
     source : 'sine', 
@@ -124,6 +125,7 @@ $(document).ready(function() {
 	
 	$("#clear").on("click", function() {
 		clearAllSound();
+		$("#notes-system .col-md-1").remove();
 	});
 	
 	/*------------------------------------------------*/
