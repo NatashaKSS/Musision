@@ -20,7 +20,7 @@ var arr = [];//array to store notes to play back
 //play notes consecutively at hard-coded intervals
 function playSequence(){
     var count = 0;
-	while(count < arr.length){
+	while(count < numOfNotes){
 	    if(arr[count] != "silence"){
 		    piano.play({ 
 	    	    wait : count * 0.3,
@@ -42,7 +42,7 @@ function clearAllSound(){
 
 //this one plays all notes together, for example a chord
 function playSimul(){
-    for(i = 0; i < arr.length; i++){
+    for(i = 0; i < numOfNotes; i++){
 	    if(arr[i] != "silence"){
 		    piano.play({pitch: arr[i]});
 		}
@@ -51,6 +51,7 @@ function playSimul(){
 
 // Remove a note from the array 
 // (User drags note out of timeline)
+/*
 function removeNote(noteName){
     for (i = 0; i < arr.length; i++){
 	    if(arr[i] == noteName){
@@ -58,7 +59,7 @@ function removeNote(noteName){
 		}
 	}
 }
-
+*/
 var piano = new Wad({
     source : 'sine', 
     env : {
@@ -107,6 +108,7 @@ function generateDivs(numOfDivs, cssClass, text) {
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
 $(document).ready(function() {
+//console.log($("#notes-system .col-md-1"));//////////////////DEBUGGING
 	$(".col-md-1").on("click", function() {
 		if(parseInt($(this).attr('data-note')) != 0){
 		    piano.play({ 
@@ -116,6 +118,7 @@ $(document).ready(function() {
 	});
 	
 	$("#all").on("click", function() {
+	   // updateArray();
 		playSequence();
 	});
 	
@@ -125,7 +128,7 @@ $(document).ready(function() {
 	
 	$("#clear").on("click", function() {
 		clearAllSound();
-		$("#notes-system .col-md-1").remove();
+		$("#notes-system .col-md-1").remove();//remove notes from the timeline
 	});
 	
 	/*------------------------------------------------*/
@@ -163,7 +166,29 @@ $(document).ready(function() {
 	$(window).on("resize", function () {
 		grid.resizeGrid();
 	});
-	
+//Aborted functions
+/*	
+function findIndex(element, count){
+    for(child = 1; child <= count; child++){//go down each column
+	    var col = ($("element:nth-child(child)").position().left - $("#timeline").position().left)/noteWidth;
+		var row = ($("element:nth-child(child)").position().top - $("#timeline").position().top)/noteHeight;
+		var index = row * numOfDivisions + col;
+		
+		    if(parseInt($("element:nth-child(child)").attr('data-note')) > 0){
+		        arr[index] = notes[parseInt($("element:nth-child(child)").attr('data-note')) - 12];
+		    } else {
+			    arr[index] = 'silence';
+		    }
+	}
+}
+
+function updateArray(){
+    for(child = 1; child <= numOfDivisions; child++){
+	    console.log($("#grid-system : nth-child(child)"));//hmm debugging here but nothing came out
+	    findIndex($("#grid-system : nth-child(child)"), 3);
+	}
+}
+*/
 /*------------------------------------------------*/
 /*------------- Generate dynamic grid-------------*/
 /*------------------------------------------------*/
@@ -188,21 +213,43 @@ $(document).ready(function() {
 			beforeStop: function(event, ui) { // Before releasing dragging
 				if (!inBox) {
 					ui.item.remove();
-					//change notes in array. Bug: still needs the "queue number"
+					numOfNotes--;
+            //now index is no longer preserved =(  
+            // arr.splice(index, 1);			
+				    
+					/*aborted parts
 					if(parseInt(ui.item.attr('data-note')) > 12){//this now still has a bug: it removes everything that has the same name as the note dragged out
 					    removeNote(notes[parseInt(ui.item.attr('data-note')) - 12]);
 					    numOfNotes--;
 					} else {
 					    removeNote("silence");//the rest inserted here
 					}
+					*///end of aborted parts
+					
 				}
+				
 			},
 			 
 			// When timeline receives the user-dragged note
 			receive: function(event, ui) { 
+				  var col = (ui.item.position().left - $("#timeline").position().left)/noteWidth;
+		          var row = (ui.item.position().top - $("#timeline").position().top)/noteHeight;
+		          var index = row * numOfDivisions + col;
+		
+		    if(parseInt(ui.item.attr('data-note')) > 0){
+		        arr.splice(index, 0, notes[parseInt(ui.item.attr('data-note')) - 12]);
+		    } else {
+			    arr.splice(index, 0, 'silence');
+		    }
+				
+				 numOfNotes++;
+				
+				/*aborted parts
 				if(parseInt(ui.item.attr('data-note')) != 0){
 				    arr.push(notes[parseInt(ui.item.attr('data-note')) - 12]);
 				    numOfNotes++;
+				   *///end of aborted parts
+				   
 				   
 				    // Procedurally generates more rows if the user has almost filled up timeline with
 				    // notes. 
@@ -221,9 +268,10 @@ $(document).ready(function() {
 							"height": grid.noteHeight // height of each grid square
 						});
 				    }
-				   
+				 /*  
 				} else {
 				    arr.push("silence");
+					*/
 				}
 				
 				// Change the look of a note on the timeline
