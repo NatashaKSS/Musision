@@ -3,6 +3,10 @@ body {
 	margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px
 }
 
+.container {
+	z-index: 1;
+}
+
 /* Contains user workspace, timeline and everything else 
    below top navbar */
 
@@ -17,22 +21,34 @@ body {
     height: 174px;
     width: auto;
 }
-
+/*
 #notes-system {
 	position: absolute;
-	overflow: auto;
+	overflow-y: auto;
+	overflow-x: hidden;
 	white-space: nowrap;
     left: 0px; top:0px; right:0; bottom:0;
-    z-index: 1;
+    z-index: 0;
     background-color: none;
     height: 170px;
-    width: auto;
+    width: 100%;
+    max-width: 100%;
+}
+*/
+#sortable-system {
+	position: absolute;
+	overflow-y: auto;
+	overflow-x: hidden;
+	white-space: nowrap;
+	z-index: 0;
+	width: auto;
+    max-width: 100%;
 }
 
 #grid-system {
 	position: absolute;
 	left: 0px; top:0px; right:0; bottom:0px;
-	z-index: -1;
+	z-index: 0;
 	height: 171px;
 	width: auto;
 }
@@ -46,10 +62,32 @@ body {
 	width: 100px; /* Default width just in case */
 }
 
+.animate-note {
+	background-color: red;
+	height: 33%%;
+	width: 0.3%;
+	/*animation: move_eye 4s linear 0s;*/
+}
+
+/*@keyframes move_eye { from { margin-left:-1%; } to { margin-left:100%; } }
+*/
 .grid-square {
 	position: relative;
 	height: 56.3333333336px; /* Default height just in case */
 	border: solid 1px #e4e4e4;
+	
+	/* Chunk of code here prevents awkward 
+       highlighting when dragging*/
+    -webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;			
+}
+
+#sortable div {
 }
 
 .col-md-1 {

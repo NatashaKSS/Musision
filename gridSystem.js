@@ -37,6 +37,11 @@ GridSystem.prototype.generateGrid = function(numRows, numCols) {
 	// Generate rows per column (Note: columns have class "grid-col-holder")
 	$(".grid-col-holder").append(generateDivs(numRows, "grid-square", ""));
 	
+	$("#sortable-system").css({
+		"max-width": "100%",
+		"width": this.timelineWidth + 20
+	});
+	
 	// Specify height of each row
 	$(".grid-square").css({
 		"height": this.noteHeight // height of each grid square
@@ -68,9 +73,19 @@ GridSystem.prototype.resizeGrid = function() {
 	this.noteHeight = $("#timeline").height() / 3;
 	//console.log("note height: " + this.noteHeight);
 	
-	// Ensures the grid-system is not updated by this statement because we
-	// don't want the entire grid-system to have noteHeight & noteWidth dimensions
-	$("#notes-system div").not(document.getElementById("grid-system")).css({
+	$("#sortable-system").css({
+		"max-width": "100%",
+		"height": this.timelineHeight - 4,
+		"width": this.timelineWidth + 20
+	});
+	
+	// Updates every division and note's height and width in timeline
+	$("#sortable-system div").css({
+		"height": this.noteHeight,
+		"width": this.noteWidth,
+	});
+	
+	$("#grid-system div").css({
 		"height": this.noteHeight,
 		"width": this.noteWidth,
 	});

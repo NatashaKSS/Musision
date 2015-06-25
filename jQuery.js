@@ -14,13 +14,17 @@ var notes = ["C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
              "C10","C#10","D10","D#10","E10","F10","F#10","G10"];
 // 128 notes, of which, the index of a single note in the array corresponds to
 // its own MIDI number
-	 
+
+/*
+ * Variables Declaration
+ */
 var arr = [];//array to store notes to play back
 
 //play notes consecutively at hard-coded intervals
 function playSequence(){
     var count = 0;
-	while(count < numOfNotes){
+    
+	while(count < arr.length){
 	    if(arr[count] != "silence"){
 		    piano.play({ 
 	    	    wait : count * 0.3,
@@ -42,24 +46,13 @@ function clearAllSound(){
 
 //this one plays all notes together, for example a chord
 function playSimul(){
-    for(i = 0; i < numOfNotes; i++){
+    for(i = 0; i < arr.length; i++){
 	    if(arr[i] != "silence"){
 		    piano.play({pitch: arr[i]});
 		}
 	}
 }
 
-// Remove a note from the array 
-// (User drags note out of timeline)
-/*
-function removeNote(noteName){
-    for (i = 0; i < arr.length; i++){
-	    if(arr[i] == noteName){
-		    arr.splice(i, 1);
-		}
-	}
-}
-*/
 var piano = new Wad({
     source : 'sine', 
     env : {
@@ -108,7 +101,6 @@ function generateDivs(numOfDivs, cssClass, text) {
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
 $(document).ready(function() {
-//console.log($("#notes-system .col-md-1"));//////////////////DEBUGGING
 	$(".col-md-1").on("click", function() {
 		if(parseInt($(this).attr('data-note')) != 0){
 		    piano.play({ 
@@ -128,37 +120,33 @@ $(document).ready(function() {
 	
 	$("#clear").on("click", function() {
 		clearAllSound();
-		$("#notes-system .col-md-1").remove();//remove notes from the timeline
+		$("#sortable-system .col-md-1").remove();//remove notes from the timeline
 	});
 	
 	/*------------------------------------------------*/
 	/*------------- Generate dynamic grid-------------*/
 	/*------------------------------------------------*/
-	
-	var numOfNotes = 0;
-	// numOfNotes on the timeline, initialized first
-	
 	var scrollbarWidth = 20; 
 	// scrollbarWidth to debug instance where notes would fly to
 	// the bottom because scrollbar (usually 17px on all browsers) 
 	// takes up its space -- trust me LOL
-	
+
 	var numOfDivisions = 8;
 	var timelineHeight = $("#timeline").height() + 
 						 parseInt($("#timeline").css("border-top-width")) + 
 						 parseInt($("#timeline").css("border-bottom-width"));
 	var timelineWidth = $("#timeline").width() - scrollbarWidth;
 
-	var grid = new GridSystem(numOfNotes,
+	var grid = new GridSystem(arr.length,
 							  scrollbarWidth,
 							  8,
 							  $("#timeline").position().top,
 							  $("#timeline").position().left,
 							  timelineHeight,
 							  timelineWidth,
-							  timelineWidth/numOfDivisions,
+							  ($("#timeline").width() - scrollbarWidth) / numOfDivisions,
 							  $("#timeline").height() / 3);
-
+	
 	// Generate initial grid
 	grid.generateGrid(3, numOfDivisions);
 	
@@ -166,8 +154,137 @@ $(document).ready(function() {
 	$(window).on("resize", function () {
 		grid.resizeGrid();
 	});
+
+/*------------------------------------------------*/
+/*------------ Draggables & Sortables-------------*/
+/*------------------------------------------------*/
+	$("#sortable-system").css({
+		"height": timelineHeight - 4,
+		"width": timelineWidth + 20
+	}); // 4 and 20 here just makes it look nicer
+	
+	$(function() {
+		var inBox = false;
+		
+		$("#sortable-system").sortable({
+			scroll: false,
+			revert: false,
+			snap: false,
+			start: function(event, ui) {
+				var startPosition = ui.item.index();
+				ui.item.data('startPos', startPosition);
+			},
+			
+			update: function(event, ui) {
+				var startPosition = ui.item.data('startPos');
+				var endPosition = ui.item.index();
+				var grabbedNote = "";
+				
+				if (ui.item.attr('data-note') != "silence") { // Because parseInt returns undefined for letters
+					grabbedNote = notes[parseInt(ui.item.attr('data-note')) - 12]; 
+				} else {
+					grabbedNote = ui.item.attr('data-note');
+				}
+				
+				// When position of a note changes on the timeline, follow up 
+				// with appropriate swap in position of notes in the array as well
+				if (startPosition < endPosition) {
+					// When swapping from left to right
+					arr.splice(endPosition + 1, 0, grabbedNote);
+					arr.splice(startPosition, 1);
+				} else if (startPosition > endPosition) {
+					// When swapping from right  to left
+					arr.splice(endPosition, 0, grabbedNote);
+					arr.splice(startPosition + 1, 1);
+				}
+				
+			},
+			
+			// If item is over timeline
+			over: function(event, ui) { 
+				inBox = true;
+			},
+			 
+			// If item is dragged outside timeline
+			out: function(event, ui) { 
+				inBox = false;
+			},
+			
+			// Before releasing dragging
+			beforeStop: function(event, ui) { 
+				if (!inBox) {
+					var startPosition = ui.item.data('startPos');
+					arr.splice(startPosition, 1);
+					ui.item.remove();
+				}
+			},
+			 
+			// When timeline receives the user-dragged note
+			receive: function(event, ui) {
+				 
+		      	if(ui.item.attr('data-note') != "silence"){
+		      		arr.push(notes[parseInt(ui.item.attr('data-note')) - 12]);
+				    
+		      		var numOfNotes = arr.length;
+					
+				    // Procedurally generates more rows if the user has almost filled up timeline with
+				    // notes. 
+				    // ((numOfNotes == (3 * numOfDivisions - 1)) checks if the user has only 1 note left to
+				    // fully fill the timeline to generate 1 row.
+				    // ((numOfNotes > (3 * numOfDivisions)) && (numOfNotes % numOfDivisions == 0)) checks
+				    // if the user, after filling up the first (3 * numOfDivisions - 1) slots --> In this case it is 
+		      		// the first 3 rows, and everytime he almost fills up the next row, generate another following row.
+				    if ((numOfNotes == (3 * numOfDivisions - 1)) ||
+				    	((numOfNotes > (3 * numOfDivisions)) && (numOfNotes % numOfDivisions == 0))) {
+				    	// Append a row of grid-squares
+				    	$(".grid-col-holder").append(generateDivs(1, "grid-square", ""));
+				    	
+				    	// Ensure grid-squares are of correct height
+				    	$(".grid-square").css({
+							"height": grid.noteHeight // height of each grid square
+						});
+				    }
+				  
+				} else {
+				    arr.push(ui.item.attr('data-note')); //ui.item.attr('data-note')) is just the string "silence"
+				}
+					
+				// Change the look of a note on the timeline
+				$("#sortable-system div").css({
+					"height": grid.noteHeight,
+					"width": grid.noteWidth,
+					"box-shadow": "none",
+					"margin-top": "0px",
+					"margin-bottom": "0px"
+				});
+				
+			}
+		}).disableSelection();
+			 
+		$(".col-md-1").draggable({
+			appendTo: "#grid-system",
+			cursor: "move",
+			connectToSortable: "#sortable-system",
+			helper: "clone",
+			opacity: 0.7,
+			revert: false
+		});
+		
+	});
+
+});
+
+
+
+
+
+
+/*
+------------------------------------
+----------CODE ON HOLD--------------
+------------------------------------
+(BEFORE DRAGGABLES & SORTABLES HEADING)
 //Aborted functions
-/*	
 function findIndex(element, count){
     for(child = 1; child <= count; child++){//go down each column
 	    var col = ($("element:nth-child(child)").position().left - $("#timeline").position().left)/noteWidth;
@@ -188,123 +305,78 @@ function updateArray(){
 	    findIndex($("#grid-system : nth-child(child)"), 3);
 	}
 }
-*/
-/*------------------------------------------------*/
-/*------------- Generate dynamic grid-------------*/
-/*------------------------------------------------*/
-	$(function() {
-		var inBox = false;
-		
-		$("#notes-system").sortable({
-			scroll: true,
-			revert: false,
-			snap: false,
-			 // Functions for deleting note from timeline
-			 // Just drag out of timeline area
-			 // Needs more work for manipulating the array itself
-			over: function(event, ui) { // If item is over timeline
-				inBox = true;
-			},
-			 
-			out: function(event, ui) { // If item is dragged outside timeline
-				inBox = false;
-			},
-		
-			beforeStop: function(event, ui) { // Before releasing dragging
-				if (!inBox) {
-					ui.item.remove();
-					numOfNotes--;
-            //now index is no longer preserved =(  
-            // arr.splice(index, 1);			
-				    
-					/*aborted parts
-					if(parseInt(ui.item.attr('data-note')) > 12){//this now still has a bug: it removes everything that has the same name as the note dragged out
-					    removeNote(notes[parseInt(ui.item.attr('data-note')) - 12]);
-					    numOfNotes--;
-					} else {
-					    removeNote("silence");//the rest inserted here
-					}
-					*///end of aborted parts
-					
-				}
-				
-			},
-			 
-			// When timeline receives the user-dragged note
-			receive: function(event, ui) { 
-				  var col = (ui.item.position().left - $("#timeline").position().left)/noteWidth;
-		          var row = (ui.item.position().top - $("#timeline").position().top)/noteHeight;
-		          var index = row * numOfDivisions + col;
-		
-		    if(parseInt(ui.item.attr('data-note')) > 0){
-		        arr.splice(index, 0, notes[parseInt(ui.item.attr('data-note')) - 12]);
-		    } else {
-			    arr.splice(index, 0, 'silence');
-		    }
-				
-				 numOfNotes++;
-				
-				/*aborted parts
-				if(parseInt(ui.item.attr('data-note')) != 0){
-				    arr.push(notes[parseInt(ui.item.attr('data-note')) - 12]);
-				    numOfNotes++;
-				   *///end of aborted parts
-				   
-				   
-				    // Procedurally generates more rows if the user has almost filled up timeline with
-				    // notes. 
-				    // ((numOfNotes == (3 * numOfDivisions - 1)) checks if the user has only 1 note left to
-				    // fully fill the timeline to generate 1 row.
-				    // ((numOfNotes > (3 * numOfDivisions)) && ((numOfNotes % numOfDivisions - 1) == 0))) checks
-				    // if the user, after filling up the first (3 * numOfDivisions) slots --> In this case it is the first 3 rows,
-				    // and everytime he almost fills up the next row, generate another row following that.
-				    if ((numOfNotes == (3 * numOfDivisions - 1)) ||
-				    	((numOfNotes > (3 * numOfDivisions)) && ((numOfNotes % numOfDivisions - 1) == 0))) {
-				    	// Append a row of grid-squares
-				    	$(".grid-col-holder").append(generateDivs(1, "grid-square", ""));
-				    	
-				    	// Ensure grid-squares are of correct height
-				    	$(".grid-square").css({
-							"height": grid.noteHeight // height of each grid square
-						});
-				    }
-				 /*  
-				} else {
-				    arr.push("silence");
-					*/
-				}
-				
-				// Change the look of a note on the timeline
-				$("#notes-system div").not(document.getElementById("grid-system")).css({
-					"height": grid.noteHeight,
-					"width": grid.noteWidth,
-					"box-shadow": "none",
-					"margin-top": "0px",
-					"margin-bottom": "0px"
-				});
-			}
-		}).disableSelection();
-			 
-		$(".col-md-1").draggable({
-			appendTo: "#notes-system",
-			cursor: "move",
-			connectToSortable: "#notes-system",
-			helper: "clone",
-			opacity: 0.7,
-			revert: false
-		});
-		
-	});
-
-});
 
 
+(IN BEFORESTOP IN SORTABLE FUNCTION)
+//now index is no longer preserved =(  
+// arr.splice(index, 1);			
+	    
+		/*aborted parts
+		if(parseInt(ui.item.attr('data-note')) > 12){//this now still has a bug: it removes everything that has the same name as the note dragged out
+		    removeNote(notes[parseInt(ui.item.attr('data-note')) - 12]);
+		    numOfNotes--;
+		} else {
+		    removeNote("silence");//the rest inserted here
+		}
+		//end of aborted parts
 
+(IN RECEIVE IN SORTABLE FUNCTION)
+var col = (ui.item.position().left - $("#timeline").position().left)/grid.noteWidth;
+var row = (ui.item.position().top - $("#timeline").position().top)/grid.noteHeight;
+var index = row * numOfDivisions + col;
 
+if (parseInt(ui.item.attr('data-note')) > 0) {
+    arr.splice(index, 0, notes[parseInt(ui.item.attr('data-note')) - 12]);
+} else {
+    arr.splice(index, 0, 'silence');
+}
+	
+numOfNotes++;
 
+------------------------------------
+------END CODE ON HOLD--------------
+------------------------------------
 
+Unused code Section 1.0: Supposedly debug code which made things worse
 
-/* Unused code Section 1.1: Web Audio ADSR implementation.
+// Bug fixer for instance when notes flicker on timeline when sorting 
+sort: function (event, ui) {
+    var that = $(this);
+    var w = ui.helper.outerWidth(); // Width of a note on timeline
+    var	h = ui.helper.outerHeight(); // Height of a note on timeline
+    
+    that.children().each(function () {
+        if ($(this).hasClass('ui-sortable-helper') || $(this).hasClass('ui-sortable-placeholder')) 
+            return true;
+        
+        // If user mouse overlap is more than half of the dragged item
+        var distX = Math.abs(ui.position.left - $(this).position().left),
+            before = ui.position.left > $(this).position().left;
+            
+        if ((w - distX) > (w / 2) && (distX < w)) {
+            if (before) // dragged item is to the left of thing to sort with
+                $('.ui-sortable-placeholder', that).insertBefore($(this));
+            else // dragged item is to the right of thing to sort with
+                $('.ui-sortable-placeholder', that).insertAfter($(this));
+            return false;
+        }
+        
+     // If user mouse overlap is more than half of the dragged item
+        var distY = Math.abs(ui.position.left - $(this).position().left),
+            before = ui.position.top > $(this).position().top;
+            
+        if ((h - distY) > (h / 2) && (distY < h)) {
+            if (before) // dragged item is to the top of thing to sort with
+                $('.ui-sortable-placeholder', that).insertBefore($(this));
+            else // dragged item is to the btm of thing to sort with
+                $('.ui-sortable-placeholder', that).insertAfter($(this));
+            return false;
+        }
+    });
+		    },
+		    
+
+Unused code Section 1.1: Web Audio ADSR implementation.
 var context = new AudioContext();
 var arr = [];
 
@@ -509,11 +581,4 @@ function playSound(midiNumber) {
 	audio.play();
 }
 
- Lab of experiments...
- var count = 0;
-	
-	$(document).on('click', 'body', function() {
-		count++;
-		$("#timeline").append("<td class='noteDefault'> Note " + count + "</td>");
-	});
 */
