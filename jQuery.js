@@ -19,24 +19,31 @@ var notes = ["C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
  * Variables Declaration
  */
 var arr = [];//array to store notes to play back
+var beatDuration = 0.3;
 
 //play notes consecutively at hard-coded intervals
 function playSequence(){
     var count = 0;
+    var noteDuration = (beatDuration) * 1000;
+    var wholeDuration = (beatDuration) * 1000 * (arr.length + 1);
+    
+    playAnimation(noteDuration, wholeDuration);
     
 	while(count < arr.length){
 	    if(arr[count] != "silence"){
 		    piano.play({ 
-	    	    wait : count * 0.3,
+	    	    wait : count * beatDuration,
 			    pitch : arr[count] 
 		    });
+		    
 		} else {
 		    quarterRest.play({
-			    wait : count * 0.5
+			    wait : count * beatDuration
 			});
 		}
 		count = count + 1;
     }
+	
 }
 
 //empty the note array    
@@ -97,15 +104,45 @@ function generateDivs(numOfDivs, cssClass, text) {
 	return divString;
 }
 
+	function playAnimation(duration, wholeDuration) {
+		jQuery(function($) {
+			var offset = 0;
+			
+			// Change each div's colour as note plays
+			// Applies setTimeout function to every div in the 
+			// timeline
+			$("#sortable-system div").map(function() {
+				var that = $(this);
+				
+				setTimeout(function () {
+					that.css({ 
+			    	   "background": "#80ffff"
+					});
+				}, duration + offset);
+				
+				offset += duration;
+		    });
+			
+			// After track is done, change back the colour
+			setTimeout(function () {
+				$("#sortable-system div").css({ "background-color": "#109bce"});
+			}, wholeDuration);
+		});
+	}
+
 /*------------------------------------------------*/
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
 $(document).ready(function() {
 	$(".col-md-1").on("click", function() {
-		if(parseInt($(this).attr('data-note')) != 0){
+		var noteName = $(this).attr('data-note');
+		
+		if(noteName != "silence"){
 		    piano.play({ 
-			    pitch : notes[parseInt($(this).attr('data-note')) - 12] 
+			    pitch : notes[parseInt(noteName - 12)] 
 		    });
+		} else {
+			// Do nothing to mimic silence...ooh
 		}
 	});
 	
@@ -123,6 +160,7 @@ $(document).ready(function() {
 		$("#sortable-system .col-md-1").remove();//remove notes from the timeline
 	});
 	
+		
 	/*------------------------------------------------*/
 	/*------------- Generate dynamic grid-------------*/
 	/*------------------------------------------------*/
