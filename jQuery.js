@@ -109,31 +109,31 @@ function generateDivs(numOfDivs, cssClass, text) {
 	return divString;
 }
 
-	function playAnimation(duration, wholeDuration) {
-		jQuery(function($) {
-			var offset = 0;
+function playAnimation(duration, wholeDuration) {
+	jQuery(function($) {
+		var offset = 0;
+		
+		// Change each div's colour as note plays
+		// Applies setTimeout function to every div in the 
+		// timeline
+		$("#sortable-system div").map(function() {
+			var that = $(this);
 			
-			// Change each div's colour as note plays
-			// Applies setTimeout function to every div in the 
-			// timeline
-			$("#sortable-system div").map(function() {
-				var that = $(this);
-				
-				setTimeout(function () {
-					that.css({ 
-			    	   "background": "#80ffff"
-					});
-				}, duration + offset);
-				
-				offset += duration;
-		    });
-			
-			// After track is done, change back the colour
 			setTimeout(function () {
-				$("#sortable-system div").css({ "background-color": "#109bce"});
-			}, wholeDuration);
+				that.css({ 
+				   "background": "#80ffff"
+				});
+			}, duration + offset);
+			
+			offset += duration;
 		});
-	}
+		
+		// After track is done, change back the colour
+		setTimeout(function () {
+			$("#sortable-system div").css({ "background-color": "#109bce"});
+		}, wholeDuration);
+	});
+}
 
 /*------------------------------------------------*/
 /*--------Document interaction with JQuery--------*/
