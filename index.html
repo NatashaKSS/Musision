@@ -22,17 +22,23 @@
 	
 	<!-- Own Custom scripts in local directory-->
 	
+	<script src="introJs/intro.js"></script>
 	<script src="jQuery.js"></script>
 	<script src="gridSystem.js"></script>
+	
 	<link rel="stylesheet" type="text/css" href="webDesign.css"/>
+	<link rel="stylesheet" type="text/css" href="introJs/introjs.css"/>
 	
 </head>
 
 <body>
-	<nav class="navbar navbar-inverse">
+	<nav class="navbar navbar-inverse" data-step="7" data-intro="Alright, you're all set! Click me into oblivion!" data-position="bottom">
 	 <div class="container-fluid">
 	  <div class="navbar-header">
-		<a class="navbar-brand" href="#">Musision</a>
+		<a class="navbar-brand" href="#" 
+		data-step="1" data-intro="Hi! Welcome to Musision! Feel free to compose your 
+		own music! But before that, let's give you a tour of Musision. Click anywhere 
+		or on 'done' to skip this tutorial" data-position="right">Musision</a>
 	  </div>
 	  <div>
 		<ul class="nav navbar-nav">
@@ -40,9 +46,9 @@
 		 <li><a href="#">Set BPM</a></li> 
 		 <li><a href="#">Download</a></li> 
 		 <!--- to play or clear all notes --->
-		 <li><a id="all" href="#">Play Sequence</a></li>
-		 <li><a id="same" href="#">Play All</a></li>
-		 <li><a id="clear" href="#">Clear All</a></li>
+		 <li><a id="all" href="#" data-step="4" data-intro="Click here to play your entire song, a note at a time." data-position="right">Play Sequence</a></li>
+		 <li><a id="same" href="#" data-step="5" data-intro="Click here to play all notes on the timeline simultaneously" data-position="right">Play All</a></li>
+		 <li><a id="clear" href="#" data-step="6" data-intro="Click here to clear all notes from timeline" data-position="right">Clear All</a></li>
 		 
 		  
 		</ul>
@@ -52,7 +58,7 @@
 	 
 	<div class="container"> <!-- Enabled by bootstrap -->
 	
-	 <div id="timeline">
+	 <div id="timeline" data-step="3" data-intro="Drag any note here and start composing!" data-position="bottom">
 	   <div id="grid-system">
 	  
 	   </div>
@@ -61,7 +67,7 @@
 	   </div>
 	 </div>
 	 
-	 <div class="col-md-1" data-note="60">C</div>
+	 <div class="col-md-1" data-note="60" data-step="2" data-intro="Click on any note to play a sound!" data-position="right">C</div>
 	 <div class="col-md-1" data-note="61">C#</div>
 	 <div class="col-md-1" data-note="62">D</div>
 	 <div class="col-md-1" data-note="63">D#</div>

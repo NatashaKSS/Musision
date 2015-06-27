@@ -134,6 +134,8 @@ function generateDivs(numOfDivs, cssClass, text) {
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
 $(document).ready(function() {
+	introJs("body").start();
+	
 	$(".col-md-1").on("click", function() {
 		var noteName = $(this).attr('data-note');
 		
