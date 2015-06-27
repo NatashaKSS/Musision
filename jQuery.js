@@ -21,6 +21,11 @@ var notes = ["C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
 var arr = [];//array to store notes to play back
 var beatDuration = 0.3;
 
+function changeBPM(){
+    var ans = prompt("The default BPM is 120. What value do you want to change BPM to?");
+	beatDuration = beatDuration /(parseInt(ans)/120);
+}
+
 //play notes consecutively at hard-coded intervals
 function playSequence(){
     var count = 0;
