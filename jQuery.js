@@ -19,10 +19,10 @@ var notes = ["C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
  * Variables Declaration
  */
 var arr = [];//array to store notes to play back
-var beatDuration = 0.3;
+var beatDuration = 0.3;//Duration of 1 beat
 
 function changeBPM(){
-    var ans = prompt("The default BPM is 120. What value do you want to change BPM to?");
+    var ans = document.getElementById("bpm-input").value;
 	beatDuration = beatDuration /(parseInt(ans)/120);
 }
 
@@ -111,11 +111,11 @@ function generateDivs(numOfDivs, cssClass, text) {
 
 function playAnimation(duration, wholeDuration) {
 	jQuery(function($) {
-		var offset = 0;
+		// This offset timing makes the animation smoother
+		var offset = -200;
 		
 		// Change each div's colour as note plays
-		// Applies setTimeout function to every div in the 
-		// timeline
+		// Applies setTimeout function to every div in the timeline
 		$("#sortable-system div").map(function() {
 			var that = $(this);
 			
@@ -126,6 +126,7 @@ function playAnimation(duration, wholeDuration) {
 			}, duration + offset);
 			
 			offset += duration;
+			
 		});
 		
 		// After track is done, change back the colour

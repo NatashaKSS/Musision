@@ -7,6 +7,21 @@ body {
 	z-index: 1;
 }
 
+/* In the navbar */
+#bpm-input {
+	border-radius: 5px;
+	width: 3em;
+}
+
+#bpm-button {
+	border-radius: 25px;
+	background-color: #b3b3b3; 
+}
+
+#bpm-button:hover {
+	background-color: #e0e1ce;
+}
+
 /* Contains user workspace, timeline and everything else 
    below top navbar */
 
