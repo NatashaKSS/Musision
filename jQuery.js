@@ -22,8 +22,23 @@ var arr = [];//array to store notes to play back
 var beatDuration = 0.3;//Duration of 1 beat
 
 function changeBPM(){
+	beatDuration = 0.3; // Flushes the previous values of beatDuration
     var ans = document.getElementById("bpm-input").value;
-	beatDuration = beatDuration /(parseInt(ans)/120);
+	
+    // Input validation
+    try {
+    	if (isNaN(ans)) {
+    		throw "not a number.";
+    	} else if (ans == "") {
+    		throw "empty.";
+    	} else if (ans < 0) {
+    		throw "negative. Please input a positive number."
+    	} else {
+    		beatDuration = beatDuration /(parseInt(ans)/120);
+    	}
+    } catch(error) {
+    	alert("Input is " + error);
+    }
 }
 
 //play notes consecutively at hard-coded intervals
@@ -210,7 +225,8 @@ $(document).ready(function() {
 	}); // 4 and 20 here just makes it look nicer
 	
 	$(function() {
-		var inBox = false;
+		var inBox = false; // Flag that facilitates removal of note
+		var inBeforeStop = false; // Flag that facilitates colour of note when removed
 		
 		$("#sortable-system").sortable({
 			scroll: false,
@@ -221,12 +237,14 @@ $(document).ready(function() {
 				ui.item.data('startPos', startPosition);
 			},
 			
+			// Whenever user has stopped sorting and the DOM element (HTML) has changed
 			update: function(event, ui) {
 				var startPosition = ui.item.data('startPos');
 				var endPosition = ui.item.index();
 				var grabbedNote = "";
 				
-				if (ui.item.attr('data-note') != "silence") { // Because parseInt returns undefined for letters
+				// Because parseInt returns undefined for letters, we must do a check here
+				if (ui.item.attr('data-note') != "silence") { 
 					grabbedNote = notes[parseInt(ui.item.attr('data-note')) - 12]; 
 				} else {
 					grabbedNote = ui.item.attr('data-note');
@@ -246,29 +264,44 @@ $(document).ready(function() {
 				
 			},
 			
-			// If item is over timeline
-			over: function(event, ui) { 
+			// If item is hovering over timeline
+			over: function(event, ui) {
 				inBox = true;
+				inBeforeStop = false;
+				
+				ui.item.css({
+					"background-color":"#109bce", // Light blue
+					"border":"none"
+				});
 			},
 			 
-			// If item is dragged outside timeline
-			out: function(event, ui) { 
+			// If item is dragged outside timeline OR if item is dropped
+			// onto timeline
+			out: function(event, ui) {
 				inBox = false;
+				
+				if (!inBeforeStop) {
+					ui.item.css({
+						"background-color":"red",
+						"border":"2px solid yellow"
+					});
+				}
 			},
 			
-			// Before releasing dragging
-			beforeStop: function(event, ui) { 
+			// Just before releasing dragging and item is outside timeline
+			beforeStop: function(event, ui) {
+				inBeforeStop = true;
+				
 				if (!inBox) {
 					var startPosition = ui.item.data('startPos');
 					arr.splice(startPosition, 1);
 					ui.item.remove();
-				}
+				}				
 			},
 			 
 			// When timeline receives the user-dragged note
 			receive: function(event, ui) {
-				 
-		      	if(ui.item.attr('data-note') != "silence"){
+				if(ui.item.attr('data-note') != "silence"){
 		      		arr.push(notes[parseInt(ui.item.attr('data-note')) - 12]);
 				    
 		      		var numOfNotes = arr.length;
@@ -294,14 +327,14 @@ $(document).ready(function() {
 				} else {
 				    arr.push(ui.item.attr('data-note')); //ui.item.attr('data-note')) is just the string "silence"
 				}
-					
+				
 				// Change the look of a note on the timeline
 				$("#sortable-system div").css({
 					"height": grid.noteHeight,
 					"width": grid.noteWidth,
 					"box-shadow": "none",
 					"margin-top": "0px",
-					"margin-bottom": "0px"
+					"margin-bottom": "0px",
 				});
 				
 			}
