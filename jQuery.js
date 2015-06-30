@@ -20,6 +20,7 @@ var notes = ["C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
  */
 var arr = [];//array to store notes to play back
 var beatDuration = 0.3;//Duration of 1 beat
+var enableLooping = false;
 
 function changeBPM(){
 	beatDuration = 0.3; // Flushes the previous values of beatDuration
@@ -78,6 +79,41 @@ function playSimul(){
 		    piano.play({pitch: arr[i]});
 		}
 	}
+}
+
+
+//function to loop in between 2 indices
+function loop(startIndx, endIndx){//infinite loop not supported @_@
+
+    var count = 0;
+	
+	var playingIndx = startIndx; 
+    while(count < 200){//cannot interrupt by clicking stopLoop here hmmmm, also no animation
+	//console.log(playingIndx);
+	console.log(enableLooping);
+	    if(!enableLooping){
+		    break;
+		} else {
+		    if(playingIndx > endIndx && enableLooping){
+			    playingIndx = startIndx;
+				count++;
+			} else if(enableLooping){
+			    piano.play({
+				    wait: (playingIndx + count * arr.length - startIndx) * beatDuration,
+				    pitch : arr[playingIndx],  
+					label: 'playing'
+				});
+				playingIndx++;
+			} else {}
+		console.log("round " + count);
+	   }
+	}
+}
+
+
+function loopAll(){
+   // enableLooping = true;
+    loop(0, arr.length - 1);
 }
 
 var piano = new Wad({
@@ -180,10 +216,23 @@ $(document).ready(function() {
 	
 	$("#clear").on("click", function() {
 		clearAllSound();
-		$("#sortable-system .col-md-1").remove();//remove notes from the timeline
+		$("#sortable-system .col-md-1").remove(); //remove notes from the timeline
 	});
 	
-		
+	$("#loopAll").on("click", function() {
+        enableLooping = true;
+		loopAll();
+    });	
+	
+	$("#startLoop").on("click", function() {
+        enableLooping = true;
+    });	
+	
+	$("#stopLoop").on("click", function() {
+	    piano.stop('playing');
+        enableLooping = false;
+    });	
+	
 	/*------------------------------------------------*/
 	/*------------- Generate dynamic grid-------------*/
 	/*------------------------------------------------*/
