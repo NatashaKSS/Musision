@@ -19,10 +19,40 @@ var notes = ["C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
  * Variables Declaration
  */
 var arr = [];//array to store notes to play back
-var beatDuration = 0.3;//Duration of 1 beat
+var beatDuration = 0.3;//Default duration of 1 beat
 var enableLooping = false;
 var loopId = 0;
 
+/*
+ * Note Object Constructor
+ * */
+function Note(pitch, duration) {
+	this.pitch = pitch; // Should be represented as a string, e.g. "C4"
+	this.duration = duration;
+}
+
+// Returns the pitch of the note
+Note.prototype.getPitch = function() {
+	return this.pitch;
+}
+
+// Returns the duration of a note
+Note.prototype.getDur = function() {
+	return this.duration;
+}
+
+Note.prototype.setPitch = function(pitch) {
+	this.Pitch = pitch;
+}
+
+Note.prototype.setDuration = function(dur) {
+	this.duration = dur;
+}
+
+
+/*
+ * Auxillary Functions
+ * */
 function changeBPM(){
 	beatDuration = 0.3; // Flushes the previous values of beatDuration
     var ans = document.getElementById("bpm-input").value;
@@ -44,24 +74,32 @@ function changeBPM(){
 }
 
 //play notes consecutively at hard-coded intervals
-function playSequence(){
+function playSequence() {
     var count = 0;
     var noteDuration = (beatDuration) * 1000;
     var wholeDuration = (beatDuration) * 1000 * (arr.length + 1);
     
+    // Note to self that noteDuration & wholeDuration will need to change
+    // because for each animation of a note, it has a different timing
+    // now that each note has its own timing.
+    
     playAnimation(noteDuration, wholeDuration);
     
 	while(count < arr.length){
-	    if(arr[count] != "silence"){
+	    if(arr[count].getPitch() != "silence"){
 		    piano.play({ 
 	    	    wait : count * beatDuration,
-			    pitch : arr[count],
+	    	    // beatDuration should be arr[count].getDur(), but need to 
+			    // change other things first.
+			    pitch : arr[count].getPitch(),
 				label : "playing" 
 		    });
 		    
 		} else {
 		    quarterRest.play({
-			    wait : count * beatDuration,
+			    wait : count * beatDuration, 
+			    // beatDuration should be arr[count].getDur(), but need to 
+			    // change other things first.
 				label : "playing" 
 			});
 		}
@@ -196,7 +234,7 @@ function playAnimation(duration, wholeDuration) {
 		
 		// After track is done, change back the colour
 		setTimeout(function () {
-			$("#sortable-system div").css({ "background-color": "#109bce"});
+			$("#sortable-system div").css({ "background-color": "#109bce" });
 		}, wholeDuration);
 	});
 }
@@ -298,8 +336,8 @@ $(document).ready(function() {
 			revert: false,
 			snap: false,
 			start: function(event, ui) {
-				var startPosition = ui.item.index();//original index
-				ui.item.data('startPos', startPosition);//create data called startPos and set it to startPosition
+				var startPosition = ui.item.index(); //original index
+				ui.item.data('startPos', startPosition); //create data called startPos and set it to startPosition
 			},
 			
 			// Whenever user has stopped sorting and the DOM element (HTML) has changed
@@ -310,9 +348,11 @@ $(document).ready(function() {
 				
 				// Because parseInt returns undefined for letters, we must do a check here
 				if (ui.item.attr('data-note') != "silence") { 
-					grabbedNote = notes[parseInt(ui.item.attr('data-note')) - 12]; 
+					grabbedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12], 
+										   beatDuration);
 				} else {
-					grabbedNote = ui.item.attr('data-note');//refers to silence
+					grabbedNote = new Note(ui.item.attr('data-note'), 
+							   			   beatDuration); //refers to silence
 				}
 				
 				// When position of a note changes on the timeline, follow up 
@@ -367,7 +407,9 @@ $(document).ready(function() {
 			// When timeline receives the user-dragged note
 			receive: function(event, ui) {
 				if(ui.item.attr('data-note') != "silence"){
-		      		arr.push(notes[parseInt(ui.item.attr('data-note')) - 12]);
+		      		var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12], 
+		      									beatDuration);
+					arr.push(insertedNote);
 				    
 		      		var numOfNotes = arr.length;
 					
@@ -390,7 +432,12 @@ $(document).ready(function() {
 				    }
 				  
 				} else {
-				    arr.push(ui.item.attr('data-note')); //ui.item.attr('data-note')) is just the string "silence"
+					var insertedSilence = new Note(ui.item.attr('data-note'), 
+												   beatDuration);
+					// Pitch for silence is just "silence"
+					// ui.item.attr('data-note')) is just the string "silence"
+	
+					arr.push(insertedSilence);
 				}
 				
 				// Change the look of a note on the timeline
