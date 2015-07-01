@@ -142,6 +142,7 @@ body {
 	user-select: none;			
 }
 
+
 .col-md-1:active {
     box-shadow: inset 0px 1px 0px #2ab7ec, 
     			0px 2px 0px 0px #07526e, 
@@ -152,6 +153,8 @@ body {
 	top: 3px;
     background: #004080;
 }
+
+
 
 
 

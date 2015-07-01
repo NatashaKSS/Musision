@@ -16,13 +16,12 @@
 	
 	<!-- Other code script references-->
 	<!-- WAAClock library online - A scheduler that is easy to use for web audio API -->
-	<script src ="http://sebpiq.github.io/WAAClock/dist/WAAClock-latest.js"></script>
+	<!-- <script src ="http://sebpiq.github.io/WAAClock/dist/WAAClock-latest.js"></script> -->
 	<!-- Wad is a Javascript library for manipulating audio using the new HTML5 Web Audio API -->
 	<script src="wad-master/src/wad.js"></script>
+	<script src="introJs/intro.js"></script>
 	
 	<!-- Own Custom scripts in local directory-->
-	
-	<script src="introJs/intro.js"></script>
 	<script src="jQuery.js"></script>
 	<script src="gridSystem.js"></script>
 	
@@ -44,18 +43,17 @@
 		 <!--<li><a href="#">Set Key</a></li> Removed this button first to avoid people questioning the use of this button-->
 		 <li><a href="#">Download</a></li> 
 		 <!--- to play or clear all notes --->
-		 <li><a id="all" href="#" data-step="4" data-intro="Click here to play your entire song, a note at a time." data-position="bottom">Play Sequence</a></li>
-		 <li><a id="same" href="#" data-step="5" data-intro="Click here to play all notes on the timeline simultaneously" data-position="bottom">Play All</a></li>
+		 <li><a id="all" data-step="4" data-intro="Click here to play your entire song, a note at a time." data-position="bottom"> Play </a></li>
+		 <li><a id="pause" href="#"> Pause </a></li>
+	<!--<li><a id="same" href="#" data-step="5" data-intro="Click here to play all notes on the timeline simultaneously" data-position="bottom">Play All</a></li>-->
 		 <li><a id="clear" href="#" data-step="6" data-intro="Click here to clear all notes from timeline" data-position="bottom">Clear All</a></li>
 		 <li>
 		  <div class="navbar-form pull-left">
     	  <input id="bpm-input" type="text" class="input-small" placeholder=" 120" 
-    	  		 data-step="7" data-intro="Type in your preferred BPM here and click 'Set BPM'" data-position="bottom"/>
+    	  		 data-step="7" data-intro="Type in your preferred BPM here and click 'Set BPM'" data-position="right"/>
   		  <button id="bpm-button" class="btn" onclick=changeBPM()>Set BPM</button>
 		  
-		  <button id ="loopAll" class="btn"> Loop All </button>
 		  <button id ="startLoop" class="btn"> Start Looping </button>
-		  <button id ="stopLoop" class="btn"> Stop Looping </button>
 		  
 		  </div>
 		 </li>
@@ -88,7 +86,7 @@
 	 <div class="col-md-1" data-note="69">A4</div>
 	 <div class="col-md-1" data-note="70">A#4</div>
 	 
-	 <div class="col-md-1" data-note="71">B5</div>
+	 <div class="col-md-1" data-note="71">B4</div>
 	 <div class="col-md-1" data-note="72">C5</div>
 	 <div class="col-md-1" data-note="73">C#5</div>
 	 <div class="col-md-1" data-note="74">D5</div>
@@ -102,7 +100,7 @@
 	 <div class="col-md-1" data-note="82">A#5</div>
 	 <div class="col-md-1" data-note="83">B5</div>
 	 
-	 <div class="col-md-1" data-note="silence">Rest</div> <!--change to the rest here-->
+	 <div class="col-md-1" data-note="silence" >Rest</div> <!--change to the rest here-->
 	 
 	</div>
 	

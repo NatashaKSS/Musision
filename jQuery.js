@@ -21,6 +21,7 @@ var notes = ["C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
 var arr = [];//array to store notes to play back
 var beatDuration = 0.3;//Duration of 1 beat
 var enableLooping = false;
+var loopId = 0;
 
 function changeBPM(){
 	beatDuration = 0.3; // Flushes the previous values of beatDuration
@@ -54,12 +55,14 @@ function playSequence(){
 	    if(arr[count] != "silence"){
 		    piano.play({ 
 	    	    wait : count * beatDuration,
-			    pitch : arr[count] 
+			    pitch : arr[count],
+				label : "playing" 
 		    });
 		    
 		} else {
 		    quarterRest.play({
-			    wait : count * beatDuration
+			    wait : count * beatDuration,
+				label : "playing" 
 			});
 		}
 		count = count + 1;
@@ -70,9 +73,15 @@ function playSequence(){
 //empty the note array    
 function clearAllSound(){
     arr = [];
+	if(document.getElementById("startLoop").value == "Stop Looping"){
+	    document.getElementById("startLoop").value = "Start Looping";
+        document.getElementById("startLoop").innerHTML = "Start Looping";
+	
+	    clearInterval(loopId);
+	}
 }
 
-//this one plays all notes together, for example a chord
+/*this one plays all notes together, for example a chord
 function playSimul(){
     for(i = 0; i < arr.length; i++){
 	    if(arr[i] != "silence"){
@@ -80,42 +89,47 @@ function playSimul(){
 		}
 	}
 }
+*/
 
 
-//function to loop in between 2 indices
-function loop(startIndx, endIndx){//infinite loop not supported @_@
-
-    var count = 0;
-	
-	var playingIndx = startIndx; 
-    while(count < 200){//cannot interrupt by clicking stopLoop here hmmmm, also no animation
-	//console.log(playingIndx);
-	console.log(enableLooping);
-	    if(!enableLooping){
-		    break;
-		} else {
-		    if(playingIndx > endIndx && enableLooping){
-			    playingIndx = startIndx;
-				count++;
-			} else if(enableLooping){
-			    piano.play({
-				    wait: (playingIndx + count * arr.length - startIndx) * beatDuration,
-				    pitch : arr[playingIndx],  
-					label: 'playing'
-				});
-				playingIndx++;
-			} else {}
-		console.log("round " + count);
-	   }
-	}
+function oneLoop(){
+    playSequence();
 }
-
 
 function loopAll(){
-   // enableLooping = true;
-    loop(0, arr.length - 1);
+//console.log(document.getElementById("startLoop").value);
+    if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
+	//console.log(document.getElementById("startLoop").value);
+	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
+		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
+	    playSequence();
+	    loopId = setInterval("oneLoop()", beatDuration * arr.length * 1000);    
+	} else {//if we want to stop
+	//console.log(document.getElementById("startLoop").value);
+	    document.getElementById("startLoop").value = "Start Looping";
+		document.getElementById("startLoop").innerHTML = "Start Looping";
+	    clearInterval(loopId);
+	}
 }
+/*
+function playPause(){
+	if(document.getElementById("#all").value == "Play"){//if paused
+		    document.getElementById("#all").value == "Pause";
+			document.getElementById("#all").innerHTML == "Pause";
+		    playSequence();
+		} else { //if playing
+		    document.getElementById("#all").value == "Play";
+			document.getElementById("#all").innerHTML == "Play";
+		    piano.stop("playing");
+		if(document.getElementById("startLoop").value == "Stop Looping"){
+		    document.getElementById("startLoop").value = "Start Looping";
+		    document.getElementById("startLoop").innerHTML = "Start Looping";
+	        clearInterval(loopId);
+		} else {}
 
+     }     
+}
+*/
 var piano = new Wad({
     source : 'sine', 
     env : {
@@ -168,8 +182,8 @@ function playAnimation(duration, wholeDuration) {
 		// Change each div's colour as note plays
 		// Applies setTimeout function to every div in the timeline
 		$("#sortable-system div").map(function() {
-			var that = $(this);
-			
+			var that = $(this);//that refers to the div 
+		//	if(document.getElementById("#all").value == "play"){
 			setTimeout(function () {
 				that.css({ 
 				   "background": "#80ffff"
@@ -177,7 +191,7 @@ function playAnimation(duration, wholeDuration) {
 			}, duration + offset);
 			
 			offset += duration;
-			
+		//  }	
 		});
 		
 		// After track is done, change back the colour
@@ -205,34 +219,36 @@ $(document).ready(function() {
 		}
 	});
 	
+	
 	$("#all").on("click", function() {
-	   // updateArray();
-		playSequence();
+	    playSequence();
+	});
+
+	$("#pause").on("click", function() {
+	    piano.stop("playing");
+	    if(document.getElementById("startLoop").value == "Stop Looping"){
+		    document.getElementById("startLoop").value = "Start Looping";
+		    document.getElementById("startLoop").innerHTML = "Start Looping";
+	        clearInterval(loopId);
+		}
 	});
 	
-	$("#same").on("click", function() {
-		playSimul();
-	});
 	
 	$("#clear").on("click", function() {
 		clearAllSound();
 		$("#sortable-system .col-md-1").remove(); //remove notes from the timeline
+		if(document.getElementById("startLoop").value == "Stop Looping"){
+		    document.getElementById("startLoop").value = "Start Looping";
+		    document.getElementById("startLoop").innerHTML = "Start Looping";
+	        clearInterval(loopId);
+		}
 	});
 	
-	$("#loopAll").on("click", function() {
-        enableLooping = true;
-		loopAll();
-    });	
-	
 	$("#startLoop").on("click", function() {
-        enableLooping = true;
+	    loopAll();
     });	
 	
-	$("#stopLoop").on("click", function() {
-	    piano.stop('playing');
-        enableLooping = false;
-    });	
-	
+
 	/*------------------------------------------------*/
 	/*------------- Generate dynamic grid-------------*/
 	/*------------------------------------------------*/
@@ -282,21 +298,21 @@ $(document).ready(function() {
 			revert: false,
 			snap: false,
 			start: function(event, ui) {
-				var startPosition = ui.item.index();
-				ui.item.data('startPos', startPosition);
+				var startPosition = ui.item.index();//original index
+				ui.item.data('startPos', startPosition);//create data called startPos and set it to startPosition
 			},
 			
 			// Whenever user has stopped sorting and the DOM element (HTML) has changed
 			update: function(event, ui) {
 				var startPosition = ui.item.data('startPos');
-				var endPosition = ui.item.index();
+				var endPosition = ui.item.index();//new position
 				var grabbedNote = "";
 				
 				// Because parseInt returns undefined for letters, we must do a check here
 				if (ui.item.attr('data-note') != "silence") { 
 					grabbedNote = notes[parseInt(ui.item.attr('data-note')) - 12]; 
 				} else {
-					grabbedNote = ui.item.attr('data-note');
+					grabbedNote = ui.item.attr('data-note');//refers to silence
 				}
 				
 				// When position of a note changes on the timeline, follow up 
@@ -328,7 +344,7 @@ $(document).ready(function() {
 			// onto timeline
 			out: function(event, ui) {
 				inBox = false;
-				
+			
 				if (!inBeforeStop) {
 					ui.item.css({
 						"background-color":"red",
@@ -390,7 +406,6 @@ $(document).ready(function() {
 		}).disableSelection();
 			 
 		$(".col-md-1").draggable({
-			appendTo: "#grid-system",
 			cursor: "move",
 			connectToSortable: "#sortable-system",
 			helper: "clone",
