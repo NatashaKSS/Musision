@@ -31,16 +31,20 @@ var enablePlaying = true;
 function Composition(track) {
 	// An array of tracks that contain notes which represents a song
 	// Because one user may have many tracks
-	this.track = []; 
+	this.tracks = [track]; 
 }
 
-Composition.prototype.getTrack = function() {
-	return this.track;
+Composition.prototype.getAllTracks = function() {
+	return this.tracks;
 }
 
 Composition.prototype.addTrack = function(track) {
-	this.track.push(track);
+	this.tracks.push(track);
 }
+
+//Any user's new composition contains, by default, an empty track.
+var composition = new Composition([]);
+
 
 /*
  * Note Object Constructor
@@ -69,9 +73,9 @@ Note.prototype.setDuration = function(dur) {
 }
 
 
-/*
- * Auxillary Functions
- * */
+/*------------------------------------------------*/
+/*-----------------Main Functions-----------------*/
+/*------------------------------------------------*/
 function changeBPM(){
 	beatDuration = 0.3; // Flushes the previous values of beatDuration
     var ans = document.getElementById("bpm-input").value;
@@ -100,7 +104,7 @@ function playSequence() {
     
     // Note to self that noteDuration & wholeDuration will need to change
     // because for each animation of a note, it has a different timing
-    // now that each note has its own timing.
+    // now that each note has its own timing. --> Once diff notes support diff lengths
     
     playAnimation(noteDuration, wholeDuration);
     
