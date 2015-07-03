@@ -22,8 +22,25 @@ var arr = [];//array to store notes to play back
 var beatDuration = 0.3;//Default duration of 1 beat
 var enableLooping = false;
 var loopId = 0;
-var playId = 0;
-var enablePlaying = true;
+
+/*
+ * User Tracks Constructor, named a composition
+ * A composition contains many track, e.g. piano track, guitar track...
+ * */
+function Composition(track) {
+	// An array of tracks that contain notes which represents a song
+	// Because one user may have many tracks
+	this.track = []; 
+}
+
+Composition.prototype.getTrack = function() {
+	return this.track;
+}
+
+Composition.prototype.addTrack = function(track) {
+	this.track.push(track);
+}
+
 /*
  * Note Object Constructor
  * */
@@ -43,7 +60,7 @@ Note.prototype.getDur = function() {
 }
 
 Note.prototype.setPitch = function(pitch) {
-	this.pitch = pitch;
+	this.Pitch = pitch;
 }
 
 Note.prototype.setDuration = function(dur) {
@@ -67,7 +84,7 @@ function changeBPM(){
     	} else if (ans < 0) {
     		throw "negative. Please input a positive number."
     	} else {
-    		beatDuration = beatDuration /(parseInt(ans)/120);
+    		beatDuration = beatDuration / (parseInt(ans)/120);
     	}
     } catch(error) {
     	alert("Input is " + error);
@@ -78,7 +95,7 @@ function changeBPM(){
 function playSequence() {
     var count = 0;
     var noteDuration = (beatDuration) * 1000;
-    var wholeDuration = (beatDuration) * 1000 * (arr.length + 1);
+    var wholeDuration = (beatDuration) * 1000 * (arr.length);
     
     // Note to self that noteDuration & wholeDuration will need to change
     // because for each animation of a note, it has a different timing
@@ -111,7 +128,6 @@ function playSequence() {
 
 //empty the note array    
 function clearAllSound(){
-    piano.stop("playing");
     arr = [];
    
     if(document.getElementById("startLoop").value == "Stop Looping"){
@@ -141,14 +157,12 @@ function loopAll(){
 //console.log(document.getElementById("startLoop").value);
     if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
 	//console.log(document.getElementById("startLoop").value);
-	    enablePlaying = true;
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
 	    playSequence();
 	    loopId = setInterval("oneLoop()", beatDuration * arr.length * 1000);    
 	} else {//if we want to stop
 	//console.log(document.getElementById("startLoop").value);
-	    enableLooping = false;
 	    document.getElementById("startLoop").value = "Start Looping";
 		document.getElementById("startLoop").innerHTML = "Start Looping";
 	    clearInterval(loopId);
@@ -225,35 +239,25 @@ function playAnimation(duration, wholeDuration) {
 		// Change each div's colour as note plays
 		// Applies setTimeout function to every div in the timeline
 		$("#sortable-system div").map(function() {
-			var that = $(this);			    
-				//if(enablePlaying == true){
-				//   console.log("in if, enable " + enablePlaying);
-					playId = setTimeout(function () {
-					   if(enablePlaying){
-			              console.log("in if, enable " + enablePlaying);
-				          that.css({ 
-				            "background": "#80ffff" //change color to light blue
-					      });
-				       } else {//if pause is pressed. 
-			               console.log("in else, enable " + enablePlaying);
-						  setTimeout(function () {
-			            $("#sortable-system div").css({ "background-color": "#109bce" });
-		            }, 100);
-						}
-					}, duration + offset);
-						offset += duration;
-							
-				
+			var that = $(this);//that refers to the div 
+		//	if(document.getElementById("#all").value == "play"){
+			setTimeout(function () {
+				that.css({ 
+				   "background": "#80ffff"
 				});
-		            setTimeout(function () {
-			            $("#sortable-system div").css({ "background-color": "#109bce" });
-		            }, wholeDuration);
-					
-				 
-			    
+			}, duration + offset);
+			
+			offset += duration;
+		//  }	
 		});
-    
+		
+		// After track is done, change back the colour
+		setTimeout(function () {
+			$("#sortable-system div").css({ "background-color": "#109bce" });
+		}, wholeDuration);
+	});
 }
+
 /*------------------------------------------------*/
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
@@ -273,12 +277,10 @@ $(document).ready(function() {
 	});
 	
 	$("#all").on("click", function() {
-	    enablePlaying = true;
 	    playSequence();
 	});
 
-	$("#stop").on("click", function() {
-	    enablePlaying = false;
+	$("#pause").on("click", function() {
 	    piano.stop("playing");
 	    
 	    if(document.getElementById("startLoop").value == "Stop Looping"){
@@ -290,10 +292,9 @@ $(document).ready(function() {
 	
 	
 	$("#clear").on("click", function() {
-	    enablePlaying = false;
 		clearAllSound();
 		$("#sortable-system div").remove(); //remove notes from the timeline
-
+		
 		if(document.getElementById("startLoop").value == "Stop Looping"){
 		    document.getElementById("startLoop").value = "Start Looping";
 		    document.getElementById("startLoop").innerHTML = "Start Looping";
@@ -302,12 +303,12 @@ $(document).ready(function() {
 	});
 	
 	$("#startLoop").on("click", function() {
-	    if(arr.length != 0)loopAll();
+	    loopAll();
     });	
 	
 	$("#sortable-system").mousewheel(function(event, delta) {
 		this.scrollLeft -= (delta * 15);
-		event.preventDefault();
+		event.preventDefault(); // Prevent scrolling down
 	});
 	
 	/*------------------------------------------------*/
