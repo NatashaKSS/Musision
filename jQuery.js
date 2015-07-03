@@ -22,6 +22,7 @@ var arr = [];//array to store notes to play back
 var beatDuration = 0.3;//Default duration of 1 beat
 var enableLooping = false;
 var loopId = 0;
+var enablePlaying = true;
 
 /*
  * User Tracks Constructor, named a composition
@@ -136,6 +137,7 @@ function clearAllSound(){
 	
 	    clearInterval(loopId);
 	}
+	
 }
 
 /*this one plays all notes together, for example a chord
@@ -189,6 +191,24 @@ function playPause(){
      }     
 }
 */
+
+////To pause and play again 
+function Timer(callback, delay) {
+    var timerId, start, remaining = delay;
+
+    this.pause = function() {
+        window.clearTimeout(timerId);
+        remaining -= new Date() - start;
+    };
+
+    this.resume = function() {
+        start = new Date();
+        window.clearTimeout(timerId);
+        timerId = window.setTimeout(callback, remaining);
+    };
+}
+
+
 var piano = new Wad({
     source : 'sine', 
     env : {
@@ -233,7 +253,7 @@ function generateDivs(numOfDivs, cssClass, text) {
 	return divString;
 }
 
-function playAnimation(duration, wholeDuration) {
+function playAnimation(duration, wholeDuration) {///////This needs debugging and cleaning up
 	jQuery(function($) {
 		// This offset timing makes the animation smoother
 		var offset = -200;
@@ -265,7 +285,7 @@ function playAnimation(duration, wholeDuration) {
 		            setTimeout(function () {
 			            $("#sortable-system div").css({ "background-color": "#109bce" });
 		            }, wholeDuration);
-					
+					clearTimeout(playId);
 				 
 			    
 		});
@@ -290,11 +310,27 @@ $(document).ready(function() {
 		}
 	});
 	
+var playingMusic;
+	
 	$("#all").on("click", function() {
 	    enablePlaying = true;
-	    playSequence();
+	    playingMusic = new Timer(playSequence(), 0);
+		
 	});
-
+    
+	//pause is not working properly
+	$("#pause").on("click", function(){
+	    if(document.getElementById("pause").value == "Pause"){//if currently playing
+	    document.getElementById("pause").value = "Pause";
+		enablePlaying = false;
+	    playingMusic.pause();		
+		} else {//want to resume
+		document.getElementById("pause").value = "Resume";
+		enablePlaying = true;
+	    playingMusic.resume();	
+		}
+	});
+	//end pause
 	$("#stop").on("click", function() {
 	    enablePlaying = false;
 	    piano.stop("playing");
@@ -307,10 +343,9 @@ $(document).ready(function() {
 	
 	
 	$("#clear").on("click", function() {
+	    $("#sortable-system div").remove(); //remove notes from the timeline
 	    enablePlaying = false;
 		clearAllSound();
-		
-		$("#sortable-system .col-md-1").remove(); //remove notes from the timeline
 		if(document.getElementById("startLoop").value == "Stop Looping"){
 		    document.getElementById("startLoop").value = "Start Looping";
 		    document.getElementById("startLoop").innerHTML = "Start Looping";
@@ -321,6 +356,7 @@ $(document).ready(function() {
 	$("#startLoop").on("click", function() {
 	    if(arr.length != 0)loopAll();
     });	
+	
 	
 	
 	$("#sortable-system").mousewheel(function(event, delta) {
@@ -481,6 +517,7 @@ $(document).ready(function() {
 			opacity: 0.7,
 			revert: false,
 		});
+		
 		
 	});
 
