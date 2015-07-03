@@ -38,14 +38,14 @@ GridSystem.prototype.generateGrid = function(numRows, numCols) {
 	$(".grid-col-holder").append(generateDivs(numRows, "grid-square", ""));
 	
 	$("#sortable-system").css({
-		"max-width": "100%",
-		"width": this.timelineWidth + 20
+		"width": this.timelineWidth
 	});
 	
 	// Specify height of each row
 	$(".grid-square").css({
 		"height": this.noteHeight // height of each grid square
 	});
+	
 };
 
 // Resizes the grid system by updating the attributes of the 
@@ -64,19 +64,18 @@ GridSystem.prototype.resizeGrid = function() {
 					 	  parseInt($("#timeline").css("border-bottom-width"));
 	//console.log("timeline height: " + this.timelineHeight);
 	
-	this.timelineWidth = $("#timeline").width() - this.scrollbarWidth;
+	this.timelineWidth = $("#timeline").width();
 	//console.log("timeline width: " + this.timelineWidth);
 	
 	this.noteWidth = (this.timelineWidth/this.numOfDivisions);
 	//console.log("note width: " + this.noteWidth);
 	
-	this.noteHeight = $("#timeline").height() / 3;
+	this.noteHeight = this.timelineHeight - 17; //17 is scrollbarWidth(20) - timeline border widths(3)
 	//console.log("note height: " + this.noteHeight);
 	
 	$("#sortable-system").css({
-		"max-width": "100%",
-		"height": this.timelineHeight - 4,
-		"width": this.timelineWidth + 20
+		"height": this.timelineHeight,
+		"width": this.timelineWidth
 	});
 	
 	// Updates every division and note's height and width in timeline

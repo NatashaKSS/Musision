@@ -111,7 +111,8 @@ function playSequence() {
 //empty the note array    
 function clearAllSound(){
     arr = [];
-	if(document.getElementById("startLoop").value == "Stop Looping"){
+   
+    if(document.getElementById("startLoop").value == "Stop Looping"){
 	    document.getElementById("startLoop").value = "Start Looping";
         document.getElementById("startLoop").innerHTML = "Start Looping";
 	
@@ -243,7 +244,7 @@ function playAnimation(duration, wholeDuration) {
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
 $(document).ready(function() {
-	introJs("body").start();
+	//introJs("body").start();
 	
 	$(".col-md-1").on("click", function() {
 		var noteName = $(this).attr('data-note');
@@ -257,13 +258,13 @@ $(document).ready(function() {
 		}
 	});
 	
-	
 	$("#all").on("click", function() {
 	    playSequence();
 	});
 
 	$("#pause").on("click", function() {
 	    piano.stop("playing");
+	    
 	    if(document.getElementById("startLoop").value == "Stop Looping"){
 		    document.getElementById("startLoop").value = "Start Looping";
 		    document.getElementById("startLoop").innerHTML = "Start Looping";
@@ -274,7 +275,8 @@ $(document).ready(function() {
 	
 	$("#clear").on("click", function() {
 		clearAllSound();
-		$("#sortable-system .col-md-1").remove(); //remove notes from the timeline
+		$("#sortable-system div").remove(); //remove notes from the timeline
+		
 		if(document.getElementById("startLoop").value == "Stop Looping"){
 		    document.getElementById("startLoop").value = "Start Looping";
 		    document.getElementById("startLoop").innerHTML = "Start Looping";
@@ -286,7 +288,11 @@ $(document).ready(function() {
 	    loopAll();
     });	
 	
-
+	$("#sortable-system").mousewheel(function(event, delta) {
+		this.scrollLeft -= (delta * 15);
+		event.preventDefault();
+	});
+	
 	/*------------------------------------------------*/
 	/*------------- Generate dynamic grid-------------*/
 	/*------------------------------------------------*/
@@ -295,24 +301,24 @@ $(document).ready(function() {
 	// the bottom because scrollbar (usually 17px on all browsers) 
 	// takes up its space -- trust me LOL
 
-	var numOfDivisions = 8;
+	var numOfDivisions = 16;
 	var timelineHeight = $("#timeline").height() + 
 						 parseInt($("#timeline").css("border-top-width")) + 
 						 parseInt($("#timeline").css("border-bottom-width"));
-	var timelineWidth = $("#timeline").width() - scrollbarWidth;
+	var timelineWidth = $("#timeline").width();
 
 	var grid = new GridSystem(arr.length,
 							  scrollbarWidth,
-							  8,
+							  numOfDivisions,
 							  $("#timeline").position().top,
 							  $("#timeline").position().left,
 							  timelineHeight,
 							  timelineWidth,
-							  ($("#timeline").width() - scrollbarWidth) / numOfDivisions,
-							  $("#timeline").height() / 3);
+							  timelineWidth / numOfDivisions,
+							  timelineHeight - 17); //17 is scrollbarWidth(20) - timeline border widths(3)
 	
 	// Generate initial grid
-	grid.generateGrid(3, numOfDivisions);
+	grid.generateGrid(1, numOfDivisions);
 	
 	// Ensures timeline dimensions are always updated after resizing webpage
 	$(window).on("resize", function () {
@@ -322,11 +328,6 @@ $(document).ready(function() {
 /*------------------------------------------------*/
 /*------------ Draggables & Sortables-------------*/
 /*------------------------------------------------*/
-	$("#sortable-system").css({
-		"height": timelineHeight - 4,
-		"width": timelineWidth + 20
-	}); // 4 and 20 here just makes it look nicer
-	
 	$(function() {
 		var inBox = false; // Flag that facilitates removal of note
 		var inBeforeStop = false; // Flag that facilitates colour of note when removed
@@ -334,6 +335,7 @@ $(document).ready(function() {
 		$("#sortable-system").sortable({
 			scroll: false,
 			revert: false,
+			placeholder: "ui-sortable-placeholder",
 			snap: false,
 			start: function(event, ui) {
 				var startPosition = ui.item.index(); //original index
@@ -411,26 +413,6 @@ $(document).ready(function() {
 		      									beatDuration);
 					arr.push(insertedNote);
 				    
-		      		var numOfNotes = arr.length;
-					
-				    // Procedurally generates more rows if the user has almost filled up timeline with
-				    // notes. 
-				    // ((numOfNotes == (3 * numOfDivisions - 1)) checks if the user has only 1 note left to
-				    // fully fill the timeline to generate 1 row.
-				    // ((numOfNotes > (3 * numOfDivisions)) && (numOfNotes % numOfDivisions == 0)) checks
-				    // if the user, after filling up the first (3 * numOfDivisions - 1) slots --> In this case it is 
-		      		// the first 3 rows, and everytime he almost fills up the next row, generate another following row.
-				    if ((numOfNotes == (3 * numOfDivisions - 1)) ||
-				    	((numOfNotes > (3 * numOfDivisions)) && (numOfNotes % numOfDivisions == 0))) {
-				    	// Append a row of grid-squares
-				    	$(".grid-col-holder").append(generateDivs(1, "grid-square", ""));
-				    	
-				    	// Ensure grid-squares are of correct height
-				    	$(".grid-square").css({
-							"height": grid.noteHeight // height of each grid square
-						});
-				    }
-				  
 				} else {
 					var insertedSilence = new Note(ui.item.attr('data-note'), 
 												   beatDuration);
@@ -441,23 +423,28 @@ $(document).ready(function() {
 				}
 				
 				// Change the look of a note on the timeline
-				$("#sortable-system div").css({
+				$("#sortable-system div").not(".ui-sortable-placeholder").removeClass().css({
 					"height": grid.noteHeight,
 					"width": grid.noteWidth,
-					"box-shadow": "none",
-					"margin-top": "0px",
-					"margin-bottom": "0px",
+					"padding-top": "15px",
+					"background": "#109bce", //default light blue-ish #109bce
+			    	"border-radius": "1em",
+					"display": "inline-block",
+					"text-align": "center",
+					"font-size": "20px",
+					"color": "#FFFFFF",
+					"text-shadow": "1px 1px 2px #000000"
 				});
 				
 			}
 		}).disableSelection();
 			 
 		$(".col-md-1").draggable({
-			cursor: "move",
+			cursor: "pointer",
 			connectToSortable: "#sortable-system",
 			helper: "clone",
 			opacity: 0.7,
-			revert: false
+			revert: false,
 		});
 		
 	});
@@ -565,8 +552,28 @@ sort: function (event, ui) {
     });
 		    },
 		    
-
 Unused code Section 1.1: Web Audio ADSR implementation.
+var numOfNotes = arr.length;
+
+// Procedurally generates more rows if the user has almost filled up timeline with
+// notes. 
+// ((numOfNotes == (3 * numOfDivisions - 1)) checks if the user has only 1 note left to
+// fully fill the timeline to generate 1 row.
+// ((numOfNotes > (3 * numOfDivisions)) && (numOfNotes % numOfDivisions == 0)) checks
+// if the user, after filling up the first (3 * numOfDivisions - 1) slots --> In this case it is 
+// the first 3 rows, and everytime he almost fills up the next row, generate another following row.
+if ((numOfNotes == (3 * numOfDivisions - 1)) ||
+	((numOfNotes > (3 * numOfDivisions)) && (numOfNotes % numOfDivisions == 0))) {
+	// Append a row of grid-squares
+	$(".grid-col-holder").append(generateDivs(1, "grid-square", ""));
+	
+	// Ensure grid-squares are of correct height
+	$(".grid-square").css({
+		"height": grid.noteHeight // height of each grid square
+	});
+}
+				 
+Unused code Section 1.2: Web Audio ADSR implementation.
 var context = new AudioContext();
 var arr = [];
 

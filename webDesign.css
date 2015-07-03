@@ -3,6 +3,10 @@ body {
 	margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px
 }
 
+a {
+	cursor: pointer;
+}
+
 .container {
 	z-index: 1;
 }
@@ -27,44 +31,52 @@ body {
 
 #timeline {
 	position: relative;
-	white-space: nowrap;
     left: 0px; top:0px; right:0; bottom:0;
     z-index: 0;
     background-color: none;
     border-top: solid 3px black;
     border-bottom: solid 2px black;
-    height: 174px;
+    height: 78px;
     width: auto;
 }
-/*
-#notes-system {
-	position: absolute;
-	overflow-y: auto;
-	overflow-x: hidden;
-	white-space: nowrap;
-    left: 0px; top:0px; right:0; bottom:0;
-    z-index: 0;
-    background-color: none;
-    height: 170px;
-    width: 100%;
-    max-width: 100%;
-}
-*/
+
 #sortable-system {
 	position: absolute;
-	overflow-y: auto;
-	overflow-x: hidden;
+	overflow-x: auto;
+	overflow-y: hidden;
 	white-space: nowrap;
 	z-index: 0;
+	height: 78px;
 	width: auto;
     max-width: 100%;
 }
+
+.ui-sortable-placeholder {
+	height: 0px; /* This is like...the most important line LOL*/
+	width: 45px; /* Just the right size */
+    display: inline-block;
+}
+
+#sortable-system div {
+	cursor: pointer;
+	
+	/* Chunk of code here prevents awkward 
+       highlighting when dragging*/
+    -webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;		
+}
+
 
 #grid-system {
 	position: absolute;
 	left: 0px; top:0px; right:0; bottom:0px;
 	z-index: 0;
-	height: 171px;
+	height: 55px;
 	width: auto;
 }
 
@@ -79,16 +91,14 @@ body {
 
 .animate-note {
 	background-color: red;
-	height: 33%%;
 	width: 0.3%;
-	/*animation: move_eye 4s linear 0s;*/
 }
 
 /*@keyframes move_eye { from { margin-left:-1%; } to { margin-left:100%; } }
 */
 .grid-square {
 	position: relative;
-	height: 56.3333333336px; /* Default height just in case */
+	height: 53px; /* Default height just in case */
 	border: solid 1px #e4e4e4;
 	
 	/* Chunk of code here prevents awkward 
@@ -102,18 +112,16 @@ body {
 	user-select: none;			
 }
 
-#sortable div {
-}
-
 .col-md-1 {
-	top: 0px;
+    position: relative;
+    display: inline;
+	top: 0.5em;
 	padding-top:0.3em;
 	padding-bottom:0.1em;
     margin-top:2px;
     margin-bottom:2px;
     margin-left:auto;
     margin-right:auto;
-    position: relative;
     float: left;
     
     text-decoration:none;
@@ -123,7 +131,6 @@ body {
     font-size:2em;
     font-weight:bold;
     color:#fff;
-    cursor:pointer;
     border: none;
     background: #109bce;/*default light blue-ish #109bce*/
     border-radius: 1em;
@@ -144,14 +151,18 @@ body {
 
 
 .col-md-1:active {
+	cursor:grab;
+	cursor:pointer;
     box-shadow: inset 0px 1px 0px #2ab7ec, 
     			0px 2px 0px 0px #07526e, 
     			0px 5px 3px #999;
 }
 
 .col-md-1:hover {
-	top: 3px;
+	top: 0.6em;
     background: #004080;
+    cursor:grab;
+    cursor:pointer;
 }
 
 
