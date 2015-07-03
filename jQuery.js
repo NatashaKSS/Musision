@@ -22,7 +22,8 @@ var arr = [];//array to store notes to play back
 var beatDuration = 0.3;//Default duration of 1 beat
 var enableLooping = false;
 var loopId = 0;
-
+var playId = 0;
+var enablePlaying = true;
 /*
  * Note Object Constructor
  * */
@@ -42,7 +43,7 @@ Note.prototype.getDur = function() {
 }
 
 Note.prototype.setPitch = function(pitch) {
-	this.Pitch = pitch;
+	this.pitch = pitch;
 }
 
 Note.prototype.setDuration = function(dur) {
@@ -110,6 +111,7 @@ function playSequence() {
 
 //empty the note array    
 function clearAllSound(){
+    piano.stop("playing");
     arr = [];
    
     if(document.getElementById("startLoop").value == "Stop Looping"){
@@ -139,12 +141,14 @@ function loopAll(){
 //console.log(document.getElementById("startLoop").value);
     if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
 	//console.log(document.getElementById("startLoop").value);
+	    enablePlaying = true;
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
 	    playSequence();
 	    loopId = setInterval("oneLoop()", beatDuration * arr.length * 1000);    
 	} else {//if we want to stop
 	//console.log(document.getElementById("startLoop").value);
+	    enableLooping = false;
 	    document.getElementById("startLoop").value = "Start Looping";
 		document.getElementById("startLoop").innerHTML = "Start Looping";
 	    clearInterval(loopId);
@@ -221,25 +225,35 @@ function playAnimation(duration, wholeDuration) {
 		// Change each div's colour as note plays
 		// Applies setTimeout function to every div in the timeline
 		$("#sortable-system div").map(function() {
-			var that = $(this);//that refers to the div 
-		//	if(document.getElementById("#all").value == "play"){
-			setTimeout(function () {
-				that.css({ 
-				   "background": "#80ffff"
+			var that = $(this);			    
+				//if(enablePlaying == true){
+				//   console.log("in if, enable " + enablePlaying);
+					playId = setTimeout(function () {
+					   if(enablePlaying){
+			              console.log("in if, enable " + enablePlaying);
+				          that.css({ 
+				            "background": "#80ffff" //change color to light blue
+					      });
+				       } else {//if pause is pressed. 
+			               console.log("in else, enable " + enablePlaying);
+						  setTimeout(function () {
+			            $("#sortable-system div").css({ "background-color": "#109bce" });
+		            }, 100);
+						}
+					}, duration + offset);
+						offset += duration;
+							
+				
 				});
-			}, duration + offset);
-			
-			offset += duration;
-		//  }	
+		            setTimeout(function () {
+			            $("#sortable-system div").css({ "background-color": "#109bce" });
+		            }, wholeDuration);
+					
+				 
+			    
 		});
-		
-		// After track is done, change back the colour
-		setTimeout(function () {
-			$("#sortable-system div").css({ "background-color": "#109bce" });
-		}, wholeDuration);
-	});
+    
 }
-
 /*------------------------------------------------*/
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
@@ -259,10 +273,12 @@ $(document).ready(function() {
 	});
 	
 	$("#all").on("click", function() {
+	    enablePlaying = true;
 	    playSequence();
 	});
 
-	$("#pause").on("click", function() {
+	$("#stop").on("click", function() {
+	    enablePlaying = false;
 	    piano.stop("playing");
 	    
 	    if(document.getElementById("startLoop").value == "Stop Looping"){
@@ -274,9 +290,10 @@ $(document).ready(function() {
 	
 	
 	$("#clear").on("click", function() {
+	    enablePlaying = false;
 		clearAllSound();
 		$("#sortable-system div").remove(); //remove notes from the timeline
-		
+
 		if(document.getElementById("startLoop").value == "Stop Looping"){
 		    document.getElementById("startLoop").value = "Start Looping";
 		    document.getElementById("startLoop").innerHTML = "Start Looping";
@@ -285,7 +302,7 @@ $(document).ready(function() {
 	});
 	
 	$("#startLoop").on("click", function() {
-	    loopAll();
+	    if(arr.length != 0)loopAll();
     });	
 	
 	$("#sortable-system").mousewheel(function(event, delta) {
