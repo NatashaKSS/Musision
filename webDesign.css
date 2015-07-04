@@ -165,11 +165,9 @@ a {
     cursor:pointer;
 }
 
-#rest {
+[data-note="silence"] {
 	opacity: 0.5;
 }
-
-
 
 
 

@@ -18,7 +18,6 @@ var notes = ["C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
 /*
  * Variables Declaration
  */
-var arr = [];//array to store notes to play back
 var beatDuration = 0.3;//Default duration of 1 beat
 var enableLooping = false;
 var loopId = 0;
@@ -29,20 +28,38 @@ var enablePlaying = true;
  * A composition contains many track, e.g. piano track, guitar track...
  * */
 function Composition(track) {
-	// An array of tracks that contain notes which represents a song
-	// Because one user may have many tracks
+	// this.tracks represents an array of tracks.
+	// Because one user may have many tracks.
+	// A track contains a song of some number of notes.
 	this.tracks = [track]; 
 }
 
+// Gets the array of tracks a user has made
 Composition.prototype.getAllTracks = function() {
 	return this.tracks;
 }
 
+// Get one particular track a user has made
+Composition.prototype.getTrack = function(trackNum) {
+	return this.tracks[trackNum];
+}
+
+// Adds a track to a user's composition
 Composition.prototype.addTrack = function(track) {
 	this.tracks.push(track);
 }
 
-//Any user's new composition contains, by default, an empty track.
+// Adds a note to a specified track in a user's composition
+Composition.prototype.addNote = function(trackNum, note) {
+	this.tracks[trackNum].push(note);
+}
+
+// Empty a specified track 
+Composition.prototype.emptyTrack = function(trackNum) {
+	this.tracks[trackNum] = [];
+}
+
+//Any user's new composition contains, by default, one track.
 var composition = new Composition([]);
 
 
@@ -100,7 +117,7 @@ function changeBPM(){
 function playSequence() {
     var count = 0;
     var noteDuration = (beatDuration) * 1000;
-    var wholeDuration = (beatDuration) * 1000 * (arr.length);
+    var wholeDuration = (beatDuration) * 1000 * (composition.getTrack(0).length);
     
     // Note to self that noteDuration & wholeDuration will need to change
     // because for each animation of a note, it has a different timing
@@ -108,13 +125,13 @@ function playSequence() {
     
     playAnimation(noteDuration, wholeDuration);
     
-	while(count < arr.length){
-	    if(arr[count].getPitch() != "silence"){
+	while(count < composition.getTrack(0).length){
+	    if(composition.getTrack(0)[count].getPitch() != "silence"){
 		    piano.play({ 
 	    	    wait : count * beatDuration,
 	    	    // beatDuration should be arr[count].getDur(), but need to 
 			    // change other things first.
-			    pitch : arr[count].getPitch(),
+			    pitch : composition.getTrack(0)[count].getPitch(),
 				label : "playing" 
 		    });
 		    
@@ -134,7 +151,8 @@ function playSequence() {
 //empty the note array    
 function clearAllSound(){
     piano.stop("playing");
-    arr = [];
+    composition.emptyTrack(0);
+    
 	if(document.getElementById("startLoop").value == "Stop Looping"){
 	    document.getElementById("startLoop").value = "Start Looping";
         document.getElementById("startLoop").innerHTML = "Start Looping";
@@ -167,7 +185,7 @@ function loopAll(){
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
 	    playSequence();
-	    loopId = setInterval("oneLoop()", beatDuration * arr.length * 1000);    
+	    loopId = setInterval("oneLoop()", beatDuration * composition.getTrack(0).length * 1000);    
 	} else {//if we want to stop
 	//console.log(document.getElementById("startLoop").value);
 	    enableLooping = false;
@@ -290,8 +308,6 @@ function playAnimation(duration, wholeDuration) {///////This needs debugging and
 			            $("#sortable-system div").css({ "background-color": "#109bce" });
 		            }, wholeDuration);
 					clearTimeout(playId);
-				 
-			    
 		});
     
 }
@@ -319,7 +335,6 @@ var playingMusic;
 	$("#all").on("click", function() {
 	    enablePlaying = true;
 	    playingMusic = new Timer(playSequence(), 0);
-		
 	});
     
 	//pause is not working properly
@@ -358,11 +373,10 @@ var playingMusic;
 	});
 	
 	$("#startLoop").on("click", function() {
-	    if(arr.length != 0)loopAll();
+	    if(composition.getTrack(0).length != 0)loopAll();
     });	
 	
-	
-	
+	// Allows user to scroll through timeline horizontally using mousewheel.
 	$("#sortable-system").mousewheel(function(event, delta) {
 		this.scrollLeft -= (delta * 15);
 		event.preventDefault(); // Prevent scrolling down
@@ -382,7 +396,7 @@ var playingMusic;
 						 parseInt($("#timeline").css("border-bottom-width"));
 	var timelineWidth = $("#timeline").width();
 
-	var grid = new GridSystem(arr.length,
+	var grid = new GridSystem(composition.getTrack(0).length,
 							  scrollbarWidth,
 							  numOfDivisions,
 							  $("#timeline").position().top,
@@ -436,12 +450,13 @@ var playingMusic;
 				// with appropriate swap in position of notes in the array as well
 				if (startPosition < endPosition) {
 					// When swapping from left to right
-					arr.splice(endPosition + 1, 0, grabbedNote);
-					arr.splice(startPosition, 1);
+					composition.getTrack(0).splice(endPosition + 1, 0, grabbedNote);
+					composition.getTrack(0).splice(startPosition, 1);
+					
 				} else if (startPosition > endPosition) {
 					// When swapping from right  to left
-					arr.splice(endPosition, 0, grabbedNote);
-					arr.splice(startPosition + 1, 1);
+					composition.getTrack(0).splice(endPosition, 0, grabbedNote);
+					composition.getTrack(0).splice(startPosition + 1, 1);
 				}
 				
 			},
@@ -476,7 +491,8 @@ var playingMusic;
 				
 				if (!inBox) {
 					var startPosition = ui.item.data('startPos');
-					arr.splice(startPosition, 1);
+					composition.getTrack(0).splice(startPosition, 1);
+					
 					ui.item.remove();
 				}				
 			},
@@ -486,15 +502,14 @@ var playingMusic;
 				if(ui.item.attr('data-note') != "silence"){
 		      		var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12], 
 		      									beatDuration);
-					arr.push(insertedNote);
+					composition.addNote(0, insertedNote);
 				    
 				} else {
 					var insertedSilence = new Note(ui.item.attr('data-note'), 
 												   beatDuration);
 					// Pitch for silence is just "silence"
 					// ui.item.attr('data-note')) is just the string "silence"
-	
-					arr.push(insertedSilence);
+					composition.addNote(0, insertedSilence);
 				}
 				
 				// Change the look of a note on the timeline
@@ -510,7 +525,6 @@ var playingMusic;
 					"color": "#FFFFFF",
 					"text-shadow": "1px 1px 2px #000000"
 				});
-				
 			}
 		}).disableSelection();
 			 
