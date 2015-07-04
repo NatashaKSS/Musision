@@ -3,9 +3,15 @@
 <head>
 	<title> Musision </title>
 	
-	<!-- BootStrap and JQuery initialization-->
+	<!-- Miscellaneous sheets -->
 	<meta charset="utf-8">
   	<meta name="viewport" content="width=device-width, initial-scale=1">
+  	
+  	<!-- CSS Stylesheets -->
+  	<link rel="stylesheet" type="text/css" href="webDesign.css"/>
+	<link rel="stylesheet" type="text/css" href="introJs/introjs.css"/>
+	
+	<!-- BootStrap and JQuery initialization-->
   	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
   	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"/>
@@ -27,8 +33,6 @@
 	<script src="jQuery.js"></script>
 	<script src="gridSystem.js"></script>
 	
-	<link rel="stylesheet" type="text/css" href="webDesign.css"/>
-	<link rel="stylesheet" type="text/css" href="introJs/introjs.css"/>
 	
 </head>
 
@@ -42,14 +46,22 @@
 	  </div>
 	  <div>
 		<ul class="nav navbar-nav" style="display:inline;">
-		 <!--<li><a href="#">Set Key</a></li> Removed this button first to avoid people questioning the use of this button-->
+		 
+		 <!--- To download composition --->
 		 <li><a>Download</a></li> 
-		 <!--- to play or clear all notes --->
+		 <!--- to play all notes --->
 		 <li><a id="all" data-step="4" data-intro="Click here to play your entire song, a note at a time." data-position="bottom"> Play </a></li>
-
-		<li><a id="stop"> Stop </a></li>
-		<!--<li><a id="same" href="#" data-step="5" data-intro="Click here to play all notes on the timeline simultaneously" data-position="bottom">Play All</a></li>-->
+		 <!--- to stop all notes --->
+		 <li><a id="stop"> Stop </a></li>
+		 
+		 <!--<li><a id="same" href="#" data-step="5" data-intro="Click here to play all notes on the timeline simultaneously" data-position="bottom">Play All</a></li>-->
+		 
+		 <!--- to clear all notes from timeline --->
 		 <li><a id="clear" data-step="6" data-intro="Click here to clear all notes from timeline" data-position="bottom">Clear All</a></li>
+		 
+		 <!--- to add a track --->
+		 <li><a id="addTrack"> Add Track </a></li>
+		 
 		 <li>
 		  <div class="navbar-form pull-left">
     	  <input id="bpm-input" type="text" class="input-small" placeholder=" 120" 
@@ -66,18 +78,20 @@
 	  </div>
 	 </div>
 	</nav>
-	 
-	<div class="container"> <!-- Enabled by bootstrap -->
 	
-	 <div id="timeline" data-step="3" data-intro="Drag any note here and start composing!" data-position="bottom">
-	   <div id="grid-system">
+	<!-- Container class Enabled by bootstrap -->
+	<div id="timeline-system" class="container">
+	 <div class="timeline" data-step="3" data-intro="Drag any note here and start composing!" data-position="bottom">
+	   <div class="grid-system">
 	  
 	   </div>
-	   <div id="sortable-system">
+	   <div class="sortable-system">
 	   
 	   </div>
 	 </div>
-	 
+	</div>
+	
+	<div id="buttons" class="container">
 	 <div class="col-md-1" data-note="60" data-step="2" data-intro="Click on any note to play a sound!" data-position="right">C4</div>
 	 <div class="col-md-1" data-note="61">C#4</div>
 	 <div class="col-md-1" data-note="62">D4</div>

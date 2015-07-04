@@ -27,7 +27,7 @@ function GridSystem(numOfNotes,
 // numRows number of rows.
 GridSystem.prototype.generateGrid = function(numRows, numCols) {
 	// Generate columns
-	$("#grid-system").append(generateDivs(numCols, "grid-col-holder", ""));
+	$(".grid-system").append(generateDivs(numCols, "grid-col-holder", ""));
 	
 	// Specify width of each column
 	$(".grid-col-holder").css({
@@ -37,7 +37,7 @@ GridSystem.prototype.generateGrid = function(numRows, numCols) {
 	// Generate rows per column (Note: columns have class "grid-col-holder")
 	$(".grid-col-holder").append(generateDivs(numRows, "grid-square", ""));
 	
-	$("#sortable-system").css({
+	$(".sortable-system").css({
 		"width": this.timelineWidth
 	});
 	
@@ -53,18 +53,18 @@ GridSystem.prototype.generateGrid = function(numRows, numCols) {
 // Note: Used for window resize, to accommodate different screen
 // resolutions
 GridSystem.prototype.resizeGrid = function() {
-	this.timelinePosTop = $("#timeline").position().top;
+	this.timelinePosTop = $(".timeline").position().top;
 	//console.log("timeline top: " + this.timelinePosTop);
 	
-	this.timelinePosLeft = $("#timeline").position().left;
+	this.timelinePosLeft = $(".timeline").position().left;
 	//console.log("timeline left: " + this.timelinePosLeft);
 	
-	this.timelineHeight = $("#timeline").height() + 
-					 	  parseInt($("#timeline").css("border-top-width")) + 
-					 	  parseInt($("#timeline").css("border-bottom-width"));
+	this.timelineHeight = $(".timeline").height() + 
+					 	  parseInt($(".timeline").css("border-top-width")) + 
+					 	  parseInt($(".timeline").css("border-bottom-width"));
 	//console.log("timeline height: " + this.timelineHeight);
 	
-	this.timelineWidth = $("#timeline").width();
+	this.timelineWidth = $(".timeline").width();
 	//console.log("timeline width: " + this.timelineWidth);
 	
 	this.noteWidth = (this.timelineWidth/this.numOfDivisions);
@@ -73,18 +73,18 @@ GridSystem.prototype.resizeGrid = function() {
 	this.noteHeight = this.timelineHeight - 17; //17 is scrollbarWidth(20) - timeline border widths(3)
 	//console.log("note height: " + this.noteHeight);
 	
-	$("#sortable-system").css({
+	$(".sortable-system").css({
 		"height": this.timelineHeight,
 		"width": this.timelineWidth
 	});
 	
 	// Updates every division and note's height and width in timeline
-	$("#sortable-system div").css({
+	$(".sortable-system div").css({
 		"height": this.noteHeight,
 		"width": this.noteWidth,
 	});
 	
-	$("#grid-system div").css({
+	$(".grid-system div").css({
 		"height": this.noteHeight,
 		"width": this.noteWidth,
 	});

@@ -29,10 +29,11 @@ a {
 /* Contains user workspace, timeline and everything else 
    below top navbar */
 
-#timeline {
+.timeline {
 	position: relative;
     left: 0px; top:0px; right:0; bottom:0;
     z-index: 0;
+    margin-top: 2px;
     background-color: none;
     border-top: solid 3px black;
     border-bottom: solid 2px black;
@@ -40,13 +41,13 @@ a {
     width: auto;
 }
 
-#sortable-system {
-	position: absolute;
+.sortable-system {
+	position: relative;
 	overflow-x: auto;
 	overflow-y: hidden;
 	white-space: nowrap;
 	z-index: 0;
-	height: 78px;
+	height: 83px;
 	width: auto;
     max-width: 100%;
 }
@@ -57,7 +58,7 @@ a {
     display: inline-block;
 }
 
-#sortable-system div {
+.sortable-system div {
 	cursor: pointer;
 	
 	/* Chunk of code here prevents awkward 
@@ -71,8 +72,7 @@ a {
 	user-select: none;		
 }
 
-
-#grid-system {
+.grid-system {
 	position: absolute;
 	left: 0px; top:0px; right:0; bottom:0px;
 	z-index: 0;
@@ -115,6 +115,7 @@ a {
 .col-md-1 {
     position: relative;
     display: inline;
+    z-index: 2;
 	top: 0.5em;
 	padding-top:0.3em;
 	padding-bottom:0.1em;
@@ -163,6 +164,11 @@ a {
     background: #004080;
     cursor:grab;
     cursor:pointer;
+}
+
+.col-md-1.ui-draggable-dragging {
+	z-index: 100;
+	background: yellow;
 }
 
 [data-note="silence"] {

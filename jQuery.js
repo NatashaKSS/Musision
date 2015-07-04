@@ -282,33 +282,33 @@ function playAnimation(duration, wholeDuration) {///////This needs debugging and
 		
 		// Change each div's colour as note plays
 		// Applies setTimeout function to every div in the timeline
-		$("#sortable-system div").map(function() {
+		$(".sortable-system div").map(function() {
 			var that = $(this);			    
-				//if(enablePlaying == true){
-				//   console.log("in if, enable " + enablePlaying);
-					playId = setTimeout(function () {
-					   if(enablePlaying){
-			              console.log("in if, enable " + enablePlaying);
-				          that.css({ 
-				            "background": "#80ffff" //change color to light blue
-					      });
-				       } else {//if pause is pressed. 
-					       clearTimeout(playId);
-			               console.log("in else, enable " + enablePlaying);
-						  setTimeout(function () {
-			            $("#sortable-system div").css({ "background-color": "#109bce" });
-		            }, 100);
-						}
-					}, duration + offset);
-						offset += duration;
-							
-				
-				});
-		            setTimeout(function () {
-			            $("#sortable-system div").css({ "background-color": "#109bce" });
-		            }, wholeDuration);
-					clearTimeout(playId);
+			//if(enablePlaying == true){
+			//   console.log("in if, enable " + enablePlaying);
+			playId = setTimeout(function () {
+			   if(enablePlaying){
+	              console.log("in if, enable " + enablePlaying);
+		          that.css({ 
+		            "background": "#80ffff" //change color to light blue
+			      });
+		       } else {//if pause is pressed. 
+			       clearTimeout(playId);
+	               console.log("in else, enable " + enablePlaying);
+				  setTimeout(function () {
+	            $(".sortable-system div").css({ "background-color": "#109bce" });
+            }, 100);
+				}
+			}, duration + offset);
+				offset += duration;
 		});
+		
+        setTimeout(function () {
+            $(".sortable-system div").css({ "background-color": "#109bce" });
+        }, wholeDuration);
+		clearTimeout(playId);
+
+	});
     
 }
 
@@ -330,7 +330,7 @@ $(document).ready(function() {
 		}
 	});
 	
-var playingMusic;
+	var playingMusic;
 	
 	$("#all").on("click", function() {
 	    enablePlaying = true;
@@ -360,9 +360,8 @@ var playingMusic;
 		}
 	});
 	
-	
 	$("#clear").on("click", function() {
-	    $("#sortable-system div").remove(); //remove notes from the timeline
+	    $(".sortable-system div").remove(); //remove notes from the timeline
 	    enablePlaying = false;
 		clearAllSound();
 		if(document.getElementById("startLoop").value == "Stop Looping"){
@@ -372,35 +371,42 @@ var playingMusic;
 		}
 	});
 	
+	$("#addTrack").on("click", function() {
+		$(".timeline").first().clone().prependTo("#timeline-system");
+		setSortable();
+	});
+	
 	$("#startLoop").on("click", function() {
 	    if(composition.getTrack(0).length != 0)loopAll();
     });	
 	
 	// Allows user to scroll through timeline horizontally using mousewheel.
-	$("#sortable-system").mousewheel(function(event, delta) {
+	$(".sortable-system").mousewheel(function(event, delta) {
 		this.scrollLeft -= (delta * 15);
 		event.preventDefault(); // Prevent scrolling down
 	});
 	
-	/*------------------------------------------------*/
-	/*------------- Generate dynamic grid-------------*/
-	/*------------------------------------------------*/
+	
+	
+/*------------------------------------------------*/
+/*------------- Generate dynamic grid-------------*/
+/*------------------------------------------------*/
 	var scrollbarWidth = 20; 
 	// scrollbarWidth to debug instance where notes would fly to
 	// the bottom because scrollbar (usually 17px on all browsers) 
 	// takes up its space -- trust me LOL
 
 	var numOfDivisions = 16;
-	var timelineHeight = $("#timeline").height() + 
-						 parseInt($("#timeline").css("border-top-width")) + 
-						 parseInt($("#timeline").css("border-bottom-width"));
-	var timelineWidth = $("#timeline").width();
+	var timelineHeight = $(".timeline").height() + 
+						 parseInt($(".timeline").css("border-top-width")) + 
+						 parseInt($(".timeline").css("border-bottom-width"));
+	var timelineWidth = $(".timeline").width();
 
 	var grid = new GridSystem(composition.getTrack(0).length,
 							  scrollbarWidth,
 							  numOfDivisions,
-							  $("#timeline").position().top,
-							  $("#timeline").position().left,
+							  $(".timeline").position().top,
+							  $(".timeline").position().left,
 							  timelineHeight,
 							  timelineWidth,
 							  timelineWidth / numOfDivisions,
@@ -417,18 +423,31 @@ var playingMusic;
 /*------------------------------------------------*/
 /*------------ Draggables & Sortables-------------*/
 /*------------------------------------------------*/
+	function setSortable() {	
 	$(function() {
 		var inBox = false; // Flag that facilitates removal of note
 		var inBeforeStop = false; // Flag that facilitates colour of note when removed
 		
-		$("#sortable-system").sortable({
+		$(".sortable-system").sortable({
 			scroll: false,
 			revert: false,
-			placeholder: "ui-sortable-placeholder",
 			snap: false,
+			placeholder: "ui-sortable-placeholder",
+			connectWith: $(".sortable-system"),
 			start: function(event, ui) {
 				var startPosition = ui.item.index(); //original index
 				ui.item.data('startPos', startPosition); //create data called startPos and set it to startPosition
+				ui.item.css({
+					"z-index": 100
+				});
+				
+				console.log(ui.item.zIndex());
+			},
+			
+			stop: function(event, ui) {
+				ui.item.css({
+					"z-index": 100
+				});
 			},
 			
 			// Whenever user has stopped sorting and the DOM element (HTML) has changed
@@ -470,6 +489,7 @@ var playingMusic;
 					"background-color":"#109bce", // Light blue
 					"border":"none"
 				});
+				
 			},
 			 
 			// If item is dragged outside timeline OR if item is dropped
@@ -513,7 +533,7 @@ var playingMusic;
 				}
 				
 				// Change the look of a note on the timeline
-				$("#sortable-system div").not(".ui-sortable-placeholder").removeClass().css({
+				$(".sortable-system div").not(".ui-sortable-placeholder").removeClass().css({
 					"height": grid.noteHeight,
 					"width": grid.noteWidth,
 					"padding-top": "15px",
@@ -525,20 +545,24 @@ var playingMusic;
 					"color": "#FFFFFF",
 					"text-shadow": "1px 1px 2px #000000"
 				});
+				
+				ui.helper.addClass("col-md-1.ui-draggable-dragging");
 			}
 		}).disableSelection();
 			 
 		$(".col-md-1").draggable({
+			zIndex: 100,
 			cursor: "pointer",
-			connectToSortable: "#sortable-system",
+			connectToSortable: ".sortable-system",
 			helper: "clone",
 			opacity: 0.7,
 			revert: false,
 		});
-		
-		
 	});
-
+	}
+	
+	setSortable();
+	
 });
 
 
@@ -554,8 +578,8 @@ var playingMusic;
 //Aborted functions
 function findIndex(element, count){
     for(child = 1; child <= count; child++){//go down each column
-	    var col = ($("element:nth-child(child)").position().left - $("#timeline").position().left)/noteWidth;
-		var row = ($("element:nth-child(child)").position().top - $("#timeline").position().top)/noteHeight;
+	    var col = ($("element:nth-child(child)").position().left - $(".timeline").position().left)/noteWidth;
+		var row = ($("element:nth-child(child)").position().top - $(".timeline").position().top)/noteHeight;
 		var index = row * numOfDivisions + col;
 		
 		    if(parseInt($("element:nth-child(child)").attr('data-note')) > 0){
@@ -588,8 +612,8 @@ function updateArray(){
 		//end of aborted parts
 
 (IN RECEIVE IN SORTABLE FUNCTION)
-var col = (ui.item.position().left - $("#timeline").position().left)/grid.noteWidth;
-var row = (ui.item.position().top - $("#timeline").position().top)/grid.noteHeight;
+var col = (ui.item.position().left - $(".timeline").position().left)/grid.noteWidth;
+var row = (ui.item.position().top - $(".timeline").position().top)/grid.noteHeight;
 var index = row * numOfDivisions + col;
 
 if (parseInt(ui.item.attr('data-note')) > 0) {
