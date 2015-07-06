@@ -8,7 +8,6 @@ a {
 }
 
 .container {
-	z-index: 1;
 }
 
 /* In the navbar */
@@ -31,9 +30,9 @@ a {
 
 .timeline {
 	position: relative;
-    left: 0px; top:0px; right:0; bottom:0;
-    z-index: 0;
+    left: 0px; top:0; right:0; bottom:0;
     margin-top: 2px;
+    margin-bottom: 10px;
     background-color: none;
     border-top: solid 3px black;
     border-bottom: solid 2px black;
@@ -43,19 +42,25 @@ a {
 
 .sortable-system {
 	position: relative;
-	overflow-x: auto;
+	overflow-x: scroll;
 	overflow-y: hidden;
 	white-space: nowrap;
-	z-index: 0;
 	height: 83px;
 	width: auto;
     max-width: 100%;
 }
 
 .ui-sortable-placeholder {
+	display: inline-block;
+	border-radius: 1em;
 	height: 0px; /* This is like...the most important line LOL*/
-	width: 45px; /* Just the right size */
-    display: inline-block;
+	width: 45px; /* Just the right size 5px */
+	background-color: #109bce;
+	opacity: 0.5;
+}
+
+.ui-draggable-dragging {
+	display: none;
 }
 
 .sortable-system div {
@@ -75,7 +80,6 @@ a {
 .grid-system {
 	position: absolute;
 	left: 0px; top:0px; right:0; bottom:0px;
-	z-index: 0;
 	height: 55px;
 	width: auto;
 }
@@ -94,8 +98,6 @@ a {
 	width: 0.3%;
 }
 
-/*@keyframes move_eye { from { margin-left:-1%; } to { margin-left:100%; } }
-*/
 .grid-square {
 	position: relative;
 	height: 53px; /* Default height just in case */
@@ -115,7 +117,6 @@ a {
 .col-md-1 {
     position: relative;
     display: inline;
-    z-index: 2;
 	top: 0.5em;
 	padding-top:0.3em;
 	padding-bottom:0.1em;
@@ -154,6 +155,7 @@ a {
 .col-md-1:active {
 	cursor:grab;
 	cursor:pointer;
+	background: #09536f;
     box-shadow: inset 0px 1px 0px #2ab7ec, 
     			0px 2px 0px 0px #07526e, 
     			0px 5px 3px #999;
@@ -164,11 +166,6 @@ a {
     background: #004080;
     cursor:grab;
     cursor:pointer;
-}
-
-.col-md-1.ui-draggable-dragging {
-	z-index: 100;
-	background: yellow;
 }
 
 [data-note="silence"] {

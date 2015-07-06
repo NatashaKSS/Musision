@@ -349,6 +349,7 @@ $(document).ready(function() {
 	    playingMusic.resume();	
 		}
 	});
+	
 	//end pause
 	$("#stop").on("click", function() {
 	    enablePlaying = false;
@@ -374,6 +375,12 @@ $(document).ready(function() {
 	$("#addTrack").on("click", function() {
 		$(".timeline").first().clone().prependTo("#timeline-system");
 		setSortable();
+		
+		// mousewheel event in addTrack so that this will be applied to all new timelines
+		$(".sortable-system").mousewheel(function(event, delta) {
+			this.scrollLeft -= (delta * 15);
+			event.preventDefault(); // Prevent scrolling down
+		});
 	});
 	
 	$("#startLoop").on("click", function() {
@@ -432,22 +439,24 @@ $(document).ready(function() {
 			scroll: false,
 			revert: false,
 			snap: false,
-			placeholder: "ui-sortable-placeholder",
+			placeholder: {
+				element: function() {
+		            return $("<div class='ui-sortable-placeholder'></div>")[0];
+		        },
+		        update: function() {
+		        	$(".ui-sortable-placeholder").css({
+			    		"height": grid.noteHeight,
+			    		"width": grid.noteWidth
+			    	});
+		        	
+		            return;
+		        }
+			},
+			
 			connectWith: $(".sortable-system"),
 			start: function(event, ui) {
 				var startPosition = ui.item.index(); //original index
 				ui.item.data('startPos', startPosition); //create data called startPos and set it to startPosition
-				ui.item.css({
-					"z-index": 100
-				});
-				
-				console.log(ui.item.zIndex());
-			},
-			
-			stop: function(event, ui) {
-				ui.item.css({
-					"z-index": 100
-				});
 			},
 			
 			// Whenever user has stopped sorting and the DOM element (HTML) has changed
@@ -482,6 +491,7 @@ $(document).ready(function() {
 			
 			// If item is hovering over timeline
 			over: function(event, ui) {
+				//console.log("over");
 				inBox = true;
 				inBeforeStop = false;
 				
@@ -489,14 +499,14 @@ $(document).ready(function() {
 					"background-color":"#109bce", // Light blue
 					"border":"none"
 				});
-				
 			},
 			 
 			// If item is dragged outside timeline OR if item is dropped
 			// onto timeline
 			out: function(event, ui) {
+				//console.log("out");
 				inBox = false;
-			
+				
 				if (!inBeforeStop) {
 					ui.item.css({
 						"background-color":"red",
@@ -507,6 +517,7 @@ $(document).ready(function() {
 			
 			// Just before releasing dragging and item is outside timeline
 			beforeStop: function(event, ui) {
+				//console.log("beforeStop");
 				inBeforeStop = true;
 				
 				if (!inBox) {
@@ -540,23 +551,25 @@ $(document).ready(function() {
 					"background": "#109bce", //default light blue-ish #109bce
 			    	"border-radius": "1em",
 					"display": "inline-block",
+					"vertical-align": "top",
 					"text-align": "center",
 					"font-size": "20px",
 					"color": "#FFFFFF",
 					"text-shadow": "1px 1px 2px #000000"
 				});
 				
-				ui.helper.addClass("col-md-1.ui-draggable-dragging");
 			}
 		}).disableSelection();
 			 
 		$(".col-md-1").draggable({
-			zIndex: 100,
 			cursor: "pointer",
 			connectToSortable: ".sortable-system",
 			helper: "clone",
 			opacity: 0.7,
 			revert: false,
+			start: function(event, ui) {
+				ui.helper.hide();
+			}
 		});
 	});
 	}
