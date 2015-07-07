@@ -22,7 +22,8 @@ var beatDuration = 0.3;//Default duration of 1 beat
 var enableLooping = false;
 var loopId = 0;
 var enablePlaying = true;
-
+var playingMusic;
+var pause = false;
 /*
  * User Tracks Constructor, named a composition
  * A composition contains many track, e.g. piano track, guitar track...
@@ -59,6 +60,7 @@ Composition.prototype.emptyTrack = function(trackNum) {
 	this.tracks[trackNum] = [];
 }
 
+
 //Any user's new composition contains, by default, one track.
 var composition = new Composition([]);
 
@@ -89,6 +91,24 @@ Note.prototype.setDuration = function(dur) {
 	this.duration = dur;
 }
 
+////To pause and play again 
+function Timer(func, delay) {
+    this.func = func;
+    this.timerId = setTimeout(func, delay); 
+    this.start = new Date(); 
+	this.remaining = delay;
+}
+
+ Timer.prototype.pause = function() {
+    window.clearTimeout(this.timerId);
+    this.remaining -= new Date() - this.start;
+}
+
+ Timer.prototype.resume = function() {
+    this.start = new Date();
+    //window.clearTimeout(this.timerId);
+    this.timerId = window.setTimeout(this.func, this.remaining);
+}
 
 /*------------------------------------------------*/
 /*-----------------Main Functions-----------------*/
@@ -113,6 +133,19 @@ function changeBPM(){
     }
 }
 
+function pianoPlay(noteName){
+    if(noteName != "silence"){
+	    piano.play({
+	    pitch : noteName,
+		label : "playing"
+	});
+	
+	} else {
+	    quarterRest.play();
+
+	}
+}
+
 //play notes consecutively at hard-coded intervals
 function playSequence() {
     var count = 0;
@@ -122,14 +155,31 @@ function playSequence() {
     // Note to self that noteDuration & wholeDuration will need to change
     // because for each animation of a note, it has a different timing
     // now that each note has its own timing. --> Once diff notes support diff lengths
-    
     playAnimation(noteDuration, wholeDuration);
     
+	composition.getTrack(0).map(function(){
+	console.log("enablePlaying " + enablePlaying);
+	console.log("pause " + pause);
+	var pitch = composition.getTrack(0)[count].getPitch();
+	
+	if(enablePlaying && !pause){
+	    playingMusic = new Timer(function(){
+		    pianoPlay(pitch);
+			},  noteDuration * count);
+		    
+	} else if(enablePlaying && pause){
+	    console.log("pause " + pause);
+	    playingMusic.pause();
+	}
+	count++;
+	});
+}
+  /*  
 	while(count < composition.getTrack(0).length){
 	    if(composition.getTrack(0)[count].getPitch() != "silence"){
 		    piano.play({ 
 	    	    wait : count * beatDuration,
-	    	    // beatDuration should be arr[count].getDur(), but need to 
+	    	    // noteDuration should be arr[count].getDur(), but need to 
 			    // change other things first.
 			    pitch : composition.getTrack(0)[count].getPitch(),
 				label : "playing" 
@@ -137,16 +187,16 @@ function playSequence() {
 		    
 		} else {
 		    quarterRest.play({
-			    wait : count * beatDuration, 
-			    // beatDuration should be arr[count].getDur(), but need to 
+			    wait : count * noteDuration, 
+			    // noteDuration should be arr[count].getDur(), but need to 
 			    // change other things first.
 				label : "playing" 
 			});
 		}
 		count = count + 1;
     }
-	
-}
+	*/
+
 
 //empty the note array    
 function clearAllSound(){
@@ -162,73 +212,26 @@ function clearAllSound(){
 	
 }
 
-/*this one plays all notes together, for example a chord
-function playSimul(){
-    for(i = 0; i < arr.length; i++){
-	    if(arr[i] != "silence"){
-		    piano.play({pitch: arr[i]});
-		}
-	}
-}
-*/
-
 
 function oneLoop(){
     playSequence();
 }
 
 function loopAll(){
-//console.log(document.getElementById("startLoop").value);
     if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
-	//console.log(document.getElementById("startLoop").value);
 	    enablePlaying = true;
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
 	    playSequence();
 	    loopId = setInterval("oneLoop()", beatDuration * composition.getTrack(0).length * 1000);    
 	} else {//if we want to stop
-	//console.log(document.getElementById("startLoop").value);
 	    enableLooping = false;
 	    document.getElementById("startLoop").value = "Start Looping";
 		document.getElementById("startLoop").innerHTML = "Start Looping";
 	    clearInterval(loopId);
 	}
 }
-/*
-function playPause(){
-	if(document.getElementById("#all").value == "Play"){//if paused
-		    document.getElementById("#all").value == "Pause";
-			document.getElementById("#all").innerHTML == "Pause";
-		    playSequence();
-		} else { //if playing
-		    document.getElementById("#all").value == "Play";
-			document.getElementById("#all").innerHTML == "Play";
-		    piano.stop("playing");
-		if(document.getElementById("startLoop").value == "Stop Looping"){
-		    document.getElementById("startLoop").value = "Start Looping";
-		    document.getElementById("startLoop").innerHTML = "Start Looping";
-	        clearInterval(loopId);
-		} else {}
 
-     }     
-}
-*/
-
-////To pause and play again 
-function Timer(callback, delay) {
-    var timerId, start, remaining = delay;
-
-    this.pause = function() {
-        window.clearTimeout(timerId);
-        remaining -= new Date() - start;
-    };
-
-    this.resume = function() {
-        start = new Date();
-        window.clearTimeout(timerId);
-        timerId = window.setTimeout(callback, remaining);
-    };
-}
 
 
 var piano = new Wad({
@@ -284,17 +287,15 @@ function playAnimation(duration, wholeDuration) {///////This needs debugging and
 		// Applies setTimeout function to every div in the timeline
 		$(".sortable-system div").map(function() {
 			var that = $(this);			    
-			//if(enablePlaying == true){
-			//   console.log("in if, enable " + enablePlaying);
 			playId = setTimeout(function () {
 			   if(enablePlaying){
-	              console.log("in if, enable " + enablePlaying);
+	            //  console.log("in if, enable " + enablePlaying);
 		          that.css({ 
 		            "background": "#80ffff" //change color to light blue
 			      });
 		       } else {//if pause is pressed. 
 			       clearTimeout(playId);
-	               console.log("in else, enable " + enablePlaying);
+	             //  console.log("in else, enable " + enablePlaying);
 				  setTimeout(function () {
 	            $(".sortable-system div").css({ "background-color": "#109bce" });
             }, 100);
@@ -317,7 +318,6 @@ function playAnimation(duration, wholeDuration) {///////This needs debugging and
 /*------------------------------------------------*/
 $(document).ready(function() {
 	//introJs("body").start();
-	enableScrollHori();
 	
 	$(".col-md-1").on("click", function() {
 		var noteName = $(this).attr('data-note');
@@ -331,22 +331,23 @@ $(document).ready(function() {
 		}
 	});
 	
-	var playingMusic;
+	
 	
 	$("#all").on("click", function() {
 	    enablePlaying = true;
-	    playingMusic = new Timer(playSequence(), 0);
+		playSequence();
 	});
     
 	//pause is not working properly
 	$("#pause").on("click", function(){
 	    if(document.getElementById("pause").value == "Pause"){//if currently playing
-	    document.getElementById("pause").value = "Pause";
-		enablePlaying = false;
-	    playingMusic.pause();		
+	    document.getElementById("pause").value = "Resume";
+		document.getElementById("pause").innerHTML = "Resume";
+		pause = true;
 		} else {//want to resume
-		document.getElementById("pause").value = "Resume";
-		enablePlaying = true;
+		document.getElementById("pause").value = "Pause";
+		document.getElementById("pause").innerHTML = "Pause";
+		pause = false;
 	    playingMusic.resume();	
 		}
 	});
@@ -373,42 +374,29 @@ $(document).ready(function() {
 		}
 	});
 	
-	// trackNum = is already in html by default
-	var trackNum = 1;
-	
 	$("#addTrack").on("click", function() {
-		var newTrack = $(".timeline").first().clone();
-		
-		// Setting the id of tracks added and appending them to correct place
-		// Every new track added will have a unique ID which increments by 1 as
-		// more tracks are added. NOTE THAT WE START COUNTING FROM 0.
-		newTrack.attr('id', "track" + trackNum);
-		newTrack.appendTo("#timeline-system");
-		$("#track" + trackNum + " .sortable-system div").remove();
-		
-		// Sets up sortable and horizontal scrolling for the new tracks
+		$(".timeline").first().clone().prependTo("#timeline-system");
 		setSortable();
-		enableScrollHori();
 		
-		// Correspondingly add a new track to our composition
-		composition.addTrack([]);
-		
-		trackNum++;
+		// mousewheel event in addTrack so that this will be applied to all new timelines
+		$(".sortable-system").mousewheel(function(event, delta) {
+			this.scrollLeft -= (delta * 15);
+			event.preventDefault(); // Prevent scrolling down
+		});
 	});
 	
 	$("#startLoop").on("click", function() {
 	    if(composition.getTrack(0).length != 0)loopAll();
     });	
 	
-	
 	// Allows user to scroll through timeline horizontally using mousewheel.
-	function enableScrollHori() {
-		$(".sortable-system").mousewheel(function(event, delta) {
-			this.scrollLeft -= (delta * 15);
-			event.preventDefault(); // Prevent scrolling down
-		});
-	}
-		
+	$(".sortable-system").mousewheel(function(event, delta) {
+		this.scrollLeft -= (delta * 15);
+		event.preventDefault(); // Prevent scrolling down
+	});
+	
+	
+	
 /*------------------------------------------------*/
 /*------------- Generate dynamic grid-------------*/
 /*------------------------------------------------*/
@@ -448,14 +436,11 @@ $(document).ready(function() {
 	$(function() {
 		var inBox = false; // Flag that facilitates removal of note
 		var inBeforeStop = false; // Flag that facilitates colour of note when removed
-		var trackNumInSortable = 0; // Default trackNum
 		
 		$(".sortable-system").sortable({
 			scroll: false,
 			revert: false,
 			snap: false,
-			connectWith: $(".sortable-system"),
-			
 			placeholder: {
 				element: function() {
 		            return $("<div class='ui-sortable-placeholder'></div>")[0];
@@ -470,13 +455,10 @@ $(document).ready(function() {
 		        }
 			},
 			
+			connectWith: $(".sortable-system"),
 			start: function(event, ui) {
 				var startPosition = ui.item.index(); //original index
 				ui.item.data('startPos', startPosition); //create data called startPos and set it to startPosition
-				
-				trackNumInSortable = parseInt(ui.item.parent().parent().attr("id").substring(5));
-				//Every ID of a track is in the format "track0", "track1", "track23", so substring works here
-				
 			},
 			
 			// Whenever user has stopped sorting and the DOM element (HTML) has changed
@@ -498,19 +480,20 @@ $(document).ready(function() {
 				// with appropriate swap in position of notes in the array as well
 				if (startPosition < endPosition) {
 					// When swapping from left to right
-					composition.getTrack(trackNumInSortable).splice(endPosition + 1, 0, grabbedNote);
-					composition.getTrack(trackNumInSortable).splice(startPosition, 1);
+					composition.getTrack(0).splice(endPosition + 1, 0, grabbedNote);
+					composition.getTrack(0).splice(startPosition, 1);
 					
 				} else if (startPosition > endPosition) {
 					// When swapping from right  to left
-					composition.getTrack(trackNumInSortable).splice(endPosition, 0, grabbedNote);
-					composition.getTrack(trackNumInSortable).splice(startPosition + 1, 1);
+					composition.getTrack(0).splice(endPosition, 0, grabbedNote);
+					composition.getTrack(0).splice(startPosition + 1, 1);
 				}
 				
 			},
 			
 			// If item is hovering over timeline
 			over: function(event, ui) {
+				//console.log("over");
 				inBox = true;
 				inBeforeStop = false;
 				
@@ -523,6 +506,7 @@ $(document).ready(function() {
 			// If item is dragged outside timeline OR if item is dropped
 			// onto timeline
 			out: function(event, ui) {
+				//console.log("out");
 				inBox = false;
 				
 				if (!inBeforeStop) {
@@ -540,26 +524,25 @@ $(document).ready(function() {
 				
 				if (!inBox) {
 					var startPosition = ui.item.data('startPos');
-					composition.getTrack(trackNumInSortable).splice(startPosition, 1);
+					composition.getTrack(0).splice(startPosition, 1);
 					
 					ui.item.remove();
 				}				
 			},
-			
+			 
 			// When timeline receives the user-dragged note
 			receive: function(event, ui) {
 				if(ui.item.attr('data-note') != "silence"){
 		      		var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12], 
 		      									beatDuration);
-					composition.addNote(trackNumInSortable, insertedNote);
-					
+					composition.addNote(0, insertedNote);
+				    
 				} else {
 					var insertedSilence = new Note(ui.item.attr('data-note'), 
 												   beatDuration);
 					// Pitch for silence is just "silence"
 					// ui.item.attr('data-note')) is just the string "silence"
-					composition.addNote(trackNumInSortable, insertedSilence);
-					
+					composition.addNote(0, insertedSilence);
 				}
 				
 				// Change the look of a note on the timeline
