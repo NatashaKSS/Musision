@@ -106,7 +106,6 @@ function Timer(func, delay) {
 
  Timer.prototype.resume = function() {
     this.start = new Date();
-    //window.clearTimeout(this.timerId);
     this.timerId = window.setTimeout(this.func, this.remaining);
 }
 
@@ -133,18 +132,7 @@ function changeBPM(){
     }
 }
 
-function pianoPlay(noteName){
-    if(noteName != "silence"){
-	    piano.play({
-	    pitch : noteName,
-		label : "playing"
-	});
-	
-	} else {
-	    quarterRest.play();
 
-	}
-}
 
 //play notes consecutively at hard-coded intervals
 function playSequence() {
@@ -161,17 +149,27 @@ function playSequence() {
 	console.log("enablePlaying " + enablePlaying);
 	console.log("pause " + pause);
 	var pitch = composition.getTrack(0)[count].getPitch();
-	
-	if(enablePlaying && !pause){
+	if(enablePlaying){
+	if(!pause){
 	    playingMusic = new Timer(function(){
-		    pianoPlay(pitch);
-			},  noteDuration * count);
+		
+            if(pitch != "silence"){
+	             piano.play({
+	             pitch : pitch,
+		         label : "playing"
+	        });
+	        } else {
+	             quarterRest.play({label : "playing"});
+
+	        }
+        },  noteDuration * count);
 		    
-	} else if(enablePlaying && pause){
+	} else {
 	    console.log("pause " + pause);
 	    playingMusic.pause();
 	}
 	count++;
+	}
 	});
 }
   /*  
@@ -213,17 +211,13 @@ function clearAllSound(){
 }
 
 
-function oneLoop(){
-    playSequence();
-}
-
 function loopAll(){
     if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
 	    enablePlaying = true;
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
 	    playSequence();
-	    loopId = setInterval("oneLoop()", beatDuration * composition.getTrack(0).length * 1000);    
+	    loopId = setInterval("playSequence()", beatDuration * composition.getTrack(0).length * 1000);    
 	} else {//if we want to stop
 	    enableLooping = false;
 	    document.getElementById("startLoop").value = "Start Looping";
@@ -293,13 +287,13 @@ function playAnimation(duration, wholeDuration) {///////This needs debugging and
 		          that.css({ 
 		            "background": "#80ffff" //change color to light blue
 			      });
-		       } else {//if pause is pressed. 
+		        } else {//if pause/stop/clearAll is pressed. 
 			       clearTimeout(playId);
 	             //  console.log("in else, enable " + enablePlaying);
 				  setTimeout(function () {
-	            $(".sortable-system div").css({ "background-color": "#109bce" });
-            }, 100);
-				}
+	                $(".sortable-system div").css({ "background-color": "#109bce" });
+                    }, 100);
+			    }
 			}, duration + offset);
 				offset += duration;
 		});
@@ -307,10 +301,9 @@ function playAnimation(duration, wholeDuration) {///////This needs debugging and
         setTimeout(function () {
             $(".sortable-system div").css({ "background-color": "#109bce" });
         }, wholeDuration);
-		clearTimeout(playId);
+		
 
-	});
-    
+	});    
 }
 
 /*------------------------------------------------*/
@@ -344,6 +337,8 @@ $(document).ready(function() {
 	    document.getElementById("pause").value = "Resume";
 		document.getElementById("pause").innerHTML = "Resume";
 		pause = true;
+		console.log("PAUSE " + pause);//DEBUGGING
+		playingMusic.pause();
 		} else {//want to resume
 		document.getElementById("pause").value = "Pause";
 		document.getElementById("pause").innerHTML = "Pause";
