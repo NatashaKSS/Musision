@@ -24,6 +24,7 @@ var loopId = 0;
 var enablePlaying = true;
 var playingMusic;
 var pause = false;
+var startPlayingFrom = 0;
 /*
  * User Tracks Constructor, named a composition
  * A composition contains many track, e.g. piano track, guitar track...
@@ -139,20 +140,37 @@ function changeBPM(){
 
 
 //play notes consecutively at hard-coded intervals
-function playSequence(trackNumber) {
-    var count = 0;
+function playSequence(trackNumber, startIndex, endIndex) {
+    var count = startIndex;
     var noteDuration = (beatDuration) * 1000;
-    var wholeDuration = (beatDuration) * 1000 * (composition.getTrack(0).length);
+    var wholeDuration = (beatDuration) * 1000 * (endIndex - startIndex);
     
     // Note to self that noteDuration & wholeDuration will need to change
     // because for each animation of a note, it has a different timing
     // now that each note has its own timing. --> Once diff notes support diff lengths
     playAnimation(noteDuration, wholeDuration);
     
+	for(count = startIndex; count <= endIndex; count++){
+	var thisPitch = composition.getTrack(trackNumber)[count].getPitch();
+	    if(enablePlaying){
+		    setTimeout(function(){
+			    if(thisPitch != "silence"){
+				    piano.play({
+			            pitch: thisPitch
+			        });
+				} else {
+				    quarterRest.play();
+				}
+				}, (count - startIndex) * noteDuration);
+		}
+	}	
+}
+	
+	/*
     composition.getTrack(trackNumber).map(function(){
 	
 	
-	var thisPitch = composition.getTrack(trackNumber)[count].getPitch();
+	
 	
 	if(enablePlaying){
 	//console.log("still playing, pause " + pause);
@@ -187,8 +205,10 @@ function playSequence(trackNumber) {
 		//pause = false;
 	}
 	    count++;
+		
 	});
-}
+*/
+
   /*  
 	while(count < composition.getTrack(0).length){
 	    if(composition.getTrack(0)[count].getPitch() != "silence"){
@@ -233,8 +253,8 @@ function loopAll(){
 		enableLooping = true;
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
-	    playSequence(0);
-	    loopId = setInterval("playSequence()", beatDuration * composition.getTrack(0).length * 1000);    
+	    playSequence(0, startPlayingFrom, composition.getTrack(0).length - 1);
+	    loopId = setInterval("playSequence(0, startPlayingFrom, composition.getTrack(0).length - 1)", beatDuration * composition.getTrack(0).length * 1000);    
 	} else {//if we want to stop
 	    enableLooping = false;
 	    document.getElementById("startLoop").value = "Start Looping";
@@ -344,13 +364,13 @@ $(document).ready(function() {
 		
 		$("#all").on("click", function() {
 		    enablePlaying = true;
-			playSequence(0);
+			playSequence(0, startPlayingFrom, composition.getTrack(0).length - 1);
 		});
 		
 		$(".play-button").unbind().on("click", function() {
 			var trackNum = parseInt($(this).attr('id').substring(10));
 			
-			playSequence(trackNum);
+			playSequence(trackNum, startPlayingFrom, composition.getTrack(trackNum).length - 1);
 		});
 	    
 		//pause is not working properly
@@ -517,6 +537,7 @@ function setSortable() {
 			update: function(event, ui) {
 				var startPosition = ui.item.data('startPos');
 				var endPosition = ui.item.index();//new position
+				ui.item.data('endPos', endPosition);
 				var grabbedNote = "";
 				
 				// Because parseInt returns undefined for letters, we must do a check here
@@ -611,6 +632,10 @@ function setSortable() {
 					"text-shadow": "1px 1px 2px #000000"
 				});
 				
+				$(".sortable-system div").on("click", function(e){
+				     $(e.target).css({"background": "#80ffff"});
+					 startPlayingFrom = $(e.target).data('endPos');
+				});
 			}
 		}).disableSelection();
 			 
