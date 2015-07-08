@@ -340,7 +340,6 @@ $(document).ready(function() {
 	});
 	
 	
-	
 	$("#all").on("click", function() {
 	    enablePlaying = true;
 		playSequence();
@@ -389,15 +388,26 @@ $(document).ready(function() {
 		
 	});
 	
+	var trackNum = 1; // We start from 1 now since 0 is already in composition by default
+	
 	$("#addTrack").on("click", function() {
-		$(".timeline").first().clone().prependTo("#timeline-system");
-		setSortable();
+		var newTrack = $(".timeline").first().clone();
 		
-		// mousewheel event in addTrack so that this will be applied to all new timelines
-		$(".sortable-system").mousewheel(function(event, delta) {
-			this.scrollLeft -= (delta * 15);
-			event.preventDefault(); // Prevent scrolling down
-		});
+		// Setting the id of tracks added and appending them to correct place
+		// Every new track added will have a unique ID which increments by 1 as
+		// more tracks are added. NOTE THAT WE START COUNTING FROM 0.
+		newTrack.attr('id', "track" + trackNum);
+		newTrack.appendTo("#timeline-system");
+		$("#track" + trackNum + " .sortable-system div").remove();
+		
+		// Sets up sortable and horizontal scrolling for the new tracks
+		setSortable();
+		enableScrollHori();
+		
+		// Correspondingly add a new track to our composition
+		composition.addTrack([]);
+		
+		trackNum++;
 	});
 	
 	$("#startLoop").on("click", function() {
@@ -405,11 +415,13 @@ $(document).ready(function() {
     });	
 	
 	// Allows user to scroll through timeline horizontally using mousewheel.
-	$(".sortable-system").mousewheel(function(event, delta) {
-		this.scrollLeft -= (delta * 15);
-		event.preventDefault(); // Prevent scrolling down
-	});
-	
+	function enableScrollHori() {
+		$(".sortable-system").mousewheel(function(event, delta) {
+			this.scrollLeft -= (delta * 15);
+			event.preventDefault(); // Prevent scrolling down
+		});
+	}
+		
 	
 	
 /*------------------------------------------------*/
@@ -447,15 +459,18 @@ $(document).ready(function() {
 /*------------------------------------------------*/
 /*------------ Draggables & Sortables-------------*/
 /*------------------------------------------------*/
-	function setSortable() {	
+function setSortable() {	
 	$(function() {
 		var inBox = false; // Flag that facilitates removal of note
 		var inBeforeStop = false; // Flag that facilitates colour of note when removed
+		var trackNumInSortable = 0; // Default trackNum
 		
 		$(".sortable-system").sortable({
 			scroll: false,
 			revert: false,
 			snap: false,
+			connectWith: $(".sortable-system"),
+			
 			placeholder: {
 				element: function() {
 		            return $("<div class='ui-sortable-placeholder'></div>")[0];
@@ -470,10 +485,13 @@ $(document).ready(function() {
 		        }
 			},
 			
-			connectWith: $(".sortable-system"),
 			start: function(event, ui) {
 				var startPosition = ui.item.index(); //original index
 				ui.item.data('startPos', startPosition); //create data called startPos and set it to startPosition
+				
+				trackNumInSortable = parseInt(ui.item.parent().parent().attr("id").substring(5));
+				//Every ID of a track is in the format "track0", "track1", "track23", so substring works here
+				
 			},
 			
 			// Whenever user has stopped sorting and the DOM element (HTML) has changed
@@ -495,20 +513,19 @@ $(document).ready(function() {
 				// with appropriate swap in position of notes in the array as well
 				if (startPosition < endPosition) {
 					// When swapping from left to right
-					composition.getTrack(0).splice(endPosition + 1, 0, grabbedNote);
-					composition.getTrack(0).splice(startPosition, 1);
+					composition.getTrack(trackNumInSortable).splice(endPosition + 1, 0, grabbedNote);
+					composition.getTrack(trackNumInSortable).splice(startPosition, 1);
 					
 				} else if (startPosition > endPosition) {
 					// When swapping from right  to left
-					composition.getTrack(0).splice(endPosition, 0, grabbedNote);
-					composition.getTrack(0).splice(startPosition + 1, 1);
+					composition.getTrack(trackNumInSortable).splice(endPosition, 0, grabbedNote);
+					composition.getTrack(trackNumInSortable).splice(startPosition + 1, 1);
 				}
 				
 			},
 			
 			// If item is hovering over timeline
 			over: function(event, ui) {
-				//console.log("over");
 				inBox = true;
 				inBeforeStop = false;
 				
@@ -521,7 +538,6 @@ $(document).ready(function() {
 			// If item is dragged outside timeline OR if item is dropped
 			// onto timeline
 			out: function(event, ui) {
-				//console.log("out");
 				inBox = false;
 				
 				if (!inBeforeStop) {
@@ -539,25 +555,26 @@ $(document).ready(function() {
 				
 				if (!inBox) {
 					var startPosition = ui.item.data('startPos');
-					composition.getTrack(0).splice(startPosition, 1);
+					composition.getTrack(trackNumInSortable).splice(startPosition, 1);
 					
 					ui.item.remove();
 				}				
 			},
-			 
+			
 			// When timeline receives the user-dragged note
 			receive: function(event, ui) {
 				if(ui.item.attr('data-note') != "silence"){
 		      		var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12], 
 		      									beatDuration);
-					composition.addNote(0, insertedNote);
-				    
+					composition.addNote(trackNumInSortable, insertedNote);
+					
 				} else {
 					var insertedSilence = new Note(ui.item.attr('data-note'), 
 												   beatDuration);
 					// Pitch for silence is just "silence"
 					// ui.item.attr('data-note')) is just the string "silence"
-					composition.addNote(0, insertedSilence);
+					composition.addNote(trackNumInSortable, insertedSilence);
+					
 				}
 				
 				// Change the look of a note on the timeline
