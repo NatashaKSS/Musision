@@ -1,6 +1,16 @@
 body {
 	font-family: "Trebuchet MS", Verdana, sans-serif;
 	margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px
+
+	/* Chunk of code here prevents awkward 
+       highlighting when dragging*/
+    -webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;	
 }
 
 a {
@@ -27,19 +37,52 @@ a {
 
 /* Contains user workspace, timeline and everything else 
    below top navbar */
+.track-settings {
+	position: absolute;
+	height: 80px;
+	width: 50px;
+	border-radius: 0.5em;
+	border-bottom: 2px solid black;
+	background-color: #86c2ff; /* Pale Blue*/
+	
+	box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75);
+	-webkit-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75);
+				
+}
+
+/* Triangular play button */
+.play-button {
+	position: relative;
+	width: 0; 
+	height: 0;
+	margin: 5px auto 10px auto;
+	border-top: 15px solid transparent;
+	border-bottom: 15px solid transparent;
+	border-left: 20px solid #004a95; /* Dark Blue */
+}
+
+.play-button:hover {
+	border-left: 20px solid #fbdf60; 
+}
+
+.play-button:active {
+	top: 3px;
+}
 
 .timeline {
 	position: relative;
-    left: 0px; top:0; right:0; bottom:0;
+    left: 51px; top:0; right:0; bottom:0;
     margin-top: 2px;
     margin-bottom: 10px;
     background-color: none;
     border-top: solid 3px black;
     border-bottom: solid 2px black;
     height: 78px;
-    width: auto;
+    width: calc(100% - 51px);
 }
 
+/* Sortable-system */
 .sortable-system {
 	position: relative;
 	overflow-x: auto;
@@ -66,15 +109,7 @@ a {
 .sortable-system div {
 	cursor: pointer;
 	
-	/* Chunk of code here prevents awkward 
-       highlighting when dragging*/
-    -webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-o-user-select: none;
-	user-select: none;		
+		
 }
 
 .grid-system {
@@ -141,18 +176,12 @@ a {
     			0px 10px 5px #999;
     			
     /* Chunk of code here prevents awkward 
-       highlighting when dragging*/
-    -webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-o-user-select: none;
-	user-select: none;			
+       highlighting when dragging*/	
 }
 
 
 .col-md-1:active {
+	top: 0.6em;
 	cursor:grab;
 	cursor:pointer;
 	background: #09536f;
@@ -162,7 +191,6 @@ a {
 }
 
 .col-md-1:hover {
-	top: 0.6em;
     background: #004080;
     cursor:grab;
     cursor:pointer;
@@ -171,32 +199,4 @@ a {
 [data-note="silence"] {
 	opacity: 0.5;
 }
-
-
-
-/* Some omitted code */
-/* Sidebar on left */
-/* Decided we don't really need a sidebar on the left yet 
-   with so much space on the top navbar
-.left-sidebar {
-    position:absolute;
-    left:0; top:80px; bottom: 0;
-    width: 120px;
-    background-color: #575757;
-    border: solid 2px black;
-}
-
-Top navigation bar already enabled by Bootstrap
-.top {
-    position:absolute;
-    left:0; right:0;
-    height: 80px;
-    background-color: #575757;
-    text-align: left;
-    font-size: 2em;
-    color: white;
-}
-*/
-
-
 

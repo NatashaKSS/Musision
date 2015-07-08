@@ -139,7 +139,7 @@ function changeBPM(){
 
 
 //play notes consecutively at hard-coded intervals
-function playSequence() {
+function playSequence(trackNumber) {
     var count = 0;
     var noteDuration = (beatDuration) * 1000;
     var wholeDuration = (beatDuration) * 1000 * (composition.getTrack(0).length);
@@ -149,10 +149,10 @@ function playSequence() {
     // now that each note has its own timing. --> Once diff notes support diff lengths
     playAnimation(noteDuration, wholeDuration);
     
-	composition.getTrack(0).map(function(){
+    composition.getTrack(trackNumber).map(function(){
 	
 	
-	var thisPitch = composition.getTrack(0)[count].getPitch();
+	var thisPitch = composition.getTrack(trackNumber)[count].getPitch();
 	
 	if(enablePlaying){
 	//console.log("still playing, pause " + pause);
@@ -233,7 +233,7 @@ function loopAll(){
 		enableLooping = true;
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
-	    playSequence();
+	    playSequence(0);
 	    loopId = setInterval("playSequence()", beatDuration * composition.getTrack(0).length * 1000);    
 	} else {//if we want to stop
 	    enableLooping = false;
@@ -327,103 +327,120 @@ function playAnimation(duration, wholeDuration) {///////This needs debugging and
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
 $(document).ready(function() {
-	//introJs("body").start();
-	
-	$(".col-md-1").on("click", function() {
-		var noteName = $(this).attr('data-note');
+	function initialize() {
 		
-		if(noteName != "silence"){
-		    piano.play({ 
-			    pitch : notes[parseInt(noteName - 12)] 
-		    });
-		} else {
-			// Do nothing to mimic silence...ooh
-		}
-	});
-	
-	
-	$("#all").on("click", function() {
-	    enablePlaying = true;
-		playSequence();
-	});
-    
-	//pause is not working properly
-	$("#pause").on("click", function(){
-	    if(document.getElementById("pause").value == "Pause"){//if currently playing and pause is clicked, enablePlaying = true, pause = true
-	    document.getElementById("pause").value = "Resume";
-		document.getElementById("pause").innerHTML = "Resume";
-		enablePlaying = true;
-		pause = true;
-		//console.log("PAUSE NOW!!!!");
-		//playingMusic.pause();
-		} else {//want to resume
-		document.getElementById("pause").value = "Pause";
-		document.getElementById("pause").innerHTML = "Pause";
-		enablePlaying = false;
-		pause = false;
-		//console.log("CONTINUE!!!!");
-	    //playingMusic.resume();	
-		}
-	});
-	
-	//end pause
-	$("#stop").on("click", function() {
-	    enablePlaying = false;
-		enableLooping = false;
-	    piano.stop("playing");
+		$(".col-md-1").on("click", function() {
+			
+			var noteName = $(this).attr('data-note');
+			
+			if(noteName != "silence"){
+			    piano.play({ 
+				    pitch : notes[parseInt(noteName - 12)] 
+			    });
+			} else {
+				// Do nothing to mimic silence...ooh
+			}
+		});
+		
+		$("#all").on("click", function() {
+		    enablePlaying = true;
+			playSequence(0);
+		});
+		
+		$(".play-button").unbind().on("click", function() {
+			var trackNum = parseInt($(this).attr('id').substring(10));
+			
+			playSequence(trackNum);
+		});
 	    
-		    document.getElementById("startLoop").value = "Start Looping";
-		    document.getElementById("startLoop").innerHTML = "Start Looping";
-	        clearInterval(loopId);
+		//pause is not working properly
+		$("#pause").on("click", function(){
+		    if(document.getElementById("pause").value == "Pause"){//if currently playing and pause is clicked, enablePlaying = true, pause = true
+		    document.getElementById("pause").value = "Resume";
+			document.getElementById("pause").innerHTML = "Resume";
+			enablePlaying = true;
+			pause = true;
+			//console.log("PAUSE NOW!!!!");
+			//playingMusic.pause();
+			} else {//want to resume
+			document.getElementById("pause").value = "Pause";
+			document.getElementById("pause").innerHTML = "Pause";
+			enablePlaying = false;
+			pause = false;
+			//console.log("CONTINUE!!!!");
+		    //playingMusic.resume();	
+			}
+		});
 		
-	});
+		//end pause
+		$("#stop").on("click", function() {
+		    enablePlaying = false;
+			enableLooping = false;
+		    piano.stop("playing");
+		    
+			    document.getElementById("startLoop").value = "Start Looping";
+			    document.getElementById("startLoop").innerHTML = "Start Looping";
+		        clearInterval(loopId);
+			
+		});
+		
+		$("#clear").on("click", function() {
+		    $(".sortable-system div").remove(); //remove notes from the timeline
+		    enablePlaying = false;
+			enableLooping = false;
+			clearAllSound();
+			
+			    document.getElementById("startLoop").value = "Start Looping";
+			    document.getElementById("startLoop").innerHTML = "Start Looping";
+		        clearInterval(loopId);
+			
+		});
+		
+		$("#startLoop").on("click", function() {
+		    if(composition.getTrack(0).length != 0)loopAll();
+	    });	
+		
+		$(".sortable-system").mousewheel(function(event, delta) {
+			this.scrollLeft -= (delta * 15);
+			event.preventDefault(); // Prevent scrolling down
+		});
 	
-	$("#clear").on("click", function() {
-	    $(".sortable-system div").remove(); //remove notes from the timeline
-	    enablePlaying = false;
-		enableLooping = false;
-		clearAllSound();
-		
-		    document.getElementById("startLoop").value = "Start Looping";
-		    document.getElementById("startLoop").innerHTML = "Start Looping";
-	        clearInterval(loopId);
-		
-	});
+	}
+	
+	/* INITIALIZE EVERYTHINGGGG */
+	//introJs("body").start();
+	initialize();
+	
 	
 	var trackNum = 1; // We start from 1 now since 0 is already in composition by default
 	
 	$("#addTrack").on("click", function() {
-		var newTrack = $(".timeline").first().clone();
+		var newTrack = $(".track").first().clone();
 		
 		// Setting the id of tracks added and appending them to correct place
 		// Every new track added will have a unique ID which increments by 1 as
 		// more tracks are added. NOTE THAT WE START COUNTING FROM 0.
-		newTrack.attr('id', "track" + trackNum);
+		
+		// For play button
+		newTrack.children().eq(0).children().attr('id', "play-track" + trackNum);
+		
+		// For track number
+		newTrack.children().eq(1).attr('id', "track" + trackNum);
+		
+		// Appending to timeline-system
 		newTrack.appendTo("#timeline-system");
 		$("#track" + trackNum + " .sortable-system div").remove();
 		
 		// Sets up sortable and horizontal scrolling for the new tracks
 		setSortable();
-		enableScrollHori();
+		initialize();
 		
 		// Correspondingly add a new track to our composition
 		composition.addTrack([]);
 		
 		trackNum++;
-	});
-	
-	$("#startLoop").on("click", function() {
-	    if(composition.getTrack(0).length != 0)loopAll();
-    });	
-	
-	// Allows user to scroll through timeline horizontally using mousewheel.
-	function enableScrollHori() {
-		$(".sortable-system").mousewheel(function(event, delta) {
-			this.scrollLeft -= (delta * 15);
-			event.preventDefault(); // Prevent scrolling down
-		});
-	}
 		
+	});
 	
 	
 /*------------------------------------------------*/
