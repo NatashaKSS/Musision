@@ -100,14 +100,18 @@ function Timer(func, delay) {
 }
 
  Timer.prototype.pause = function() {
-    window.clearTimeout(this.timerId);
+    clearTimeout(this.timerId);
     this.remaining -= new Date() - this.start;
+	console.log("time left " + this.remaining);
 }
 
  Timer.prototype.resume = function() {
+    clearTimeout(this.timerId);
     this.start = new Date();
-    this.timerId = window.setTimeout(this.func, this.remaining);
+    this.timerId = setTimeout(this.func, this.remaining);
 }
+
+
 
 /*------------------------------------------------*/
 /*-----------------Main Functions-----------------*/
@@ -146,16 +150,18 @@ function playSequence() {
     playAnimation(noteDuration, wholeDuration);
     
 	composition.getTrack(0).map(function(){
-	console.log("enablePlaying " + enablePlaying);
-	console.log("pause " + pause);
-	var pitch = composition.getTrack(0)[count].getPitch();
+	
+	
+	var thisPitch = composition.getTrack(0)[count].getPitch();
 	if(enablePlaying){
-	if(!pause){
+	//console.log("still playing, pause " + pause);
+	//console.log("enablePlaying " + enablePlaying);
+	  if(pause == false){//if playing as normal and haven't paused yet, enablePlaying = true; pause = false;
 	    playingMusic = new Timer(function(){
 		
-            if(pitch != "silence"){
+            if(thisPitch != "silence"){
 	             piano.play({
-	             pitch : pitch,
+	             pitch : thisPitch,
 		         label : "playing"
 	        });
 	        } else {
@@ -164,12 +170,21 @@ function playSequence() {
 	        }
         },  noteDuration * count);
 		    
-	} else {
-	    console.log("pause " + pause);
+	  } else {//when pause is on , enablePlaying = true and pause = true;
+	   // console.log("in Pause " + pause);
+	   //	console.log("enablePlaying " + enablePlaying);
 	    playingMusic.pause();
+	  } 
+	
+	} else if(pause == false){//if want to resume after pausing, enablePlaying = false and pause = false
+	    //console.log("Resuming, pause " + pause);
+		//console.log("enablePlaying " + enablePlaying);
+		playingMusic.resume();
+		
+		enablePlaying = true;
+		//pause = false;
 	}
-	count++;
-	}
+	    count++;
 	});
 }
   /*  
@@ -201,10 +216,9 @@ function clearAllSound(){
     piano.stop("playing");
     composition.emptyTrack(0);
     
-	if(document.getElementById("startLoop").value == "Stop Looping"){
+	if(enableLooping){
 	    document.getElementById("startLoop").value = "Start Looping";
         document.getElementById("startLoop").innerHTML = "Start Looping";
-	
 	    clearInterval(loopId);
 	}
 	
@@ -214,6 +228,7 @@ function clearAllSound(){
 function loopAll(){
     if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
 	    enablePlaying = true;
+		enableLooping = true;
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
 	    playSequence();
@@ -333,40 +348,45 @@ $(document).ready(function() {
     
 	//pause is not working properly
 	$("#pause").on("click", function(){
-	    if(document.getElementById("pause").value == "Pause"){//if currently playing
+	    if(document.getElementById("pause").value == "Pause"){//if currently playing and pause is clicked, enablePlaying = true, pause = true
 	    document.getElementById("pause").value = "Resume";
 		document.getElementById("pause").innerHTML = "Resume";
+		enablePlaying = true;
 		pause = true;
-		console.log("PAUSE " + pause);//DEBUGGING
-		playingMusic.pause();
+		//console.log("PAUSE NOW!!!!");
+		//playingMusic.pause();
 		} else {//want to resume
 		document.getElementById("pause").value = "Pause";
 		document.getElementById("pause").innerHTML = "Pause";
+		enablePlaying = false;
 		pause = false;
-	    playingMusic.resume();	
+		//console.log("CONTINUE!!!!");
+	    //playingMusic.resume();	
 		}
 	});
 	
 	//end pause
 	$("#stop").on("click", function() {
 	    enablePlaying = false;
+		enableLooping = false;
 	    piano.stop("playing");
-	    if(document.getElementById("startLoop").value == "Stop Looping"){
+	    
 		    document.getElementById("startLoop").value = "Start Looping";
 		    document.getElementById("startLoop").innerHTML = "Start Looping";
 	        clearInterval(loopId);
-		}
+		
 	});
 	
 	$("#clear").on("click", function() {
 	    $(".sortable-system div").remove(); //remove notes from the timeline
 	    enablePlaying = false;
+		enableLooping = false;
 		clearAllSound();
-		if(document.getElementById("startLoop").value == "Stop Looping"){
+		
 		    document.getElementById("startLoop").value = "Start Looping";
 		    document.getElementById("startLoop").innerHTML = "Start Looping";
 	        clearInterval(loopId);
-		}
+		
 	});
 	
 	$("#addTrack").on("click", function() {
