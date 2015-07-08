@@ -153,30 +153,32 @@ function playSequence() {
 	
 	
 	var thisPitch = composition.getTrack(0)[count].getPitch();
+	
 	if(enablePlaying){
 	//console.log("still playing, pause " + pause);
 	//console.log("enablePlaying " + enablePlaying);
-	  if(pause == false){//if playing as normal and haven't paused yet, enablePlaying = true; pause = false;
-	    playingMusic = new Timer(function(){
+		if(pause == false){//if playing as normal and haven't paused yet, enablePlaying = true; pause = false;
+			playingMusic = new Timer(function(){
+				
+		        if(thisPitch != "silence"){
+			         piano.play({
+			         pitch : thisPitch,
+				     label : "playing"
+			    });
+		        } else {
+		          quarterRest.play({label : "playing"});
 		
-            if(thisPitch != "silence"){
-	             piano.play({
-	             pitch : thisPitch,
-		         label : "playing"
-	        });
-	        } else {
-	             quarterRest.play({label : "playing"});
-
-	        }
-        },  noteDuration * count);
-		    
-	  } else {//when pause is on , enablePlaying = true and pause = true;
-	   // console.log("in Pause " + pause);
-	   //	console.log("enablePlaying " + enablePlaying);
-	    playingMusic.pause();
-	  } 
+			    }
+		        
+		    },  noteDuration * count);
+			    
+		} else {//when pause is on , enablePlaying = true and pause = true;
+		   // console.log("in Pause " + pause);
+		   //	console.log("enablePlaying " + enablePlaying);
+		    playingMusic.pause();
+		}
 	
-	} else if(pause == false){//if want to resume after pausing, enablePlaying = false and pause = false
+	} else if(pause == false) {//if want to resume after pausing, enablePlaying = false and pause = false
 	    //console.log("Resuming, pause " + pause);
 		//console.log("enablePlaying " + enablePlaying);
 		playingMusic.resume();
