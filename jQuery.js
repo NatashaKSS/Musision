@@ -22,7 +22,7 @@ var beatDuration = 0.3;//Default duration of 1 beat
 var enableLooping = false;
 var loopId = 0;
 var enablePlaying = true;
-var playingMusic;
+//var playingMusic;
 var pause = false;
 var startPlayingFrom = 0;
 /*
@@ -141,73 +141,40 @@ function changeBPM(){
 
 //play notes consecutively at hard-coded intervals
 function playSequence(trackNumber, startIndex, endIndex) {
-    var count = startIndex;
+    var count = 0;
     var noteDuration = (beatDuration) * 1000;
     var wholeDuration = (beatDuration) * 1000 * (endIndex - startIndex);
-    
+    var arr = [];
     // Note to self that noteDuration & wholeDuration will need to change
     // because for each animation of a note, it has a different timing
     // now that each note has its own timing. --> Once diff notes support diff lengths
     playAnimation(noteDuration, wholeDuration);
-    
-	for(count = startIndex; count <= endIndex; count++){
-	var thisPitch = composition.getTrack(trackNumber)[count].getPitch();
-	    if(enablePlaying){
-		    setTimeout(function(){
-			    if(thisPitch != "silence"){
-				    piano.play({
-			            pitch: thisPitch
-			        });
-				} else {
-				    quarterRest.play();
-				}
-				}, (count - startIndex) * noteDuration);
-		}
-	}	
-}
-	
-	/*
-    composition.getTrack(trackNumber).map(function(){
-	
-	
-	
-	
-	if(enablePlaying){
-	//console.log("still playing, pause " + pause);
-	//console.log("enablePlaying " + enablePlaying);
-		if(pause == false){//if playing as normal and haven't paused yet, enablePlaying = true; pause = false;
-			playingMusic = new Timer(function(){
-				
-		        if(thisPitch != "silence"){
-			         piano.play({
-			         pitch : thisPitch,
-				     label : "playing"
-			    });
-		        } else {
-		          quarterRest.play({label : "playing"});
-		
-			    }
-		        
-		    },  noteDuration * count);
-			    
-		} else {//when pause is on , enablePlaying = true and pause = true;
-		   // console.log("in Pause " + pause);
-		   //	console.log("enablePlaying " + enablePlaying);
-		    playingMusic.pause();
-		}
-	
-	} else if(pause == false) {//if want to resume after pausing, enablePlaying = false and pause = false
-	    //console.log("Resuming, pause " + pause);
-		//console.log("enablePlaying " + enablePlaying);
-		playingMusic.resume();
-		
-		enablePlaying = true;
-		//pause = false;
+	for(count = startIndex; count <= endIndex; count++) {
+    	var currentPitch = composition.getTrack(0)[count].getPitch();
+        arr.push(currentPitch);
+    }
+
+	console.log("length " + arr.length);
+    for(indx = 0; indx < arr.length; indx++) {
+    	console.log("arr pitch: " + arr[indx]);
+    	 
+    	 if(arr[indx] != "silence"){
+    		console.log("playing");
+    		piano.play({ 
+ 	    	    wait : indx * noteDuration,
+ 			    pitch : arr[indx],
+ 				label : "playing" 
+ 		    });
+ 		    
+ 		 } else {
+ 			console.log("silence");
+ 		    quarterRest.play({
+ 			    wait : indx * noteDuration,
+ 				label : "playing" 
+ 			});
+ 		 }
 	}
-	    count++;
-		
-	});
-*/
+}
 
   /*  
 	while(count < composition.getTrack(0).length){
@@ -372,7 +339,7 @@ $(document).ready(function() {
 			
 			playSequence(trackNum, startPlayingFrom, composition.getTrack(trackNum).length - 1);
 		});
-	    
+	  /*  
 		//pause is not working properly
 		$("#pause").on("click", function(){
 		    if(document.getElementById("pause").value == "Pause"){//if currently playing and pause is clicked, enablePlaying = true, pause = true
@@ -391,7 +358,7 @@ $(document).ready(function() {
 		    //playingMusic.resume();	
 			}
 		});
-		
+		*/
 		//end pause
 		$("#stop").on("click", function() {
 		    enablePlaying = false;
