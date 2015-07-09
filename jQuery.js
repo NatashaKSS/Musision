@@ -18,13 +18,15 @@ var notes = ["C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
 /*
  * Variables Declaration
  */
-var beatDuration = 0.5;//Default duration of 1 beat
+var beatDuration = 0.3;//Default duration of 1 beat
 var enableLooping = false;
 var loopId = 0;
-var enablePlaying = true;
-//var playingMusic;
+var enablePlaying = true;//<----  can use this to mute/unmute a track
+//var playingMusic;<-- this one was supposed to be used for Pause
 var pause = false;
 var startPlayingFrom = 0;
+var playUntil = 0;
+
 
 /*
  * User Tracks Constructor, named a composition
@@ -215,7 +217,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
     var noteDuration = (beatDuration) * 1000;
     var wholeDuration = (beatDuration) * 1000 * (endIndex - startIndex + 1);
     var arr = [];
-   
+   if(enablePlaying){
     animation.playAnimation(noteDuration, wholeDuration, startIndex, trackNumber);
     
 	for(count = startIndex; count <= endIndex; count++) {
@@ -242,6 +244,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
  				label : "playing" 
  			});
  		 }
+	}
 	}
 }
 
@@ -308,6 +311,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
 
 //empty the note array    
 function clearAllSound(){
+    enablePlaying = false;
     piano.stop("playing");
     composition.emptyTrack(0);
     
@@ -326,9 +330,8 @@ function loopAll(){
 		enableLooping = true;
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
-	    playSequence(0, startPlayingFrom, composition.getTrack(0).length - 1);
-	    loopId = setInterval("playSequence(0, startPlayingFrom, composition.getTrack(0).length - 1)", 
-	    					 beatDuration * (composition.getTrack(0).length - startPlayingFrom) * 1000);
+	    playSequence(0, startPlayingFrom, playUntil);
+	    loopId = setInterval("playSequence(0, startPlayingFrom, playUntil)", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);    
 	} else {//if we want to stop
 	    enableLooping = false;
 	    document.getElementById("startLoop").value = "Start Looping";
@@ -336,7 +339,6 @@ function loopAll(){
 	    clearInterval(loopId);
 	}
 }
-
 
 var piano = new Wad({
     source : 'sine', 
@@ -402,14 +404,21 @@ $(document).ready(function() {
 			
 		});
 		
+		//to select a note to play FROM, click the note and hold the Shift key
+		//to select a note to play UNTIL, double click the note 
+		
 		$("#all").on("click", function() {
+		    if(composition.getTrack(0).length > 1 && playUntil == 0) {
+			    playUntil = composition.getTrack(0).length - 1;
+			}
 		    enablePlaying = true;
-			playSequence(0, startPlayingFrom, composition.getTrack(0).length - 1);
+			playSequence(0, startPlayingFrom, playUntil);
 			startPlayingFrom = 0;//change back to default
+			playUntil = composition.getTrack(0).length - 1;//change back to default
 			//debugging
 			console.log("check play length " + composition.getTrack(0).length + 
 						" and start from " + composition.getTrack(0)[startPlayingFrom].getPitch() + 
-						" to " + composition.getTrack(0)[composition.getTrack(0).length - 1].getPitch());
+						" to " + composition.getTrack(0)[playUntil].getPitch());
 		});
 		
 		$(".play-button").unbind().on("click", function() {
@@ -689,14 +698,33 @@ function setSortable() {
 					"text-shadow": "1px 1px 2px #000000"
 				});
 				
+				var firstNote; 
 				$(".sortable-system div").on("click", function(e){
-				    $(".sortable-system div").css({ "border": "none" }); 
+				    //$(".sortable-system div").css({ "border": "none" });    //comment this line first to allow choosing of starting and ending note
 					// To ensure if user clicks on more than 1 note, the prev note click
 					// will have its border color reverted.
-					
+					firstNote = $(e.target);
+					if(e.shiftKey){//Mouse Click+shift event to choose the first note to play
 				    $(e.target).css({ "border": "1px solid red" });
 					startPlayingFrom = $(e.target).data('endPos');
-					
+					}
+				});
+			
+				$(".sortable-system div").on("dblclick", function(e){	
+                    //if(e.shiftKey){
+					   // firstNote.css({"border": "1px solid red"});
+					   if(startPlayingFrom > 0) {
+					   firstNote.css({ "border": "1px solid red" });//this doesn't work leh =P
+					   }
+                        $(e.target).css({ "border": "1px solid yellow" });
+						playUntil = $(e.target).data('endPos');
+						//startPlayingFrom = tempStart;
+                   // } else {
+					    //playUntil = composition.getTrack(0).length - 1;
+					    //startPlayingFrom = tempStart;
+					//}
+					console.log("first note " + startPlayingFrom);
+					console.log("last note " + playUntil);
 				});
 			}
 			
