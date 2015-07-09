@@ -318,7 +318,7 @@ function loopAll(){
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
 	    playSequence(0, startPlayingFrom, composition.getTrack(0).length - 1);
-	    loopId = setInterval("playSequence(0, startPlayingFrom, composition.getTrack(0).length - 1)", beatDuration * composition.getTrack(0).length * 1000);    
+	    loopId = setInterval("playSequence(0, startPlayingFrom, composition.getTrack(0).length - 1)", beatDuration * (composition.getTrack(0).length - startPlayingFrom) * 1000);    
 	} else {//if we want to stop
 	    enableLooping = false;
 	    document.getElementById("startLoop").value = "Start Looping";
