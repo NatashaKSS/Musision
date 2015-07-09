@@ -141,7 +141,7 @@ function changeBPM(){
 
 //play notes consecutively at hard-coded intervals
 function playSequence(trackNumber, startIndex, endIndex) {
-    var count = 0;
+    //var count = 0;
     var noteDuration = (beatDuration) * 1000;
     var wholeDuration = (beatDuration) * 1000 * (endIndex - startIndex);
     var arr = [];
@@ -151,6 +151,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
     playAnimation(noteDuration, wholeDuration);
 	for(count = startIndex; count <= endIndex; count++) {
     	var currentPitch = composition.getTrack(0)[count].getPitch();
+		console.log("composition " + currentPitch);
         arr.push(currentPitch);
     }
 
@@ -161,7 +162,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
     	 if(arr[indx] != "silence"){
     		console.log("playing");
     		piano.play({ 
- 	    	    wait : indx * noteDuration,
+ 	    	    wait : indx * beatDuration,
  			    pitch : arr[indx],
  				label : "playing" 
  		    });
@@ -169,7 +170,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
  		 } else {
  			console.log("silence");
  		    quarterRest.play({
- 			    wait : indx * noteDuration,
+ 			    wait : indx * beatDuration,
  				label : "playing" 
  			});
  		 }
@@ -332,6 +333,9 @@ $(document).ready(function() {
 		$("#all").on("click", function() {
 		    enablePlaying = true;
 			playSequence(0, startPlayingFrom, composition.getTrack(0).length - 1);
+			startPlayingFrom = 0;//change back to default
+			//debugging
+			console.log("check play length " + composition.getTrack(0).length + " and start from " + composition.getTrack(0)[startPlayingFrom].getPitch() + " to " + composition.getTrack(0)[composition.getTrack(0).length - 1].getPitch());
 		});
 		
 		$(".play-button").unbind().on("click", function() {
