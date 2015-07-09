@@ -25,6 +25,7 @@ var enablePlaying = true;
 //var playingMusic;
 var pause = false;
 var startPlayingFrom = 0;
+
 /*
  * User Tracks Constructor, named a composition
  * A composition contains many track, e.g. piano track, guitar track...
@@ -61,11 +62,6 @@ Composition.prototype.emptyTrack = function(trackNum) {
 	this.tracks[trackNum] = [];
 }
 
-
-//Any user's new composition contains, by default, one track.
-var composition = new Composition([]);
-
-
 /*
  * Note Object Constructor
  * */
@@ -92,6 +88,71 @@ Note.prototype.setDuration = function(dur) {
 	this.duration = dur;
 }
 
+/*
+ * Track Animation Constructor
+ * */
+function Animation() {
+	this.currentAnimationOngoing = [];
+	this.revertAnimationOngoing = [];
+	this.elementsAnimated = [];
+}
+
+Animation.prototype.playAnimation = function(duration, wholeDuration, startIndex) {
+	jQuery(function($) {
+		// This offset timing makes the animation smoother
+		var offset = -200;
+		
+		// Because startIndex doesn't make sense to be -1 in gt() function. So I specified 2 cases, 
+		// one where user clicks first note and tries to play from there and when user
+		// chooses some other note. If not, the formula in the else statement will not work
+		if (startIndex <= 0) { // User chose first note 
+			this.elementsAnimated = $(".sortable-system div");
+		} else {
+			this.elementsAnimated = $(".sortable-system div:gt(" + (startIndex - 1) + ")");
+		}
+		
+		// Change each div's colour as note plays
+		// Applies setTimeout function to every div in the timeline
+		this.elementsAnimated.map(function() {
+				
+			var that = $(this);
+			
+			this.currentAnimationOngoing = setTimeout(function() {
+				that.css({ 
+				   "background": "#80ffff" //change color to light blue
+				});
+			}, duration + offset);
+			 
+			this.revertAnimationOngoing = setTimeout(function () {
+		        $(".sortable-system div").css({ 
+		        	"background-color": "#109bce",
+		        	
+		        });
+		    }, wholeDuration);
+				 
+			offset += duration;
+			
+		});
+		
+	});
+	
+}
+
+//Stops all animation regardless of whether setTimeout or setInterval has been set
+Animation.prototype.stopAnimation = function() {
+	
+	$(".sortable-system div").map(function() {
+		clearTimeout(this.currentAnimationOngoing);
+		clearTimeout(this.revertAnimationOngoing);
+	});
+	
+	$(".sortable-system div").css({ 
+		"background-color": "#109bce", 
+		"border": "none"
+	});
+}
+
+
 ////To pause and play again 
 function Timer(func, delay) {
     this.func = func;
@@ -112,7 +173,10 @@ function Timer(func, delay) {
     this.timerId = setTimeout(this.func, this.remaining);
 }
 
-
+ /* Initialisation of objects */
+//Any user's new composition contains, by default, one track.
+var composition = new Composition([]);
+var animation = new Animation();
 
 /*------------------------------------------------*/
 /*-----------------Main Functions-----------------*/
@@ -137,30 +201,26 @@ function changeBPM(){
     }
 }
 
-
-
 //play notes consecutively at hard-coded intervals
 function playSequence(trackNumber, startIndex, endIndex) {
-    //var count = 0;
     var noteDuration = (beatDuration) * 1000;
-    var wholeDuration = (beatDuration) * 1000 * (endIndex - startIndex);
+    var wholeDuration = (beatDuration) * 1000 * (endIndex - startIndex + 1);
     var arr = [];
-    // Note to self that noteDuration & wholeDuration will need to change
-    // because for each animation of a note, it has a different timing
-    // now that each note has its own timing. --> Once diff notes support diff lengths
-    playAnimation(noteDuration, wholeDuration);
+   
+    animation.playAnimation(noteDuration, wholeDuration, startIndex);
+    
 	for(count = startIndex; count <= endIndex; count++) {
     	var currentPitch = composition.getTrack(0)[count].getPitch();
-		console.log("composition " + currentPitch);
+		//console.log("composition " + currentPitch);
         arr.push(currentPitch);
     }
 
-	console.log("length " + arr.length);
+	//console.log("length " + arr.length);
+	
     for(indx = 0; indx < arr.length; indx++) {
-    	console.log("arr pitch: " + arr[indx]);
+    	//console.log("arr pitch: " + arr[indx]);
     	 
     	 if(arr[indx] != "silence"){
-    		console.log("playing");
     		piano.play({ 
  	    	    wait : indx * beatDuration,
  			    pitch : arr[indx],
@@ -168,8 +228,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
  		    });
  		    
  		 } else {
- 			console.log("silence");
- 		    quarterRest.play({
+ 			quarterRest.play({
  			    wait : indx * beatDuration,
  				label : "playing" 
  			});
@@ -200,6 +259,43 @@ function playSequence(trackNumber, startIndex, endIndex) {
     }
 	*/
 
+/* FOR VAN: IN CASE YOU NEED THIS *******************
+ * 
+ * 
+ * function playAnimation(duration, wholeDuration) {///////This needs debugging and cleaning up
+	jQuery(function($) {
+		// This offset timing makes the animation smoother
+		var offset = -200;
+		
+		// Change each div's colour as note plays
+		// Applies setTimeout function to every div in the timeline
+		$(".sortable-system div").map(function() {
+			var that = $(this);			    
+			playId = setTimeout(function () {
+			   if(enablePlaying){
+	            //  console.log("in if, enable " + enablePlaying);
+		          that.css({ 
+		            "background": "#80ffff" //change color to light blue
+			      });
+		        } else {//if pause/stop/clearAll is pressed. 
+			       clearTimeout(playId);
+	             //  console.log("in else, enable " + enablePlaying);
+				  setTimeout(function () {
+	                $(".sortable-system div").css({ "background-color": "#109bce" });
+                    }, 100);
+			    }
+			}, duration + offset);
+				offset += duration;
+		});
+		
+        setTimeout(function () {
+            $(".sortable-system div").css({ "background-color": "#109bce" });
+        }, wholeDuration);
+		
+
+	});    
+}
+ * */
 
 //empty the note array    
 function clearAllSound(){
@@ -230,7 +326,6 @@ function loopAll(){
 	    clearInterval(loopId);
 	}
 }
-
 
 
 var piano = new Wad({
@@ -277,40 +372,6 @@ function generateDivs(numOfDivs, cssClass, text) {
 	return divString;
 }
 
-function playAnimation(duration, wholeDuration) {///////This needs debugging and cleaning up
-	jQuery(function($) {
-		// This offset timing makes the animation smoother
-		var offset = -200;
-		
-		// Change each div's colour as note plays
-		// Applies setTimeout function to every div in the timeline
-		$(".sortable-system div").map(function() {
-			var that = $(this);			    
-			playId = setTimeout(function () {
-			   if(enablePlaying){
-	            //  console.log("in if, enable " + enablePlaying);
-		          that.css({ 
-		            "background": "#80ffff" //change color to light blue
-			      });
-		        } else {//if pause/stop/clearAll is pressed. 
-			       clearTimeout(playId);
-	             //  console.log("in else, enable " + enablePlaying);
-				  setTimeout(function () {
-	                $(".sortable-system div").css({ "background-color": "#109bce" });
-                    }, 100);
-			    }
-			}, duration + offset);
-				offset += duration;
-		});
-		
-        setTimeout(function () {
-            $(".sortable-system div").css({ "background-color": "#109bce" });
-        }, wholeDuration);
-		
-
-	});    
-}
-
 /*------------------------------------------------*/
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
@@ -328,6 +389,7 @@ $(document).ready(function() {
 			} else {
 				// Do nothing to mimic silence...ooh
 			}
+			
 		});
 		
 		$("#all").on("click", function() {
@@ -335,7 +397,9 @@ $(document).ready(function() {
 			playSequence(0, startPlayingFrom, composition.getTrack(0).length - 1);
 			startPlayingFrom = 0;//change back to default
 			//debugging
-			console.log("check play length " + composition.getTrack(0).length + " and start from " + composition.getTrack(0)[startPlayingFrom].getPitch() + " to " + composition.getTrack(0)[composition.getTrack(0).length - 1].getPitch());
+			console.log("check play length " + composition.getTrack(0).length + 
+						" and start from " + composition.getTrack(0)[startPlayingFrom].getPitch() + 
+						" to " + composition.getTrack(0)[composition.getTrack(0).length - 1].getPitch());
 		});
 		
 		$(".play-button").unbind().on("click", function() {
@@ -367,9 +431,13 @@ $(document).ready(function() {
 		$("#stop").on("click", function() {
 		    enablePlaying = false;
 			enableLooping = false;
+			
 		    piano.stop("playing");
 		    
-			    document.getElementById("startLoop").value = "Start Looping";
+		    startPlayingFrom = 0;
+		    animation.stopAnimation();
+			    
+		    	document.getElementById("startLoop").value = "Start Looping";
 			    document.getElementById("startLoop").innerHTML = "Start Looping";
 		        clearInterval(loopId);
 			
@@ -485,6 +553,7 @@ function setSortable() {
 				element: function() {
 		            return $("<div class='ui-sortable-placeholder'></div>")[0];
 		        },
+		        
 		        update: function() {
 		        	$(".ui-sortable-placeholder").css({
 			    		"height": grid.noteHeight,
@@ -496,6 +565,7 @@ function setSortable() {
 			},
 			
 			start: function(event, ui) {
+				
 				var startPosition = ui.item.index(); //original index
 				ui.item.data('startPos', startPosition); //create data called startPos and set it to startPosition
 				
@@ -506,12 +576,12 @@ function setSortable() {
 			
 			// Whenever user has stopped sorting and the DOM element (HTML) has changed
 			update: function(event, ui) {
+				
 				var startPosition = ui.item.data('startPos');
 				var endPosition = ui.item.index();//new position
-				ui.item.data('endPos', endPosition);
+				ui.item.data('endPos', endPosition);//update and save item's latest data attribute
 				var grabbedNote = "";
 				
-				// Because parseInt returns undefined for letters, we must do a check here
 				if (ui.item.attr('data-note') != "silence") { 
 					grabbedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12], 
 										   beatDuration);
@@ -531,12 +601,14 @@ function setSortable() {
 					// When swapping from right  to left
 					composition.getTrack(trackNumInSortable).splice(endPosition, 0, grabbedNote);
 					composition.getTrack(trackNumInSortable).splice(startPosition + 1, 1);
+				
 				}
 				
 			},
 			
 			// If item is hovering over timeline
 			over: function(event, ui) {
+				
 				inBox = true;
 				inBeforeStop = false;
 				
@@ -544,11 +616,13 @@ function setSortable() {
 					"background-color":"#109bce", // Light blue
 					"border":"none"
 				});
+				
 			},
 			 
 			// If item is dragged outside timeline OR if item is dropped
 			// onto timeline
 			out: function(event, ui) {
+				
 				inBox = false;
 				
 				if (!inBeforeStop) {
@@ -557,6 +631,7 @@ function setSortable() {
 						"border":"2px solid yellow"
 					});
 				}
+				
 			},
 			
 			// Just before releasing dragging and item is outside timeline
@@ -565,25 +640,30 @@ function setSortable() {
 				inBeforeStop = true;
 				
 				if (!inBox) {
+					
 					var startPosition = ui.item.data('startPos');
 					composition.getTrack(trackNumInSortable).splice(startPosition, 1);
-					
 					ui.item.remove();
+					
 				}				
 			},
 			
 			// When timeline receives the user-dragged note
 			receive: function(event, ui) {
 				if(ui.item.attr('data-note') != "silence"){
-		      		var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12], 
+		      		
+					var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12], 
 		      									beatDuration);
+		      		
 					composition.addNote(trackNumInSortable, insertedNote);
 					
 				} else {
+					
 					var insertedSilence = new Note(ui.item.attr('data-note'), 
 												   beatDuration);
 					// Pitch for silence is just "silence"
 					// ui.item.attr('data-note')) is just the string "silence"
+					
 					composition.addNote(trackNumInSortable, insertedSilence);
 					
 				}
@@ -604,10 +684,16 @@ function setSortable() {
 				});
 				
 				$(".sortable-system div").on("click", function(e){
-				     $(e.target).css({"background": "#80ffff"});
-					 startPlayingFrom = $(e.target).data('endPos');
+				    $(".sortable-system div").css({ "border": "none" }); 
+					// To ensure if user clicks on more than 1 note, the prev note click
+					// will have its border color reverted.
+					
+				    $(e.target).css({ "border": "1px solid red" });
+					startPlayingFrom = $(e.target).data('endPos');
+					
 				});
 			}
+			
 		}).disableSelection();
 			 
 		$(".col-md-1").draggable({
