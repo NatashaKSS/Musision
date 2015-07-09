@@ -337,6 +337,8 @@ function loopAll(){
 	    document.getElementById("startLoop").value = "Start Looping";
 		document.getElementById("startLoop").innerHTML = "Start Looping";
 	    clearInterval(loopId);
+		startPlayingFrom = 0;//change back to default
+	    playUntil = composition.getTrack(0).length - 1;//change back to default
 	}
 }
 
@@ -406,6 +408,7 @@ $(document).ready(function() {
 		
 		//to select a note to play FROM, click the note and hold the Shift key
 		//to select a note to play UNTIL, double click the note 
+		//to delete all the colors, press Stop and start all over again fresh!!!
 		
 		$("#all").on("click", function() {
 		    if(composition.getTrack(0).length > 1 && playUntil == 0) {
@@ -453,7 +456,8 @@ $(document).ready(function() {
 			
 		    piano.stop("playing");
 		    
-		    startPlayingFrom = 0;
+		    startPlayingFrom = 0;//change back to default
+			playUntil = composition.getTrack(0).length - 1;//change back to default
 		    animation.stopAnimation();
 			    
 		    	document.getElementById("startLoop").value = "Start Looping";
@@ -467,7 +471,8 @@ $(document).ready(function() {
 		    enablePlaying = false;
 			enableLooping = false;
 			clearAllSound();
-			
+			startPlayingFrom = 0;//change back to default
+			playUntil = composition.getTrack(0).length - 1;//change back to default
 			    document.getElementById("startLoop").value = "Start Looping";
 			    document.getElementById("startLoop").innerHTML = "Start Looping";
 		        clearInterval(loopId);
@@ -475,6 +480,7 @@ $(document).ready(function() {
 		});
 		
 		$("#startLoop").on("click", function() {
+		    enableLooping = true;
 		    if(composition.getTrack(0).length != 0)loopAll();
 	    });	
 		
