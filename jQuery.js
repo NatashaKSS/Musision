@@ -18,7 +18,7 @@ var notes = ["C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
 /*
  * Variables Declaration
  */
-var beatDuration = 0.3;//Default duration of 1 beat
+var beatDuration = 0.5;//Default duration of 1 beat
 var enableLooping = false;
 var loopId = 0;
 var enablePlaying = true;
@@ -28,13 +28,17 @@ var startPlayingFrom = 0;
 
 /*
  * User Tracks Constructor, named a composition
- * A composition contains many track, e.g. piano track, guitar track...
+ * 
  * */
 function Composition(track) {
 	// this.tracks represents an array of tracks.
 	// Because one user may have many tracks.
 	// A track contains a song of some number of notes.
-	this.tracks = [track]; 
+	this.tracks = [track];
+	
+	// Default note sustain duration 0.015secs, which is Wad's
+	// hold attribute for piano
+	this.noteLength = 0.015; 
 }
 
 // Gets the array of tracks a user has made
@@ -62,12 +66,18 @@ Composition.prototype.emptyTrack = function(trackNum) {
 	this.tracks[trackNum] = [];
 }
 
+
 /*
  * Note Object Constructor
- * */
-function Note(pitch, duration) {
+ */
+
+function Note(pitch) {
 	this.pitch = pitch; // Should be represented as a string, e.g. "C4"
-	this.duration = duration;
+	
+	// Whole note: 2000ms, Half note: 1000ms... for 120 BPM so far
+	// adapted from https://www.msu.edu/course/asc/232/song_project/dectalk_pages/note_to_%20ms.html
+	// and http://rsgames.org/bpmtool.php
+	this.duration = 0.5; // Our default 120BPM quarter note
 }
 
 // Returns the pitch of the note
@@ -76,7 +86,7 @@ Note.prototype.getPitch = function() {
 }
 
 // Returns the duration of a note
-Note.prototype.getDur = function() {
+Note.prototype.getDuration = function() {
 	return this.duration;
 }
 
@@ -88,6 +98,7 @@ Note.prototype.setDuration = function(dur) {
 	this.duration = dur;
 }
 
+
 /*
  * Track Animation Constructor
  * */
@@ -97,18 +108,16 @@ function Animation() {
 	this.elementsAnimated = [];
 }
 
-Animation.prototype.playAnimation = function(duration, wholeDuration, startIndex) {
+Animation.prototype.playAnimation = function(duration, wholeDuration, startIndex, trackNum) {
 	jQuery(function($) {
 		// This offset timing makes the animation smoother
-		var offset = -200;
+		var offset = -300;
+		var trackID = "#track" + trackNum + " "; // Space and # here to match CSS selector syntax
 		
-		// Because startIndex doesn't make sense to be -1 in gt() function. So I specified 2 cases, 
-		// one where user clicks first note and tries to play from there and when user
-		// chooses some other note. If not, the formula in the else statement will not work
 		if (startIndex <= 0) { // User chose first note 
-			this.elementsAnimated = $(".sortable-system div");
+			this.elementsAnimated = $(trackID + ".sortable-system div");
 		} else {
-			this.elementsAnimated = $(".sortable-system div:gt(" + (startIndex - 1) + ")");
+			this.elementsAnimated = $(trackID + ".sortable-system div:gt(" + (startIndex - 1) + ")");
 		}
 		
 		// Change each div's colour as note plays
@@ -182,7 +191,7 @@ var animation = new Animation();
 /*-----------------Main Functions-----------------*/
 /*------------------------------------------------*/
 function changeBPM(){
-	beatDuration = 0.3; // Flushes the previous values of beatDuration
+	beatDuration = 0.5; // Flushes the previous values of beatDuration
     var ans = document.getElementById("bpm-input").value;
 	
     // Input validation
@@ -207,10 +216,10 @@ function playSequence(trackNumber, startIndex, endIndex) {
     var wholeDuration = (beatDuration) * 1000 * (endIndex - startIndex + 1);
     var arr = [];
    
-    animation.playAnimation(noteDuration, wholeDuration, startIndex);
+    animation.playAnimation(noteDuration, wholeDuration, startIndex, trackNumber);
     
 	for(count = startIndex; count <= endIndex; count++) {
-    	var currentPitch = composition.getTrack(0)[count].getPitch();
+    	var currentPitch = composition.getTrack(trackNumber)[count].getPitch();
 		//console.log("composition " + currentPitch);
         arr.push(currentPitch);
     }
@@ -318,7 +327,8 @@ function loopAll(){
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
 	    playSequence(0, startPlayingFrom, composition.getTrack(0).length - 1);
-	    loopId = setInterval("playSequence(0, startPlayingFrom, composition.getTrack(0).length - 1)", beatDuration * (composition.getTrack(0).length - startPlayingFrom) * 1000);    
+	    loopId = setInterval("playSequence(0, startPlayingFrom, composition.getTrack(0).length - 1)", 
+	    					 beatDuration * (composition.getTrack(0).length - startPlayingFrom) * 1000);
 	} else {//if we want to stop
 	    enableLooping = false;
 	    document.getElementById("startLoop").value = "Start Looping";
@@ -335,7 +345,7 @@ var piano = new Wad({
         attack : .01, 
         decay : .005, 
         sustain : .2, 
-        hold : .015, 
+        hold : (0.5 - 0.01 - 0.005 - 0.3), // Default duration of quarter-note or beat 0.5s
         release : .3
     }
 });
@@ -348,7 +358,7 @@ var quarterRest = new Wad({
         attack : .00, 
         decay : .000, 
         sustain : 0.0, 
-        hold : .00, 
+        hold : (0.5 - 0.01 - 0.005 - 0.3), // Default duration of quarter-note or beat 0.5s
         release : 0.0
     }
 });
@@ -583,11 +593,9 @@ function setSortable() {
 				var grabbedNote = "";
 				
 				if (ui.item.attr('data-note') != "silence") { 
-					grabbedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12], 
-										   beatDuration);
+					grabbedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12]);
 				} else {
-					grabbedNote = new Note(ui.item.attr('data-note'), 
-							   			   beatDuration); //refers to silence
+					grabbedNote = new Note(ui.item.attr('data-note')); //refers to silence
 				}
 				
 				// When position of a note changes on the timeline, follow up 
@@ -652,15 +660,13 @@ function setSortable() {
 			receive: function(event, ui) {
 				if(ui.item.attr('data-note') != "silence"){
 		      		
-					var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12], 
-		      									beatDuration);
-		      		
+					var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12]);
+		      		console.log(insertedNote.getDuration());
 					composition.addNote(trackNumInSortable, insertedNote);
 					
 				} else {
 					
-					var insertedSilence = new Note(ui.item.attr('data-note'), 
-												   beatDuration);
+					var insertedSilence = new Note(ui.item.attr('data-note'));
 					// Pitch for silence is just "silence"
 					// ui.item.attr('data-note')) is just the string "silence"
 					
