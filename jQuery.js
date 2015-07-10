@@ -219,8 +219,9 @@ function playSequence(trackNumber, startIndex, endIndex) {
     var noteDuration = (beatDuration) * 1000;
     var wholeDuration = (beatDuration) * 1000 * (endIndex - startIndex + 1);
     var arr = [];
-   if(enablePlaying){
-    animation.playAnimation(noteDuration, wholeDuration, startIndex, endIndex, trackNumber);
+    
+    if(enablePlaying){
+    	animation.playAnimation(noteDuration, wholeDuration, startIndex, endIndex, trackNumber);
     
 	for(count = startIndex; count <= endIndex; count++) {
     	var currentPitch = composition.getTrack(trackNumber)[count].getPitch();
@@ -344,30 +345,6 @@ function loopAll(){
 	}
 }
 
-var piano = new Wad({
-    source : 'sine', 
-    env : {
-    	volume: 1.0,
-        attack : .01, 
-        decay : .005, 
-        sustain : .2, 
-        hold : (0.5 - 0.01 - 0.005 - 0.3), // Default duration of quarter-note or beat 0.5s
-        release : .3
-    }
-});
-
-//rest here. Quarter rest is just a name to say that it's one of the rests available
-var quarterRest = new Wad({
-    source : 'sine', 
-    env : {
-    	volume: 0.0,
-        attack : .00, 
-        decay : .000, 
-        sustain : 0.0, 
-        hold : (0.5 - 0.01 - 0.005 - 0.3), // Default duration of quarter-note or beat 0.5s
-        release : 0.0
-    }
-});
 
 /* Utility Functions */
 //Takes in num of divs to generate and cssClass to associate
@@ -706,28 +683,31 @@ function setSortable() {
 					"text-shadow": "1px 1px 2px #000000"
 				});
 				
-				var firstNote; 
+				var firstNote;
+				
 				$(".sortable-system div").on("click", function(e){
 				    //$(".sortable-system div").css({ "border": "none" });    //comment this line first to allow choosing of starting and ending note
 					// To ensure if user clicks on more than 1 note, the prev note click
 					// will have its border color reverted.
 					firstNote = $(e.target);
+					
 					if(e.shiftKey){//Mouse Click+shift event to choose the first note to play
-				    $(e.target).css({ "border": "1px solid red" });
-					startPlayingFrom = $(e.target).data('endPos');
+						$(e.target).css({ "border": "1px solid red" });
+						startPlayingFrom = $(e.target).data('endPos');
 					}
 				});
 			
 				$(".sortable-system div").on("dblclick", function(e){	
                     //if(e.shiftKey){
-					   // firstNote.css({"border": "1px solid red"});
-					   if(startPlayingFrom > 0) {
+					// firstNote.css({"border": "1px solid red"});
+					if(startPlayingFrom > 0) {
 					   firstNote.css({ "border": "1px solid red" });//this doesn't work leh =P
-					   }
-                        $(e.target).css({ "border": "1px solid yellow" });
-						playUntil = $(e.target).data('endPos');
-						//startPlayingFrom = tempStart;
-                   // } else {
+					}
+                    
+					$(e.target).css({ "border": "1px solid yellow" });
+                    playUntil = $(e.target).data('endPos');
+					//startPlayingFrom = tempStart;
+                    // } else {
 					    //playUntil = composition.getTrack(0).length - 1;
 					    //startPlayingFrom = tempStart;
 					//}
