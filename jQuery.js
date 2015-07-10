@@ -110,8 +110,9 @@ function Animation() {
 	this.elementsAnimated = [];
 }
 
-Animation.prototype.playAnimation = function(duration, wholeDuration, startIndex, trackNum) {
+Animation.prototype.playAnimation = function(duration, wholeDuration, startIndex, endIndex, trackNum) {
 	jQuery(function($) {
+	
 		// This offset timing makes the animation smoother
 		var offset = -300;
 		var trackID = "#track" + trackNum + " "; // Space and # here to match CSS selector syntax
@@ -119,7 +120,8 @@ Animation.prototype.playAnimation = function(duration, wholeDuration, startIndex
 		if (startIndex <= 0) { // User chose first note 
 			this.elementsAnimated = $(trackID + ".sortable-system div");
 		} else {
-			this.elementsAnimated = $(trackID + ".sortable-system div:gt(" + (startIndex - 1) + ")");
+			//this.elementsAnimated = $(trackID + ".sortable-system div:gt(" + (startIndex - 1) + ")");
+			this.elementsAnimated = $(trackID + ".sortable-system div").slice(startIndex, endIndex + 1);
 		}
 		
 		// Change each div's colour as note plays
@@ -218,7 +220,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
     var wholeDuration = (beatDuration) * 1000 * (endIndex - startIndex + 1);
     var arr = [];
    if(enablePlaying){
-    animation.playAnimation(noteDuration, wholeDuration, startIndex, trackNumber);
+    animation.playAnimation(noteDuration, wholeDuration, startIndex, endIndex, trackNumber);
     
 	for(count = startIndex; count <= endIndex; count++) {
     	var currentPitch = composition.getTrack(trackNumber)[count].getPitch();
