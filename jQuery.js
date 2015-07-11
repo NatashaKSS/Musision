@@ -28,7 +28,7 @@ var startPlayingFrom = 0;
 var playUntil = 0;
 var pi = Math.PI;
 var songOfPi = [];  //to prepare for the song using PI's numbers
-console.log(pi);
+//console.log(pi);
 var piSong = function(pivot, numOfNotes){//num of notes to add on top of the pivot
     var timesTen = pi * Math.pow(10, numOfNotes - 1);
 	songOfPi.push(notes[pivot - 12]);
@@ -436,14 +436,8 @@ $(document).ready(function() {
 			
 			playSequence(trackNum, startPlayingFrom, composition.getTrack(trackNum).length - 1);
 		});
+
 		
-		//var hiddenMessage = $(
-		
-		$("#randomPI").on("click", function(){
-		   // $("#hiddenPIMessage").show();
-		    playSongOfPi();
-			songOfPi = [];
-		});
 	  /*  
 		//pause is not working properly
 		$("#pause").on("click", function(){
@@ -678,11 +672,9 @@ function setSortable() {
 				inBeforeStop = true;
 				
 				if (!inBox) {
-					
 					var startPosition = ui.item.data('startPos');
 					composition.getTrack(trackNumInSortable).splice(startPosition, 1);
-					ui.item.remove();
-					
+					ui.item.remove();	
 				}				
 			},
 			
@@ -719,13 +711,13 @@ function setSortable() {
 					"text-shadow": "1px 1px 2px #000000"
 				});
 				
-				var firstNote;
+				//var firstNote;
 				
 				$(".sortable-system div").on("click", function(e){
 				    //$(".sortable-system div").css({ "border": "none" });    //comment this line first to allow choosing of starting and ending note
 					// To ensure if user clicks on more than 1 note, the prev note click
 					// will have its border color reverted.
-					firstNote = $(e.target);
+				//	firstNote = $(e.target);
 					
 					if(e.shiftKey){//Mouse Click+shift event to choose the first note to play
 						$(e.target).css({ "border": "1px solid red" });
@@ -734,19 +726,12 @@ function setSortable() {
 				});
 			
 				$(".sortable-system div").on("dblclick", function(e){	
-                    //if(e.shiftKey){
-					// firstNote.css({"border": "1px solid red"});
-					if(startPlayingFrom > 0) {
-					   firstNote.css({ "border": "1px solid red" });//this doesn't work leh =P
-					}
+				//	if(startPlayingFrom > 0) {
+				//	   firstNote.css({ "border": "1px solid red" });//this doesn't work leh =P
+				//	}
                     
 					$(e.target).css({ "border": "1px solid yellow" });
                     playUntil = $(e.target).data('endPos');
-					//startPlayingFrom = tempStart;
-                    // } else {
-					    //playUntil = composition.getTrack(0).length - 1;
-					    //startPlayingFrom = tempStart;
-					//}
 					console.log("first note " + startPlayingFrom);
 					console.log("last note " + playUntil);
 				});
@@ -768,7 +753,28 @@ function setSortable() {
 	}
 	
 	setSortable();
-	
+	$("#randomPI").on("click", function(){
+		   // $("#hiddenPIMessage").show();
+		   // console.log("Enter PI!");
+		    console.log("before for loop");
+			playSongOfPi();
+			//console.log("length " + songOfPi.length);
+			for(index = 0; index < songOfPi.length; index++){
+			console.log("in for loop");
+			    $("div").each(function(){
+				//console.log("all notes " + $(this).attr("data-note") + " and now at index " + songOfPi[index] + "which has midi number " + (notes.indexOf(songOfPi[index]) + 12));
+				    if($(this).hasClass("col-md-1")){
+					    if($(this).attr("data-note") != "silence" && parseInt($(this).attr("data-note")) == ((notes.indexOf(songOfPi[index]))  +12)){
+						console.log($(this).attr("data-note") + " and " + songOfPi[index]);
+						    $(".sortable-system").append($(this).clone());//this doesn't work 
+						}
+					}
+			    });
+			}
+			console.log("after fop loop");
+			
+			songOfPi = [];
+		});
 });
 
 
