@@ -26,14 +26,16 @@ a {
 	width: 3em;
 }
 
-#bpm-button {
+.btn {
 	border-radius: 25px;
 	background-color: #b3b3b3; 
 }
 
-#bpm-button:hover {
+.btn:hover {
 	background-color: #e0e1ce;
 }
+
+
 
 /* Contains user workspace, timeline and everything else 
    below top navbar */
@@ -198,5 +200,10 @@ a {
 
 [data-note="silence"] {
 	opacity: 0.5;
+}
+
+
+#randomPI:hover{
+    background: #DC143C;
 }
 

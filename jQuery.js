@@ -26,6 +26,34 @@ var enablePlaying = true;//<----  can use this to mute/unmute a track
 var pause = false;
 var startPlayingFrom = 0;
 var playUntil = 0;
+var pi = Math.PI;
+var songOfPi = [];  //to prepare for the song using PI's numbers
+console.log(pi);
+var piSong = function(pivot, numOfNotes){//num of notes to add on top of the pivot
+    var timesTen = pi * Math.pow(10, numOfNotes - 1);
+	songOfPi.push(notes[pivot - 12]);
+	for(count = numOfNotes; count >= 0; count--){
+	var div = Math.floor(timesTen / (Math.pow(10, count - 1)));
+	console.log("div" + div);
+	var mod = timesTen % (Math.pow(10, count - 1));
+	timesTen = mod;
+	songOfPi.push(notes[pivot + div - 12]);
+	}
+}
+
+
+var playSongOfPi = function(){
+    piSong(60, 10);
+    console.log(songOfPi.length);
+    for(count = 0; count < songOfPi.length; count++){
+    console.log(songOfPi[count]);
+      flute.play({
+         wait : beatDuration * count,
+         pitch: songOfPi[count]
+   
+      });
+   }
+}
 
 
 /*
@@ -407,6 +435,14 @@ $(document).ready(function() {
 			var trackNum = parseInt($(this).attr('id').substring(10));
 			
 			playSequence(trackNum, startPlayingFrom, composition.getTrack(trackNum).length - 1);
+		});
+		
+		//var hiddenMessage = $(
+		
+		$("#randomPI").on("click", function(){
+		   // $("#hiddenPIMessage").show();
+		    playSongOfPi();
+			songOfPi = [];
 		});
 	  /*  
 		//pause is not working properly

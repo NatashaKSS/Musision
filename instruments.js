@@ -21,6 +21,23 @@ var bass = new Wad({
         release : .1
     }
 });
+/*
+var synthGuitar = new Wad({
+    source : 'sawtooth',
+	detune : 100,
+	  env : {
+        attack : .02,
+        decay : .1,
+        sustain : .9,
+        hold : .4,
+        release : .1
+    },
+	
+	reverb: {
+	    wet : 1
+	}
+});
+*/
 
 //Snare drum
 var snare = new Wad ({
