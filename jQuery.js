@@ -53,7 +53,7 @@ var playSongOfPi = function(){
     for(count = 0; count < songOfPi.length; count++){
     	console.log(songOfPi[count]);
     	
-    	flute.play({
+    	synthGuitar.play({
     		wait : beatDuration * count,
     		pitch: songOfPi[count]
     	});
@@ -449,7 +449,7 @@ $(document).ready(function() {
 			var noteName = $(this).attr('data-note');
 			
 			if(noteName != "silence"){
-			    piano.play({ 
+			    string.play({ 
 				    pitch : notes[parseInt(noteName - 12)] 
 			    });
 			} else {

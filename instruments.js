@@ -15,29 +15,135 @@ var bass = new Wad({
     source : 'sine',
     env : {
         attack : .02,
-        decay : .1,
+        decay : .05,
         sustain : .9,
-        hold : .4,
-        release : .1
-    }
+        hold : .02,
+        release : .05
+    },
+	
+	filter : { // slap
+            type : 'lowpass',
+            frequency : 500,
+            env : {
+                attack : .2,
+                frequency : 300
+            }
+        }
 });
-/*
+
 var synthGuitar = new Wad({
     source : 'sawtooth',
-	detune : 100,
+	
 	  env : {
         attack : .02,
         decay : .1,
-        sustain : .9,
+        sustain : .5,
         hold : .4,
         release : .1
-    },
-	
-	reverb: {
-	    wet : 1
-	}
+     },
+	filter : { // slap
+            type : 'lowpass',
+            frequency : 1300,
+            env : {
+                attack : .2,
+                frequency : 700
+            }
+        }
 });
-*/
+
+var sine1 = new Wad({
+    source : 'sine',
+	
+	env : {
+        attack : .1,
+        decay : .1,
+        sustain : .5,
+        hold : .2,
+        release : .1
+     },
+	/* 
+	 reverb  : {
+        wet     : 1,                                            // Volume of the reverberations.
+        impulse : 'http://www.myServer.com/path/to/impulse.wav' // A URL for an impulse response file, if you do not want to use the default impulse response.
+    },
+	*/
+    filter : { 
+            type : 'lowpass',
+            frequency : 1700,
+            env : {
+                attack : .4,
+                frequency : 700
+            }
+        }
+	
+});
+
+var triangle1 = new Wad({
+source : 'triangle',
+env : {
+        attack : .4,
+        decay : .1,
+        sustain : .9,
+        hold : .2,
+        release : .1
+     },
+	 
+	filter : { 
+            type : 'lowpass',
+            frequency : 1400,
+            env : {
+                attack : .4,
+                frequency : 300
+            }
+        }
+});
+
+var saw1 = new Wad({
+source : 'sawtooth',
+env : {
+        attack : .4,
+        decay : .1,
+        sustain : .5,
+        hold : .2,
+        release : .1
+     },
+	 
+	filter : { 
+            type : 'lowpass',
+            frequency : 1400,
+            env : {
+                attack : .4,
+                frequency : 300
+            }
+        }
+});
+
+var square1 = new Wad({
+source : 'square',
+env : {
+        attack : .4,
+        decay : .1,
+        sustain : .8,
+        hold : .2,
+        release : .1
+     },
+	 
+	filter : { 
+            type : 'lowpass',
+            frequency : 1600,
+            env : {
+                attack : .4,
+                frequency : 300
+            }
+        }
+});
+
+
+var string = new Wad.Poly();
+string.add(sine1).add(triangle1).add(square1).add(saw1);
+string.setVolume(0.5);
+
+
 
 //Snare drum
 var snare = new Wad ({

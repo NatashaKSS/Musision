@@ -31,6 +31,10 @@ a {
 	background-color: #b3b3b3; 
 }
 
+.btn:hover{
+    background-color: #e0e1ce;
+}
+
 #bpm-button:hover {
 	background-color: #e0e1ce;
 }
