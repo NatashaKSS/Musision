@@ -28,16 +28,20 @@ var startPlayingFrom = 0;
 var playUntil = 0;
 var pi = Math.PI;
 var songOfPi = [];  //to prepare for the song using PI's numbers
+
 //console.log(pi);
+
 var piSong = function(pivot, numOfNotes){//num of notes to add on top of the pivot
     var timesTen = pi * Math.pow(10, numOfNotes - 1);
 	songOfPi.push(notes[pivot - 12]);
-	for(count = numOfNotes; count >= 0; count--){
-	var div = Math.floor(timesTen / (Math.pow(10, count - 1)));
-	console.log("div" + div);
-	var mod = timesTen % (Math.pow(10, count - 1));
-	timesTen = mod;
-	songOfPi.push(notes[pivot + div - 12]);
+	
+	for(count = numOfNotes; count >= 0; count--) {
+		var div = Math.floor(timesTen / (Math.pow(10, count - 1)));
+		console.log("div" + div);
+		var mod = timesTen % (Math.pow(10, count - 1));
+		
+		timesTen = mod;
+		songOfPi.push(notes[pivot + div - 12]);
 	}
 }
 
@@ -45,13 +49,14 @@ var piSong = function(pivot, numOfNotes){//num of notes to add on top of the piv
 var playSongOfPi = function(){
     piSong(60, 10);
     console.log(songOfPi.length);
+    
     for(count = 0; count < songOfPi.length; count++){
-    console.log(songOfPi[count]);
-      flute.play({
-         wait : beatDuration * count,
-         pitch: songOfPi[count]
-   
-      });
+    	console.log(songOfPi[count]);
+    	
+    	flute.play({
+    		wait : beatDuration * count,
+    		pitch: songOfPi[count]
+    	});
    }
 }
 
@@ -68,7 +73,10 @@ function Composition(track) {
 	
 	// Default note sustain duration 0.015secs, which is Wad's
 	// hold attribute for piano
-	this.noteLength = 0.015; 
+	this.noteLength = 0.015;
+	
+	// List of booleans for indicating if this track has enabled playing.
+	this.enablePlaying = [true];
 }
 
 // Gets the array of tracks a user has made
@@ -84,6 +92,7 @@ Composition.prototype.getTrack = function(trackNum) {
 // Adds a track to a user's composition
 Composition.prototype.addTrack = function(track) {
 	this.tracks.push(track);
+	this.enablePlaying.push(true);
 }
 
 // Adds a note to a specified track in a user's composition
@@ -95,6 +104,22 @@ Composition.prototype.addNote = function(trackNum, note) {
 Composition.prototype.emptyTrack = function(trackNum) {
 	this.tracks[trackNum] = [];
 }
+
+//Empty a specified track 
+Composition.prototype.emptyAllTracks = function(trackNum) {
+	this.tracks = [[]];
+}
+
+//Gets the boolean value for whether a track has 'playing' enabled or not
+Composition.prototype.isEnablePlaying = function(trackNum) {
+	return this.enablePlaying[trackNum];
+}
+
+// Enable/Disable playing, must accept only boolean values true/false.
+Composition.prototype.setEnablePlaying = function(trackNum, bool) {
+	this.enablePlaying[trackNum] = bool;
+}
+
 
 
 /*
@@ -248,34 +273,43 @@ function playSequence(trackNumber, startIndex, endIndex) {
     var wholeDuration = (beatDuration) * 1000 * (endIndex - startIndex + 1);
     var arr = [];
     
-    if(enablePlaying){
+    // Whether this track (with the trackNumber) has enabled playing or not
+    if(composition.isEnablePlaying(trackNumber)){
     	animation.playAnimation(noteDuration, wholeDuration, startIndex, endIndex, trackNumber);
     
-	for(count = startIndex; count <= endIndex; count++) {
-    	var currentPitch = composition.getTrack(trackNumber)[count].getPitch();
-		//console.log("composition " + currentPitch);
-        arr.push(currentPitch);
-    }
-
-	//console.log("length " + arr.length);
+		for(count = startIndex; count <= endIndex; count++) {
+	    	var currentPitch = composition.getTrack(trackNumber)[count].getPitch();
+			//console.log("composition " + currentPitch);
+	        arr.push(currentPitch);
+	    }
 	
-    for(indx = 0; indx < arr.length; indx++) {
-    	//console.log("arr pitch: " + arr[indx]);
-    	 
-    	 if(arr[indx] != "silence"){
-    		piano.play({ 
- 	    	    wait : indx * beatDuration,
- 			    pitch : arr[indx],
- 				label : "playing" 
- 		    });
- 		    
- 		 } else {
- 			quarterRest.play({
- 			    wait : indx * beatDuration,
- 				label : "playing" 
- 			});
- 		 }
+		//console.log("length " + arr.length);
+		
+	    for(indx = 0; indx < arr.length; indx++) {
+	    	//console.log("arr pitch: " + arr[indx]);
+	    	 
+	    	if(arr[indx] != "silence"){
+	    		piano.play({ 
+	    			wait : indx * beatDuration,
+	 			    pitch : arr[indx],
+	 				label : "playing" 
+	 		    });
+	 		    
+	 		} else {
+	 			quarterRest.play({
+				    wait : indx * beatDuration,
+					label : "playing" 
+	 			});
+	 		}
+	    }
 	}
+}
+
+function playAllSequences() {
+	var numOfTracks = composition.getAllTracks().length;
+	
+	for (counter = 0; counter < numOfTracks; counter++) {
+		playSequence(counter, 0, composition.getTrack(counter).length - 1);
 	}
 }
 
@@ -342,11 +376,16 @@ function playSequence(trackNumber, startIndex, endIndex) {
 
 //empty the note array    
 function clearAllSound(){
-    enablePlaying = false;
-    piano.stop("playing");
-    composition.emptyTrack(0);
-    
-	if(enableLooping){
+	var numOfTracks = composition.getAllTracks().length;
+	
+	for (i = 0; i < numOfTracks; i++) {
+		composition.setEnablePlaying(i, false);
+		composition.emptyAllTracks(); // Empties all tracks
+	}
+	
+	piano.stop("playing");
+   
+    if(enableLooping){
 	    document.getElementById("startLoop").value = "Start Looping";
         document.getElementById("startLoop").innerHTML = "Start Looping";
 	    clearInterval(loopId);
@@ -357,7 +396,13 @@ function clearAllSound(){
 
 function loopAll(){
     if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
-	    enablePlaying = true;
+    	composition.setEnablePlaying(0, true);
+    	// The above statement mimics this statement, but only sets the first track '0'
+    	// enablePlaying = true;
+    	/* 
+    	 * ^^^^Above Just for the time being ^^^^
+    	 * */
+    	
 		enableLooping = true;
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
@@ -398,9 +443,9 @@ function generateDivs(numOfDivs, cssClass, text) {
 /*------------------------------------------------*/
 $(document).ready(function() {
 	function initialize() {
+		initializeTrackSettings();
 		
 		$(".col-md-1").on("click", function() {
-			
 			var noteName = $(this).attr('data-note');
 			
 			if(noteName != "silence"){
@@ -413,30 +458,10 @@ $(document).ready(function() {
 			
 		});
 		
-		//to select a note to play FROM, click the note and hold the Shift key
-		//to select a note to play UNTIL, double click the note 
-		//to delete all the colors, press Stop and start all over again fresh!!!
-		
 		$("#all").on("click", function() {
-		    if(composition.getTrack(0).length > 1 && playUntil == 0) {
-			    playUntil = composition.getTrack(0).length - 1;
-			}
-		    enablePlaying = true;
-			playSequence(0, startPlayingFrom, playUntil);
-			startPlayingFrom = 0;//change back to default
-			playUntil = composition.getTrack(0).length - 1;//change back to default
-			//debugging
-			console.log("check play length " + composition.getTrack(0).length + 
-						" and start from " + composition.getTrack(0)[startPlayingFrom].getPitch() + 
-						" to " + composition.getTrack(0)[playUntil].getPitch());
+			playAllSequences();
 		});
 		
-		$(".play-button").unbind().on("click", function() {
-			var trackNum = parseInt($(this).attr('id').substring(10));
-			
-			playSequence(trackNum, startPlayingFrom, composition.getTrack(trackNum).length - 1);
-		});
-
 		
 	  /*  
 		//pause is not working properly
@@ -459,8 +484,8 @@ $(document).ready(function() {
 		});
 		*/
 		//end pause
+		
 		$("#stop").on("click", function() {
-		    enablePlaying = false;
 			enableLooping = false;
 			
 		    piano.stop("playing");
@@ -476,10 +501,11 @@ $(document).ready(function() {
 		});
 		
 		$("#clear").on("click", function() {
-		    $(".sortable-system div").remove(); //remove notes from the timeline
-		    enablePlaying = false;
-			enableLooping = false;
+			
+			$(".sortable-system div").remove(); //remove notes from the timeline
+		    enableLooping = false;
 			clearAllSound();
+			
 			startPlayingFrom = 0;//change back to default
 			playUntil = composition.getTrack(0).length - 1;//change back to default
 			    document.getElementById("startLoop").value = "Start Looping";
@@ -493,47 +519,115 @@ $(document).ready(function() {
 		    if(composition.getTrack(0).length != 0)loopAll();
 	    });	
 		
+		/* Might not want this
 		$(".sortable-system").mousewheel(function(event, delta) {
 			this.scrollLeft -= (delta * 15);
 			event.preventDefault(); // Prevent scrolling down
 		});
+		 */
+		
+		var addTrackNum = 1; // We start from 1 now since 0 is already in composition by default
+		
+		$("#addTrack").on("click", function() {
+			var newTrack = $(".track").first().clone();
+			
+			// Setting the id of tracks added and appending them to correct place
+			// Every new track added will have a unique ID which increments by 1 as
+			// more tracks are added. NOTE THAT WE START COUNTING FROM 0.
+			
+			// For play button
+			newTrack.children().eq(0).children().attr('id', "play-track" + addTrackNum);
+			
+			// For track number
+			newTrack.children().eq(1).attr('id', "track" + addTrackNum);
+			
+			// Appending to timeline-system
+			newTrack.appendTo("#timeline-system");
+			$("#track" + addTrackNum + " .sortable-system div").remove();
+			
+			// Must reintialise the sortables
+			setSortable();
+			initializeTrackSettings();
+			
+			// Correspondingly add a new track to our composition
+			composition.addTrack([]);
+			
+			addTrackNum++;
+			
+		});
+	}
 	
+	function initializeTrackSettings() {
+		$(".muteButton").unbind().on("click", function() {
+			var trackNum = parseInt($(this).prev().attr('id').substring(10));
+			
+			composition.setEnablePlaying(trackNum, !composition.isEnablePlaying(trackNum));
+			// Toggles whether a track is playing or not in composition's list of boolean values
+			// for each track
+			
+			console.log("track num: " + trackNum + " can play? " + composition.isEnablePlaying(trackNum));
+			
+			if (!composition.isEnablePlaying(trackNum)) {
+				// When users click to mute track.
+				$(this).css({
+					"padding": "3px 10px 3px 2px",
+					"border": "none",
+					"background-color": "#c0c0c0", // Greyed out effect
+					"color": "#FFFFFF"
+				}).html("Unmute");
+				
+				// Grey out the timeline that is muted
+				$(this).parent().parent().css({
+					"background-color": "grey"
+				});
+			} else {
+				// When users click to unmute track.
+				$(this).css({
+					"padding": "3px 10px 2px 10px",
+					"border": "1px solid #000000",
+					"background-color": "#575757", // Back to normal effect :)
+					"color": "#e2e2e2"
+				}).html("Mute");
+
+				// Return timeline to original css white when unmuted
+				$(this).parent().parent().css({
+					"background-color": "white"
+				});
+			}
+			
+		});
+		
+		//to select a note to play FROM, click the note and hold the Shift key
+		//to select a note to play UNTIL, double click the note 
+		//to delete all the colors, press Stop and start all over again fresh!!!
+		$(".play-button").unbind().on("click", function() {
+			var trackNum = parseInt($(this).attr('id').substring(10));
+			var trackLength = composition.getTrack(trackNum).length;
+			
+			console.log(startPlayingFrom);
+			console.log(playUntil);
+			if(trackLength > 1 && playUntil == 0) {
+				    playUntil = trackLength - 1;
+			}
+		    
+			playSequence(trackNum, startPlayingFrom, playUntil);
+			startPlayingFrom = 0;//change back to default
+			playUntil = trackLength - 1;//change back to default
+			//debugging
+			console.log("check play length " + trackLength + 
+						" and start from " + composition.getTrack(trackNum)[startPlayingFrom].getPitch() + 
+						" to " + composition.getTrack(trackNum)[playUntil].getPitch());
+		});
+		
 	}
 	
 	/* INITIALIZE EVERYTHINGGGG */
 	//introJs("body").start();
+	setSortable();
 	initialize();
+	initializeTrackSettings();
 	
 	
-	var trackNum = 1; // We start from 1 now since 0 is already in composition by default
-	
-	$("#addTrack").on("click", function() {
-		var newTrack = $(".track").first().clone();
-		
-		// Setting the id of tracks added and appending them to correct place
-		// Every new track added will have a unique ID which increments by 1 as
-		// more tracks are added. NOTE THAT WE START COUNTING FROM 0.
-		
-		// For play button
-		newTrack.children().eq(0).children().attr('id', "play-track" + trackNum);
-		
-		// For track number
-		newTrack.children().eq(1).attr('id', "track" + trackNum);
-		
-		// Appending to timeline-system
-		newTrack.appendTo("#timeline-system");
-		$("#track" + trackNum + " .sortable-system div").remove();
-		
-		// Sets up sortable and horizontal scrolling for the new tracks
-		setSortable();
-		initialize();
-		
-		// Correspondingly add a new track to our composition
-		composition.addTrack([]);
-		
-		trackNum++;
-		
-	});
 	
 	
 /*------------------------------------------------*/
@@ -672,9 +766,11 @@ function setSortable() {
 				inBeforeStop = true;
 				
 				if (!inBox) {
+					
 					var startPosition = ui.item.data('startPos');
 					composition.getTrack(trackNumInSortable).splice(startPosition, 1);
-					ui.item.remove();	
+					ui.item.remove();
+					
 				}				
 			},
 			
@@ -753,28 +849,33 @@ function setSortable() {
 	}
 	
 	setSortable();
+	
 	$("#randomPI").on("click", function(){
 		   // $("#hiddenPIMessage").show();
 		   // console.log("Enter PI!");
-		    console.log("before for loop");
-			playSongOfPi();
-			//console.log("length " + songOfPi.length);
-			for(index = 0; index < songOfPi.length; index++){
-			console.log("in for loop");
-			    $("div").each(function(){
-				//console.log("all notes " + $(this).attr("data-note") + " and now at index " + songOfPi[index] + "which has midi number " + (notes.indexOf(songOfPi[index]) + 12));
-				    if($(this).hasClass("col-md-1")){
-					    if($(this).attr("data-note") != "silence" && parseInt($(this).attr("data-note")) == ((notes.indexOf(songOfPi[index]))  +12)){
-						console.log($(this).attr("data-note") + " and " + songOfPi[index]);
-						    $(".sortable-system").append($(this).clone());//this doesn't work 
-						}
-					}
-			    });
-			}
-			console.log("after fop loop");
+		   console.log("before for loop");
+		   playSongOfPi();
+		   //console.log("length " + songOfPi.length);
+		   
+		   for(index = 0; index < songOfPi.length; index++){
+			   console.log("in for loop");
+			   $("div").each(function(){
+			   //console.log("all notes " + $(this).attr("data-note") + " and now at index " + songOfPi[index] + "which has midi number " + (notes.indexOf(songOfPi[index]) + 12));
+				   if($(this).hasClass("col-md-1")){
+					   if($(this).attr("data-note") != "silence" && parseInt($(this).attr("data-note")) == ((notes.indexOf(songOfPi[index]))  +12)){
+						   console.log($(this).attr("data-note") + " and " + songOfPi[index]);
+						   $(".sortable-system").append($(this).clone());//this doesn't work 
+					   }
+				   }
+			   });
+		   }
+			
+		   console.log("after fop loop");
 			
 			songOfPi = [];
-		});
+		
+	});
+	
 });
 
 

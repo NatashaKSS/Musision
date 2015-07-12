@@ -26,16 +26,14 @@ a {
 	width: 3em;
 }
 
-.btn {
+#bpm-button {
 	border-radius: 25px;
 	background-color: #b3b3b3; 
 }
 
-.btn:hover {
+#bpm-button:hover {
 	background-color: #e0e1ce;
 }
-
-
 
 /* Contains user workspace, timeline and everything else 
    below top navbar */
@@ -52,6 +50,33 @@ a {
 	-moz-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75);
 				
 }
+
+.muteButton {
+	border:1px solid #000000;
+	padding: 3px 10px 2px 10px; 
+	
+	height: 25px;
+	width: 50px;
+	font-size:12px;
+	font-family:arial, helvetica, sans-serif; 
+	text-decoration:none; 
+	display:inline-block;
+	text-shadow: -1px -1px 0 rgba(0,0,0,0.3);
+	font-weight:bold; 
+	color: #FFFFFF;
+	
+	background-color: #575757; 
+	
+}
+
+.muteButton:hover {
+	border:1px solid #000000!important;
+	cursor: pointer!important;
+	background-color: #3d3d3d!important; 
+}
+
+
+
 
 /* Triangular play button */
 .play-button {
@@ -200,10 +225,5 @@ a {
 
 [data-note="silence"] {
 	opacity: 0.5;
-}
-
-
-#randomPI:hover{
-    background: #DC143C;
 }
 

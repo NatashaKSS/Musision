@@ -69,8 +69,8 @@
   		  <button id="bpm-button" class="btn" onclick=changeBPM()>Set BPM</button>
 		  
 		  <button id ="startLoop" class="btn"> Start Looping </button>
-		  <button id ="randomPI" class="btn" TITLE = "Click this button to hear what a melody programmed using the first few digits of PI may sound like!"> What does PI sound like?</button>
-		 <!--<div class= "bubble" id="HiddenPImessage">  PI Song! </div>-->
+		  <button id ="pause" class="btn"> Pause </button>
+		  
 		  </div>
 		 </li>
 		  
@@ -81,11 +81,18 @@
 	
 	<!-- Container class Enabled by bootstrap -->
 	<div id="timeline-system" class="container">
+	 
 	 <div class="track">
+	  
 	  <div class="track-settings">
 	    <div id="play-track0" class="play-button">
+	    
 	    </div>
+	    
+	    <div class="muteButton" data-muted="true">Mute</div>
+	  
 	  </div>
+	  
 	  <div id="track0" class="timeline" data-step="3" data-intro="Drag any note here and start composing!" data-position="bottom">
 	   
 	    <div class="grid-system">
