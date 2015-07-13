@@ -271,27 +271,27 @@ function changeBPM(){
 function playSequence(trackNumber, startIndex, endIndex) {
     var noteDuration = (beatDuration) * 1000;
     var wholeDuration = (beatDuration) * 1000 * (endIndex - startIndex + 1);
-    var arr = [];
+    //var arr = [];
     
     // Whether this track (with the trackNumber) has enabled playing or not
     if(composition.isEnablePlaying(trackNumber)){
     	animation.playAnimation(noteDuration, wholeDuration, startIndex, endIndex, trackNumber);
-    
-		for(count = startIndex; count <= endIndex; count++) {
-	    	var currentPitch = composition.getTrack(trackNumber)[count].getPitch();
-			//console.log("composition " + currentPitch);
-	        arr.push(currentPitch);
-	    }
-	
-		//console.log("length " + arr.length);
+    console.log("length " + (endIndex - startIndex));
 		
-	    for(indx = 0; indx < arr.length; indx++) {
+		for(indx = startIndex; indx <= endIndex; indx++) {
+	    	var currentPitch = composition.getTrack(trackNumber)[indx].getPitch();
+			console.log("composition " + currentPitch);
+	      //  arr.push(currentPitch);
+	   // }
+	
+		
+	 //   for(indx = 0; indx < arr.length; indx++) {
 	    	//console.log("arr pitch: " + arr[indx]);
 	    	 
-	    	if(arr[indx] != "silence"){
+	    	if(currentPitch != "silence"){
 	    		piano.play({ 
 	    			wait : indx * beatDuration,
-	 			    pitch : arr[indx],
+	 			    pitch : currentPitch,
 	 				label : "playing" 
 	 		    });
 	 		    
@@ -303,13 +303,14 @@ function playSequence(trackNumber, startIndex, endIndex) {
 	 		}
 	    }
 	}
+	$(".sortable-system div").css({ "border": "none" });
 }
 
 function playAllSequences() {
 	var numOfTracks = composition.getAllTracks().length;
 	
 	for (counter = 0; counter < numOfTracks; counter++) {
-		playSequence(counter, 0, composition.getTrack(counter).length - 1);
+		playSequence(counter, startPlayingFrom, playUntil);
 	}
 }
 
@@ -406,8 +407,10 @@ function loopAll(){
 		enableLooping = true;
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
-	    playSequence(0, startPlayingFrom, playUntil);
-	    loopId = setInterval("playSequence(0, startPlayingFrom, playUntil)", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);    
+	    //playSequence(0, startPlayingFrom, playUntil);
+		playAllSequences();
+	    //loopId = setInterval("playSequence(0, startPlayingFrom, playUntil)", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);  
+        loopId = setInterval("playAllSequences()", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);   		
 	} else {//if we want to stop
 	    enableLooping = false;
 	    document.getElementById("startLoop").value = "Start Looping";
@@ -814,6 +817,9 @@ function setSortable() {
 					// To ensure if user clicks on more than 1 note, the prev note click
 					// will have its border color reverted.
 				//	firstNote = $(e.target);
+					piano.play({
+					    pitch : notes[parseInt($(e.target).attr('data-note')) -12]
+					});
 					
 					if(e.shiftKey){//Mouse Click+shift event to choose the first note to play
 						$(e.target).css({ "border": "1px solid red" });
@@ -851,8 +857,6 @@ function setSortable() {
 	setSortable();
 	
 	$("#randomPI").on("click", function(){
-		   // $("#hiddenPIMessage").show();
-		   // console.log("Enter PI!");
 		   console.log("before for loop");
 		   playSongOfPi();
 		   //console.log("length " + songOfPi.length);
@@ -864,14 +868,37 @@ function setSortable() {
 				   if($(this).hasClass("col-md-1")){
 					   if($(this).attr("data-note") != "silence" && parseInt($(this).attr("data-note")) == ((notes.indexOf(songOfPi[index]))  +12)){
 						   console.log($(this).attr("data-note") + " and " + songOfPi[index]);
-						   $(".sortable-system").append($(this).clone());//this doesn't work 
+						   var tempNote = $(this).clone();
+						   tempNote.css({ //to be the same as a regular note on the timeline
+						        "height": grid.noteHeight,
+					            "width": grid.noteWidth,
+					            "padding-top": "15px",
+					            "background": "#109bce", //default light blue-ish #109bce
+			    	            "border-radius": "1em",
+					            "display": "inline-block",
+					            "vertical-align": "top",
+					            "text-align": "center",
+					            "font-size": "20px",
+					            "color": "#FFFFFF",
+					            "text-shadow": "1px 1px 2px #000000"
+					
+						   });
+						   $(".sortable-system").append(tempNote); 
+						   
+						   composition.getTrack(0).push(new Note(notes[parseInt(tempNote.attr('data-note')) - 12], beatDuration));
 					   }
+					
 				   }
+				   
 			   });
 		   }
 			
 		   console.log("after fop loop");
-			
+		   /*
+			for(count = 0; count < songOfPi.length; count++){
+			    composition.getTrack(0).push(new Note(songOfPi[count], beatDuration));
+			}
+			*/
 			songOfPi = [];
 		
 	});

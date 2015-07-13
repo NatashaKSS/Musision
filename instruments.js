@@ -141,7 +141,7 @@ env : {
 
 var string = new Wad.Poly();
 string.add(sine1).add(triangle1).add(square1).add(saw1);
-string.setVolume(0.5);
+string.setVolume(0.4);
 
 
 
