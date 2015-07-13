@@ -55,7 +55,8 @@ var playSongOfPi = function(){
     	
     	synthGuitar.play({
     		wait : beatDuration * count,
-    		pitch: songOfPi[count]
+    		pitch: songOfPi[count],
+			label: 'playing'
     	});
    }
 }
@@ -269,25 +270,22 @@ function changeBPM(){
 
 //play notes consecutively at hard-coded intervals
 function playSequence(trackNumber, startIndex, endIndex) {
+    //endIndex = Math.min(endIndex, findMaxLength());
     var noteDuration = (beatDuration) * 1000;
-    var wholeDuration = (beatDuration) * 1000 * (endIndex - startIndex + 1);
+    var wholeDuration = (beatDuration) * 1000 * (Math.max(endIndex, playUntil) - startIndex + 1);
     //var arr = [];
-    
+    console.log("play Until " + playUntil);
     // Whether this track (with the trackNumber) has enabled playing or not
     if(composition.isEnablePlaying(trackNumber)){
-    	animation.playAnimation(noteDuration, wholeDuration, startIndex, endIndex, trackNumber);
-    console.log("length " + (endIndex - startIndex));
+    	animation.playAnimation(noteDuration, wholeDuration, startIndex, Math.max(endIndex, playUntil), trackNumber);
+		console.log("start " + startIndex);
+		console.log("end " + endIndex);
+        console.log("length " + (endIndex - startIndex + 1));
 		
 		for(indx = startIndex; indx <= endIndex; indx++) {
 	    	var currentPitch = composition.getTrack(trackNumber)[indx].getPitch();
 			console.log("composition " + currentPitch);
-	      //  arr.push(currentPitch);
-	   // }
-	
-		
-	 //   for(indx = 0; indx < arr.length; indx++) {
-	    	//console.log("arr pitch: " + arr[indx]);
-	    	 
+
 	    	if(currentPitch != "silence"){
 	    		piano.play({ 
 	    			wait : indx * beatDuration,
@@ -306,11 +304,30 @@ function playSequence(trackNumber, startIndex, endIndex) {
 	$(".sortable-system div").css({ "border": "none" });
 }
 
+function findMaxLength(){
+    var max = 0;
+	var numOfTracks = composition.getAllTracks().length;
+	for(counter = 0; counter < numOfTracks; counter++){
+	    if(composition.getTrack(counter).length >= max){
+		    max = composition.getTrack(counter).length;
+		}
+	}
+	return max;
+}
+
 function playAllSequences() {
+    console.log("max length = "  + findMaxLength());
+    //playSequence(0, startPlayingFrom, playUntil);
+	if(findMaxLength() > 1 && playUntil==0){
+	    playUntil = findMaxLength() - 1;
+	}
+	
 	var numOfTracks = composition.getAllTracks().length;
 	
 	for (counter = 0; counter < numOfTracks; counter++) {
-		playSequence(counter, startPlayingFrom, playUntil);
+	    var tempEnd = Math.min(composition.getTrack(counter).length - 1, playUntil);
+		console.log('tempEnd at ' + tempEnd);
+		playSequence(counter, startPlayingFrom, tempEnd);
 	}
 }
 
@@ -492,9 +509,10 @@ $(document).ready(function() {
 			enableLooping = false;
 			
 		    piano.stop("playing");
-		    
+		    synthGuitar.stop("playing");
+			
 		    startPlayingFrom = 0;//change back to default
-			playUntil = composition.getTrack(0).length - 1;//change back to default
+			playUntil = findMaxLength() - 1;//change back to default
 		    animation.stopAnimation();
 			    
 		    	document.getElementById("startLoop").value = "Start Looping";
@@ -510,7 +528,7 @@ $(document).ready(function() {
 			clearAllSound();
 			
 			startPlayingFrom = 0;//change back to default
-			playUntil = composition.getTrack(0).length - 1;//change back to default
+			playUntil = findMaxLength() - 1;//change back to default
 			    document.getElementById("startLoop").value = "Start Looping";
 			    document.getElementById("startLoop").innerHTML = "Start Looping";
 		        clearInterval(loopId);
@@ -519,7 +537,7 @@ $(document).ready(function() {
 		
 		$("#startLoop").on("click", function() {
 		    enableLooping = true;
-		    if(composition.getTrack(0).length != 0)loopAll();
+		    if(findMaxLength() > 0)loopAll();
 	    });	
 		
 		/* Might not want this
@@ -710,7 +728,7 @@ function setSortable() {
 				
 				var startPosition = ui.item.data('startPos');
 				var endPosition = ui.item.index();//new position
-				ui.item.data('endPos', endPosition);//update and save item's latest data attribute
+				//ui.item.data('endPos', endPosition);//update and save item's latest data attribute
 				var grabbedNote = "";
 				
 				if (ui.item.attr('data-note') != "silence") { 
@@ -810,30 +828,25 @@ function setSortable() {
 					"text-shadow": "1px 1px 2px #000000"
 				});
 				
-				//var firstNote;
 				
 				$(".sortable-system div").on("click", function(e){
 				    //$(".sortable-system div").css({ "border": "none" });    //comment this line first to allow choosing of starting and ending note
 					// To ensure if user clicks on more than 1 note, the prev note click
 					// will have its border color reverted.
-				//	firstNote = $(e.target);
+				    
 					piano.play({
 					    pitch : notes[parseInt($(e.target).attr('data-note')) -12]
 					});
 					
 					if(e.shiftKey){//Mouse Click+shift event to choose the first note to play
 						$(e.target).css({ "border": "1px solid red" });
-						startPlayingFrom = $(e.target).data('endPos');
+						startPlayingFrom = $(e.target).index();
 					}
 				});
 			
 				$(".sortable-system div").on("dblclick", function(e){	
-				//	if(startPlayingFrom > 0) {
-				//	   firstNote.css({ "border": "1px solid red" });//this doesn't work leh =P
-				//	}
-                    
 					$(e.target).css({ "border": "1px solid yellow" });
-                    playUntil = $(e.target).data('endPos');
+                    playUntil = $(e.target).index();;
 					console.log("first note " + startPlayingFrom);
 					console.log("last note " + playUntil);
 				});
@@ -855,6 +868,18 @@ function setSortable() {
 	}
 	
 	setSortable();
+	$("#download").on("click", function(){
+	    var mixerTrack = new Wad.Poly({
+            recConfig : { // The Recorder configuration object. The only required property is 'workerPath'.
+            workerPath : '/src/Recorderjs/recorderWorker.js' // The path to the Recorder.js web worker script.
+            }
+        });
+		
+		mixerTrack.rec.record();
+		    playAllSequences();
+		mixerTrack.rec.stop();
+        mixerTrack.rec.exportWAV();          	
+	});
 	
 	$("#randomPI").on("click", function(){
 		   console.log("before for loop");
@@ -864,7 +889,6 @@ function setSortable() {
 		   for(index = 0; index < songOfPi.length; index++){
 			   console.log("in for loop");
 			   $("div").each(function(){
-			   //console.log("all notes " + $(this).attr("data-note") + " and now at index " + songOfPi[index] + "which has midi number " + (notes.indexOf(songOfPi[index]) + 12));
 				   if($(this).hasClass("col-md-1")){
 					   if($(this).attr("data-note") != "silence" && parseInt($(this).attr("data-note")) == ((notes.indexOf(songOfPi[index]))  +12)){
 						   console.log($(this).attr("data-note") + " and " + songOfPi[index]);
@@ -884,7 +908,7 @@ function setSortable() {
 					
 						   });
 						   $(".sortable-system").append(tempNote); 
-						   
+						   console.log("index " + tempNote.index());
 						   composition.getTrack(0).push(new Note(notes[parseInt(tempNote.attr('data-note')) - 12], beatDuration));
 					   }
 					
@@ -893,12 +917,8 @@ function setSortable() {
 			   });
 		   }
 			
-		   console.log("after fop loop");
-		   /*
-			for(count = 0; count < songOfPi.length; count++){
-			    composition.getTrack(0).push(new Note(songOfPi[count], beatDuration));
-			}
-			*/
+		  // console.log("after for loop");
+			console.log("end at " + playUntil);
 			songOfPi = [];
 		
 	});
