@@ -640,11 +640,13 @@ $(document).ready(function() {
 						" to " + composition.getTrack(trackNum)[playUntil].getPitch());
 		});
 		
-		$(".close-panel").hover(function(event) {
+		$(".close-panel").unbind().hover(function(event) {
 			$(this).children(".close-button").stop().animate({
 				width: event.type=="mouseenter" ? 20: 0,
 				fontSize: event.type=="mouseenter" ? "15px": 0
 			}, 500);
+		}).on("click", function(event) {
+			console.log("delete track");
 		});
 		
 	}
