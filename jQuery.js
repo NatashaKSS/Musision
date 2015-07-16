@@ -101,6 +101,10 @@ Composition.prototype.addNote = function(trackNum, note) {
 	this.tracks[trackNum].push(note);
 }
 
+Composition.prototype.deleteTrack = function(trackIndexToDelete) {
+	this.tracks.splice(trackIndexToDelete, 1);
+}
+
 // Empty a specified track 
 Composition.prototype.emptyTrack = function(trackNum) {
 	this.tracks[trackNum] = [];
@@ -547,11 +551,11 @@ $(document).ready(function() {
 		});
 		 */
 		
-		var addTrackNum = 1; // We start from 1 now since 0 is already in composition by default
+		var addTrackNum = $("#timeline-system").children().length; // Which is 1 now since by default
 		
 		$("#addTrack").on("click", function() {
 			var newTrack = $(".track").first().clone();
-			
+			addTrackNum = $("#timeline-system").children().length; // update trackNum
 			// Setting the id of tracks added and appending them to correct place
 			// Every new track added will have a unique ID which increments by 1 as
 			// more tracks are added. NOTE THAT WE START COUNTING FROM 0.
@@ -581,6 +585,7 @@ $(document).ready(function() {
 	function initializeTrackSettings() {
 		$(".muteButton").unbind().on("click", function() {
 			var trackNum = parseInt($(this).prev().attr('id').substring(10));
+			console.log("mute trackNum: " + trackNum);
 			
 			composition.setEnablePlaying(trackNum, !composition.isEnablePlaying(trackNum));
 			// Toggles whether a track is playing or not in composition's list of boolean values
@@ -624,7 +629,6 @@ $(document).ready(function() {
 		$(".play-button").unbind().on("click", function() {
 			var trackNum = parseInt($(this).attr('id').substring(10));
 			var trackLength = composition.getTrack(trackNum).length;
-			
 			console.log(startPlayingFrom);
 			console.log(playUntil);
 			if(trackLength > 1 && playUntil == 0) {
@@ -646,7 +650,29 @@ $(document).ready(function() {
 				fontSize: event.type=="mouseenter" ? "15px": 0
 			}, 500);
 		}).on("click", function(event) {
-			console.log("delete track");
+			var trackSystem = $("#timeline-system");
+			var numOfTracks = trackSystem.children().length;
+			
+			if (numOfTracks > 1) {
+				// To remove track from our backend first
+				var trackNumToBeRemoved = parseInt($(this).parent().attr("id").substring(5));
+				composition.deleteTrack(trackNumToBeRemoved);
+				
+				// To actually remove track from DOM in html
+				$(this).parents(".track").remove();
+				
+				// To update all the IDs of the remaining tracks
+				var numOfTracksToDelete = numOfTracks - 1;
+				
+				for (trackIndex = 0; trackIndex < numOfTracksToDelete; trackIndex++) {
+					// Change ID of all tracks' play buttons
+					trackSystem.children().eq(trackIndex).find(".play-button").attr('id', "play-track" + trackIndex);
+					// Change ID of each track
+					trackSystem.children().eq(trackIndex).children().eq(1).attr('id', "track" + trackIndex);
+				}
+			} else {
+				alert("Can't delete last remaining track");
+			}
 		});
 		
 	}
