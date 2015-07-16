@@ -482,6 +482,12 @@ $(document).ready(function() {
 			
 		});
 		
+		$("#buttons").draggable({ 
+			axis: "y",
+			cursor: "row-resize",
+			containment: "window"
+		});
+		
 		$("#all").on("click", function() {
 			playAllSequences();
 		});
@@ -649,6 +655,7 @@ $(document).ready(function() {
 				width: event.type=="mouseenter" ? 20: 0,
 				fontSize: event.type=="mouseenter" ? "15px": 0
 			}, 500);
+			
 		}).on("click", function(event) {
 			var trackSystem = $("#timeline-system");
 			var numOfTracks = trackSystem.children().length;
