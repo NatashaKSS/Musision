@@ -288,14 +288,14 @@ function playSequence(trackNumber, startIndex, endIndex) {
 
 	    	if(currentPitch != "silence"){
 	    		piano.play({ 
-	    			wait : indx * beatDuration,
+	    			wait : (indx - startIndex) * beatDuration,
 	 			    pitch : currentPitch,
 	 				label : "playing" 
 	 		    });
 	 		    
 	 		} else {
 	 			quarterRest.play({
-				    wait : indx * beatDuration,
+				    wait : (indx - startIndex) * beatDuration,
 					label : "playing" 
 	 			});
 	 		}
@@ -846,7 +846,14 @@ function setSortable() {
 					piano.play({
 					    pitch : notes[parseInt($(e.target).attr('data-note')) -12]
 					});
-					
+					$(e.target).css({ 
+				        "background": "#80ffff" //change color to light blue
+				    });
+					setTimeout(function(){
+					    $(e.target).css({ 
+				        "background": "#109bce" //change color to light blue
+				    });
+					}, 500);
 					if(e.shiftKey){//Mouse Click+shift event to choose the first note to play
 						$(e.target).css({ "border": "1px solid red" });
 						startPlayingFrom = $(e.target).index();
