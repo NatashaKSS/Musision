@@ -101,6 +101,28 @@ a {
 	top: 3px;
 }
 
+.close-panel {
+	position: absolute;
+	height: 20px;
+	width: 20px;
+	top: 0px;
+	right: 0px;
+	background-color: transparent;
+}
+
+.close-button {
+	position: absolute;
+	padding: 0px 3px 0px 3px;
+	height: 20px;
+	width: 0px;
+	top: -23px;
+	right: 0px;
+	font-size: 0px;
+	color: #636363;
+	background-color: #cecece;
+	cursor: pointer;
+}
+
 .timeline {
 	position: relative;
     left: 51px; top:0; right:0; bottom:0;
@@ -139,8 +161,6 @@ a {
 
 .sortable-system div {
 	cursor: pointer;
-	
-		
 }
 
 .grid-system {
