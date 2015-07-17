@@ -28,7 +28,8 @@ var startPlayingFrom = 0;
 var playUntil = 0;
 var pi = Math.PI;
 var songOfPi = [];  //to prepare for the song using PI's numbers
-
+var instruments = [];//to keep track of which instrument play what track
+instruments[0] = "Piano";
 //console.log(pi);
 
 var piSong = function(pivot, numOfNotes){//num of notes to add on top of the pivot
@@ -291,12 +292,27 @@ function playSequence(trackNumber, startIndex, endIndex) {
 			console.log("composition " + currentPitch);
 
 	    	if(currentPitch != "silence"){
+			var inst = instruments[trackNumber];
+			if(inst == "Piano"){
 	    		piano.play({ 
 	    			wait : indx * beatDuration,
 	 			    pitch : currentPitch,
 	 				label : "playing" 
 	 		    });
-	 		    
+	 		  }  else if(inst == "Guitar"){
+	    		synthGuitar.play({ 
+	    			wait : (indx - startIndex) * beatDuration,
+	 			    pitch : currentPitch,
+	 				label : "playing" 
+	 		    });
+			  
+			  } else if(inst == "Violin"){
+	    		string.play({ 
+	    			wait : (indx - startIndex) * beatDuration,
+	 			    pitch : currentPitch,
+	 				label : "playing" 
+	 		    });
+				}
 	 		} else {
 	 			quarterRest.play({
 				    wait : indx * beatDuration,
@@ -559,15 +575,18 @@ $(document).ready(function() {
 		
 		var addTrackNum = $("#timeline-system").children().length; // Which is 1 now since by default
 		
-		$("#addTrack").on("click", function() {
+				$("#addTrack").on("click", function() {
 			var newTrack = $(".track").first().clone();
-			addTrackNum = $("#timeline-system").children().length; // update trackNum
+			instruments[addTrackNum] = "Piano";
 			// Setting the id of tracks added and appending them to correct place
 			// Every new track added will have a unique ID which increments by 1 as
 			// more tracks are added. NOTE THAT WE START COUNTING FROM 0.
 			
 			// For play button
 			newTrack.children().eq(0).children().attr('id', "play-track" + addTrackNum);
+			
+			//Instrument
+			newTrack.children().eq(0).children().eq(2).attr('id', "Instrument" + addTrackNum);
 			
 			// For track number
 			newTrack.children().eq(1).attr('id', "track" + addTrackNum);
@@ -586,7 +605,40 @@ $(document).ready(function() {
 			addTrackNum++;
 			
 		});
-	}
+		//piano- guitar- violin
+		$(".chooseInstrument").on("click", function(){
+		    var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
+			//var name = "trackNum" + trackNum;
+			//console.log(name);
+		    var self = document.getElementById("Instrument"+trackNum);
+		    var allInstrument = ["Piano", "Guitar", "Violin"];
+		    var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
+			console.log("trackNum " + trackNum);
+			console.log("currently playing " + self.value);
+			var currIndex = allInstrument.indexOf(self.value);
+			var next = allInstrument[(currIndex + 1)%allInstrument.length];
+			instruments[trackNum] = next;
+			self.value = next;
+			self.innerHTML = next;
+			console.log(trackNum + " play " + instruments[trackNum]);			
+		});
+		/*
+		$("#chooseInstrument").on("click", function(){
+		    var trackNum = parseInt($(this).parent().prev().parent().prev().prev().attr('id').substring(10));
+			
+			instruments[trackNum] = "piano";
+			$("#chooseInstrument").innerHTML = "Piano";
+			console.log(trackNum + " play " + instruments[trackNum]);
+		});
+		
+		$("#violin").on("click", function(){
+		    var trackNum = parseInt($(this).parent().prev().parent().prev().prev().attr('id').substring(10));	
+			instruments[trackNum] = "string";
+			$("#chooseInstrument").innerHTML = "Violin";
+			console.log(trackNum + " play " + instruments[trackNum]);
+		});
+		*/
+}
 	
 	function initializeTrackSettings() {
 		$(".muteButton").unbind().on("click", function() {
@@ -885,9 +937,10 @@ function setSortable() {
 				    });
 					setTimeout(function(){
 					    $(e.target).css({ 
-				        "background": "#109bce" //change color to light blue
+				        "background": "#109bce" //change color back to original
 				    });
-					}, 500);
+
+					}, 400);
 					
 					if(e.shiftKey){//Mouse Click+shift event to choose the first note to play
 						$(e.target).css({ "border": "1px solid red" });
