@@ -489,7 +489,7 @@ $(document).ready(function() {
 			var noteName = $(this).attr('data-note');
 			
 			if(noteName != "silence"){
-			    string.play({ 
+			    piano.play({ 
 				    pitch : notes[parseInt(noteName - 12)] 
 			    });
 			} else {
@@ -612,14 +612,16 @@ $(document).ready(function() {
 			//console.log(name);
 		    var self = document.getElementById("Instrument"+trackNum);
 		    var allInstrument = ["Piano", "Guitar", "Violin"];
-		    var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
+		    
 			console.log("trackNum " + trackNum);
 			console.log("currently playing " + self.value);
+			
 			var currIndex = allInstrument.indexOf(self.value);
-			var next = allInstrument[(currIndex + 1)%allInstrument.length];
-			instruments[trackNum] = next;
-			self.value = next;
-			self.innerHTML = next;
+			var nextInstrument = allInstrument[(currIndex + 1)%allInstrument.length];
+			
+			instruments[trackNum] = nextInstrument;
+			self.value = nextInstrument;
+			self.innerHTML = nextInstrument;
 			console.log(trackNum + " play " + instruments[trackNum]);			
 		});
 		/*
@@ -972,6 +974,7 @@ function setSortable() {
 	}
 	
 	setSortable();
+	/* from recorder.js
 	$("#download").on("click", function(){
 	    var mixerTrack = new Wad.Poly({
             recConfig : { // The Recorder configuration object. The only required property is 'workerPath'.
@@ -984,7 +987,37 @@ function setSortable() {
 		mixerTrack.rec.stop();
         mixerTrack.rec.exportWAV();          	
 	});
+	*/
+	/*
+	//from p5.js  at http://p5js.org/examples/examples/Sound__Record_Save_Audio.php
 	
+    var mic, recorder, soundFile;
+
+    var state = 0; // mousePress will increment from Record, to Stop, to Play
+
+    //function setup() {
+    //    createCanvas(400,400);
+     //   background(200);
+       // fill(0);
+        //text('Enable mic and click the mouse to begin recording', 20, 20);
+
+  // create an audio in
+        mic = new p5.AudioIn();
+
+  // users must manually enable their browser microphone for recording to work properly!
+        mic.start();
+
+  // create a sound recorder
+        recorder = new p5.SoundRecorder();
+
+  // connect the mic to the recorder
+        recorder.setInput(mic);
+
+  // create an empty sound file that we will use to playback the recording
+        soundFile = new p5.SoundFile();
+   // }
+	
+	*/
 	$("#randomPI").on("click", function(){
 		   console.log("before for loop");
 		   playSongOfPi();
