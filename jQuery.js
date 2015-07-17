@@ -478,6 +478,27 @@ function generateDivs(numOfDivs, cssClass, text) {
 	return divString;
 }
 
+// Generate notes divs
+function generateNotes() {
+	var allNotesDivs = "";
+	
+	for (noteNum = 0; noteNum < notes.length; noteNum++) {
+		allNotesDivs += generateNotesDivs(noteNum, notes[noteNum]);
+	}
+	
+	$(function() {
+		$("#notes-buttons-holder").append(allNotesDivs);
+	});
+}
+
+function generateNotesDivs(dataNote, noteName) {
+	var result = '<div class="col-md-1" data-note=' + dataNote + '>' + noteName + '</div>';
+
+	return result;
+}
+
+generateNotes();
+
 /*------------------------------------------------*/
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
@@ -487,6 +508,7 @@ $(document).ready(function() {
 		
 		$(".col-md-1").on("click", function() {
 			var noteName = $(this).attr('data-note');
+			console.log(noteName);
 			
 			if(noteName != "silence"){
 			    piano.play({ 
@@ -501,7 +523,8 @@ $(document).ready(function() {
 		$("#buttons").draggable({ 
 			axis: "y",
 			cursor: "row-resize",
-			containment: "window"
+			containment: "window",
+			handle: "#move-vertical-button"
 		});
 		
 		$("#all").on("click", function() {
