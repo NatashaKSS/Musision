@@ -253,13 +253,28 @@ a {
 }
 
 .notes-buttons-holder {
-	overflow-y: auto;
+	overflow: auto;
 	position: absolute;
 	padding-right: 40px;
 	top: -2px;
-	right: 0px;
+	left: 50px;
 	height: 182px;
-	width: 92%;
+	width: 93%;
+}
+
+.octave-holder {
+	position: relative;
+	overflow-x: scroll;
+	height: 88px;
+	width: 100%;
+	white-space: nowrap;
+	padding-left: 10px;
+	padding-right: 10px;
+	
+	background: ;
+	background: ;
+	background: linear-gradient(#333333, #444444);
+	border: 5px solid black;
 }
 
 .toolbar-left {
@@ -282,6 +297,7 @@ a {
 	width: 30px;
 	top: 2px;
 	left: 2.5px;
+	float: left;
 	background: #dadada;
 	border: 1px solid black;
 }
@@ -295,15 +311,16 @@ a {
 /* Individual Buttons */
 .col-md-1 {
     position: relative;
-    display: inline;
-	top: 5px;
+    display: inline-block;
+	top: 0px;
 	padding-top:0.3em;
 	padding-bottom:0.1em;
     margin-top:2px;
     margin-bottom:2px;
     margin-left:auto;
     margin-right:auto;
-    float: left;
+    
+    max-width: 100px;
     
     text-decoration:none;
     text-transform:uppercase;
@@ -322,7 +339,7 @@ a {
 }
 
 .col-md-1:active {
-	top: 8px;
+	top: 3px;
 	cursor:grab;
 	cursor:pointer;
 	background: #09536f;
