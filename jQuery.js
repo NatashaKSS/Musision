@@ -319,7 +319,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
 			var inst = instruments[trackNumber];
 			if(inst == "Piano"){
 	    		piano.play({ 
-	    			wait : indx * beatDuration,
+	    			wait : (indx - startIndex) * beatDuration,
 	 			    pitch : currentPitch,
 	 				label : "playing" 
 	 		    });
@@ -362,6 +362,7 @@ function findMaxLength(){
 
 function playAllSequences() {
     console.log("max length = "  + findMaxLength());
+	console.log("start index = "  + startPlayingFrom);
     //playSequence(0, startPlayingFrom, playUntil);
 	if(findMaxLength() > 1 && playUntil==0){
 	    playUntil = findMaxLength() - 1;
@@ -510,7 +511,7 @@ function generateDivs(numOfDivs, cssClass, text) {
 function generateNotes() {
 	var allNotesDivs = "";
 	
-	for (noteNum = 12; noteNum < notes.length; noteNum++) {
+	for (noteNum = 24; noteNum < notes.length; noteNum++) {
 		allNotesDivs += generateNotesDivs(noteNum, notes[noteNum]);
 	}
 	
@@ -587,7 +588,7 @@ $(document).ready(function() {
 			
 		    piano.stop("playing");
 		    synthGuitar.stop("playing");
-			
+			violin.stop("playing");
 		    startPlayingFrom = 0;//change back to default
 			playUntil = findMaxLength() - 1;//change back to default
 		    animation.stopAnimation();
@@ -603,7 +604,7 @@ $(document).ready(function() {
 			$(".sortable-system div").remove(); //remove notes from the timeline
 		    enableLooping = false;
 			clearAllSound();
-			
+			animation.stopAnimation();
 			startPlayingFrom = 0;//change back to default
 			playUntil = findMaxLength() - 1;//change back to default
 			    document.getElementById("startLoop").value = "Start Looping";
