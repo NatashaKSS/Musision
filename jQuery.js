@@ -2,6 +2,7 @@
 //-------------------Sound Generation------------------------//
 //-----------------------------------------------------------//
 var notes = ["C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
+             "C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
              "C1","C#1","D1","D#1","E1","F1","F#1","G1","G#1","A1","A#1","B1",
              "C2","C#2","D2","D#2","E2","F2","F#2","G2","G#2","A2","A#2","B2",
              "C3","C#3","D3","D#3","E3","F3","F#3","G3","G#3","A3","A#3","B3",
@@ -12,7 +13,7 @@ var notes = ["C0","C#0","D0","D#0","E0","F0","F#0","G0","G#0","A0","A#0","B0",
              "C8","C#8","D8","D#8","E8","F8","F#8","G8","G#8","A8","A#8","B8",
              "C9","C#9","D9","D#9","E9","F9","F#9","G9","G#9","A9","A#9","B9",
              "C10","C#10","D10","D#10","E10","F10","F#10","G10"];
-// 128 notes, of which, the index of a single note in the array corresponds to
+// 128 notes, of which, the index of a single note in the array (from 12) corresponds to
 // its own MIDI number
 
 /*
@@ -34,7 +35,7 @@ instruments[0] = "Piano";
 
 var piSong = function(pivot, numOfNotes){//num of notes to add on top of the pivot
     var timesTen = pi * Math.pow(10, numOfNotes - 1);
-	songOfPi.push(notes[pivot - 12]);
+	songOfPi.push(notes[pivot]);
 	
 	for(count = numOfNotes; count >= 0; count--) {
 		var div = Math.floor(timesTen / (Math.pow(10, count - 1)));
@@ -42,13 +43,13 @@ var piSong = function(pivot, numOfNotes){//num of notes to add on top of the piv
 		var mod = timesTen % (Math.pow(10, count - 1));
 		
 		timesTen = mod;
-		songOfPi.push(notes[pivot + div - 12]);
+		songOfPi.push(notes[pivot + div]);
 	}
 }
 
 
 var playSongOfPi = function(){
-    piSong(60, 10);
+    piSong(60, 30);
     console.log(songOfPi.length);
     
     for(count = 0; count < songOfPi.length; count++){
@@ -482,7 +483,7 @@ function generateDivs(numOfDivs, cssClass, text) {
 function generateNotes() {
 	var allNotesDivs = "";
 	
-	for (noteNum = 0; noteNum < notes.length; noteNum++) {
+	for (noteNum = 12; noteNum < notes.length; noteNum++) {
 		allNotesDivs += generateNotesDivs(noteNum, notes[noteNum]);
 	}
 	
@@ -512,7 +513,7 @@ $(document).ready(function() {
 			
 			if(noteName != "silence"){
 			    piano.play({ 
-				    pitch : notes[parseInt(noteName - 12)] 
+				    pitch : notes[parseInt(noteName)] 
 			    });
 			} else {
 				// Do nothing to mimic silence...ooh
@@ -851,7 +852,7 @@ function setSortable() {
 				var grabbedNote = "";
 				
 				if (ui.item.attr('data-note') != "silence") { 
-					grabbedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12]);
+					grabbedNote = new Note(notes[parseInt(ui.item.attr('data-note'))]);
 				} else {
 					grabbedNote = new Note(ui.item.attr('data-note')); //refers to silence
 				}
@@ -918,7 +919,7 @@ function setSortable() {
 			receive: function(event, ui) {
 				if(ui.item.attr('data-note') != "silence"){
 		      		
-					var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12]);
+					var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note'))]);
 		      		console.log(insertedNote.getDuration());
 					composition.addNote(trackNumInSortable, insertedNote);
 					
@@ -954,7 +955,7 @@ function setSortable() {
 					// will have its border color reverted.
 				    
 					piano.play({
-					    pitch : notes[parseInt($(e.target).attr('data-note')) -12]
+					    pitch : notes[parseInt($(e.target).attr('data-note'))]
 					});
 					
 					$(e.target).css({ 
@@ -1050,7 +1051,7 @@ function setSortable() {
 			   console.log("in for loop");
 			   $("div").each(function(){
 				   if($(this).hasClass("col-md-1")){
-					   if($(this).attr("data-note") != "silence" && parseInt($(this).attr("data-note")) == ((notes.indexOf(songOfPi[index]))  +12)){
+					   if($(this).attr("data-note") != "silence" && parseInt($(this).attr("data-note")) == ((notes.indexOf(songOfPi[index])))){
 						   console.log($(this).attr("data-note") + " and " + songOfPi[index]);
 						   var tempNote = $(this).clone();
 						   tempNote.css({ //to be the same as a regular note on the timeline
@@ -1069,7 +1070,7 @@ function setSortable() {
 						   });
 						   $(".sortable-system").append(tempNote); 
 						   console.log("index " + tempNote.index());
-						   composition.getTrack(0).push(new Note(notes[parseInt(tempNote.attr('data-note')) - 12], beatDuration));
+						   composition.getTrack(0).push(new Note(notes[parseInt(tempNote.attr('data-note'))], beatDuration));
 					   }
 					
 				   }
