@@ -488,7 +488,7 @@ function generateNotes() {
 	}
 	
 	$(function() {
-		$("#notes-buttons-holder").append(allNotesDivs);
+		$(".notes-buttons-holder").append(allNotesDivs);
 	});
 }
 
@@ -524,7 +524,7 @@ $(document).ready(function() {
 		$("#buttons").draggable({ 
 			axis: "y",
 			cursor: "row-resize",
-			containment: "window",
+			containment: "body",
 			handle: "#move-vertical-button"
 		});
 		
@@ -599,7 +599,7 @@ $(document).ready(function() {
 		
 		var addTrackNum = $("#timeline-system").children().length; // Which is 1 now since by default
 		
-				$("#addTrack").on("click", function() {
+		$("#addTrack").on("click", function() {
 			var newTrack = $(".track").first().clone();
 			instruments[addTrackNum] = "Piano";
 			// Setting the id of tracks added and appending them to correct place
@@ -664,7 +664,7 @@ $(document).ready(function() {
 			console.log(trackNum + " play " + instruments[trackNum]);
 		});
 		*/
-}
+	}
 	
 	function initializeTrackSettings() {
 		$(".muteButton").unbind().on("click", function() {

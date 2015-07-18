@@ -241,10 +241,8 @@ a {
 /* Notes bar settings */
 
 #buttons {
-	overflow: auto;
-	float: left;
+	position: relative;
 	display: inline-block;
-	padding-right: 20px;
 	height: 185px;
 	width: 100%;
 	border: 3px solid black;
@@ -254,29 +252,38 @@ a {
 	background: linear-gradient(#2a2a2a, #333333);
 }
 
-
-.notes-buttons {
-	position: relative;
-	float: left;
-	width: 90%;
+.notes-buttons-holder {
+	overflow-y: auto;
+	position: absolute;
+	padding-right: 40px;
+	top: -2px;
+	right: 0px;
+	height: 182px;
+	width: 92%;
 }
 
 .toolbar-left {
 	position: relative;
 	float: left;
-	height: 100%;
-	width: 4%;
-	top: 8px;
-	left: 10px;
-	margin-left: 0;
-	margin-right: 8px;
+	display: inline-block;
+	height: 180px;
+	width: 40px;
+	margin-left: 2px;
+	margin-right: 2px;
+	
+	border: 1px solid #c0c0c0;
+	background: linear-gradient(#aaaaaa, #e9e9e9);
 }
 
 .toolbar-button {
+	position: absolute;
 	border-radius: 5px;
 	height: 30px;
 	width: 30px;
+	top: 2px;
+	left: 2.5px;
 	background: #dadada;
+	border: 1px solid black;
 }
 
 .glyphicon-resize-vertical {
@@ -284,6 +291,8 @@ a {
 	padding: 6px 7px 7px 7px;
 }
 
+
+/* Individual Buttons */
 .col-md-1 {
     position: relative;
     display: inline;
