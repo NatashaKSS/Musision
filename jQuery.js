@@ -47,12 +47,34 @@ var piSong = function(pivot, numOfNotes){//num of notes to add on top of the piv
 	}
 }
 
+var randomLength = function(){
+    if(Math.random() > 0.5 ) { 
+	    return Math.floor(Math.random() * Math.random() * 1099) % 41;
+	} else {
+	    return Math.floor(Math.random() * Math.random() * 1099) % 41 + 20;
+	}
+    console.log("random length " + randomLength());
+}
+var randomPivot = Math.floor(Math.random() * Math.random() * 2999) % 79;
+if(randomPivot < 40){
+	    randomPivot += 15;
+}
+if(randomPivot > 80){
+	    randomPivot -= 10;
+}
+console.log("random pivot " + randomPivot);
 
 var playSongOfPi = function(){
-    piSong(60, 30);
-    console.log(songOfPi.length);
     
-    for(count = 0; count < songOfPi.length; count++){
+	if(randomLength() < 10){
+	    randomLength() += 15;
+	}
+	
+    piSong(randomPivot, randomLength());
+    console.log(songOfPi.length);
+    var randomStart = Math.floor(Math.random() * 1099) % randomLength(); 
+	console.log("randomStart = " + randomStart);
+    for(count = randomStart; count < songOfPi.length; count++){
     	console.log(songOfPi[count]);
     	
     	synthGuitar.play({
@@ -101,6 +123,7 @@ Composition.prototype.addTrack = function(track) {
 // Adds a note to a specified track in a user's composition
 Composition.prototype.addNote = function(trackNum, note) {
 	this.tracks[trackNum].push(note);
+	console.log("track " + trackNum + "has length " + this.tracks[trackNum].length);
 }
 
 Composition.prototype.deleteTrack = function(trackIndexToDelete) {
@@ -323,6 +346,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
 	    }
 	}
 	$(".sortable-system div").css({ "border": "none" });
+	//playUntil = 0;
 }
 
 function findMaxLength(){
@@ -347,9 +371,10 @@ function playAllSequences() {
 	
 	for (counter = 0; counter < numOfTracks; counter++) {
 	    var tempEnd = Math.min(composition.getTrack(counter).length - 1, playUntil);
-		console.log('tempEnd at ' + tempEnd);
-		playSequence(counter, startPlayingFrom, tempEnd);
+		console.log('tempEnd at ' + tempEnd + "for track " + counter);
+		if(tempEnd > -1) {playSequence(counter, startPlayingFrom, tempEnd);}
 	}
+	playUntil = 0;
 }
 
   /*  
@@ -423,7 +448,9 @@ function clearAllSound(){
 	}
 	
 	piano.stop("playing");
-   
+    synthGuitar.stop("playing");
+	violin.stop("playing");
+	
     if(enableLooping){
 	    document.getElementById("startLoop").value = "Start Looping";
         document.getElementById("startLoop").innerHTML = "Start Looping";
@@ -447,7 +474,7 @@ function loopAll(){
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
 	    //playSequence(0, startPlayingFrom, playUntil);
 		playAllSequences();
-	    //loopId = setInterval("playSequence(0, startPlayingFrom, playUntil)", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);  
+		if(findMaxLength() > 0 && playUntil == 0){ playUntil = findMaxLength();}
         loopId = setInterval("playAllSequences()", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);   		
 	} else {//if we want to stop
 	    enableLooping = false;
@@ -847,9 +874,13 @@ function setSortable() {
 			update: function(event, ui) {
 				
 				var startPosition = ui.item.data('startPos');
+				
+				console.log("start position " + ui.item.data('startPos'));
+				
 				var endPosition = ui.item.index();//new position
-				//ui.item.data('endPos', endPosition);//update and save item's latest data attribute
+				ui.item.data('endPos', endPosition);//update and save item's latest data attribute
 				var grabbedNote = "";
+				console.log("end position " + ui.item.data('endPos'));
 				
 				if (ui.item.attr('data-note') != "silence") { 
 					grabbedNote = new Note(notes[parseInt(ui.item.attr('data-note'))]);
@@ -920,9 +951,9 @@ function setSortable() {
 				if(ui.item.attr('data-note') != "silence"){
 		      		
 					var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note'))]);
-		      		console.log(insertedNote.getDuration());
+		      		//console.log(insertedNote.getDuration());
 					composition.addNote(trackNumInSortable, insertedNote);
-					
+					console.log("note " + ui.item.attr('data-note') + "at index " + ui.item.index());
 				} else {
 					
 					var insertedSilence = new Note(ui.item.attr('data-note'));
@@ -930,8 +961,11 @@ function setSortable() {
 					// ui.item.attr('data-note')) is just the string "silence"
 					
 					composition.addNote(trackNumInSortable, insertedSilence);
-					
+					console.log("note " + ui.item.attr('data-note') + "at index " + ui.item.index());
 				}
+				
+				//console.log("end position " + ui.item.data('endPos'));
+				
 				
 				// Change the look of a note on the timeline
 				$(".sortable-system div").not(".ui-sortable-placeholder").removeClass().css({
@@ -1068,7 +1102,7 @@ function setSortable() {
 					            "text-shadow": "1px 1px 2px #000000"
 					
 						   });
-						   $(".sortable-system").append(tempNote); 
+						   $("#track0").children().eq(1).append(tempNote); 
 						   console.log("index " + tempNote.index());
 						   composition.getTrack(0).push(new Note(notes[parseInt(tempNote.attr('data-note'))], beatDuration));
 					   }
