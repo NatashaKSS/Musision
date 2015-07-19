@@ -30,64 +30,14 @@ var enablePlaying = true;//<----  can use this to mute/unmute a track
 //var playingMusic;<-- this one was supposed to be used for Pause
 var pause = false;
 var startPlayingFrom = 0;
-var playUntil = 0;
+var playUntil = -1;
 var pi = Math.PI;
 var songOfPi = [];  //to prepare for the song using PI's numbers
 var instruments = [];//to keep track of which instrument play what track
 instruments[0] = "Piano";
 //console.log(pi);
 
-var piSong = function(pivot, numOfNotes){//num of notes to add on top of the pivot
-    var timesTen = pi * Math.pow(10, numOfNotes - 1);
-	songOfPi.push(notes[pivot]);
-	
-	for(count = numOfNotes; count >= 0; count--) {
-		var div = Math.floor(timesTen / (Math.pow(10, count - 1)));
-		console.log("div" + div);
-		var mod = timesTen % (Math.pow(10, count - 1));
-		
-		timesTen = mod;
-		songOfPi.push(notes[pivot + div]);
-	}
-}
 
-var randomLength = function(){
-    if(Math.random() > 0.5 ) { 
-	    return Math.floor(Math.random() * Math.random() * 1099) % 41;
-	} else {
-	    return Math.floor(Math.random() * Math.random() * 1099) % 41 + 20;
-	}
-    console.log("random length " + randomLength());
-}
-var randomPivot = Math.floor(Math.random() * Math.random() * 2999) % 79;
-if(randomPivot < 40){
-	    randomPivot += 15;
-}
-if(randomPivot > 80){
-	    randomPivot -= 10;
-}
-console.log("random pivot " + randomPivot);
-
-var playSongOfPi = function(){
-    
-	if(randomLength() < 10){
-	    randomLength() += 15;
-	}
-	
-    piSong(randomPivot, randomLength());
-    console.log(songOfPi.length);
-    var randomStart = Math.floor(Math.random() * 1099) % randomLength(); 
-	console.log("randomStart = " + randomStart);
-    for(count = randomStart; count < songOfPi.length; count++){
-    	console.log(songOfPi[count]);
-    	
-    	synthGuitar.play({
-    		wait : beatDuration * count,
-    		pitch: songOfPi[count],
-			label: 'playing'
-    	});
-   }
-}
 
 
 /*
@@ -257,6 +207,7 @@ Animation.prototype.stopAnimation = function() {
 
 
 ////To pause and play again 
+/*
 function Timer(func, delay) {
     this.func = func;
     this.timerId = setTimeout(func, delay); 
@@ -275,7 +226,7 @@ function Timer(func, delay) {
     this.start = new Date();
     this.timerId = setTimeout(this.func, this.remaining);
 }
-
+*/
  /* Initialisation of objects */
 //Any user's new composition contains, by default, one track.
 var composition = new Composition([]);
@@ -321,7 +272,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
 		for(indx = startIndex; indx <= endIndex; indx++) {
 		    if (composition.getTrack(trackNumber)[indx] != undefined) {	
 				var currentPitch = composition.getTrack(trackNumber)[indx].getPitch();
-				console.log("composition " + currentPitch);
+				console.log("in composition " + currentPitch);
 	
 		    	if(currentPitch != "silence") {
 					var inst = instruments[trackNumber];
@@ -349,7 +300,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
 					
 		 		} else {
 		 			quarterRest.play({
-					    wait : indx * beatDuration,
+					    wait : (indx - startIndex) * beatDuration,
 						label : "playing" 
 		 			});
 		 		}
@@ -357,36 +308,43 @@ function playSequence(trackNumber, startIndex, endIndex) {
 	    }
 	}
 	$(".sortable-system div").css({ "border": "none" });
-	//playUntil = 0;
+	
 }
 
 function findMaxLength(){
+
     var max = 0;
 	var numOfTracks = composition.getAllTracks().length;
+	
 	for(counter = 0; counter < numOfTracks; counter++){
 	    if(composition.getTrack(counter).length >= max){
 		    max = composition.getTrack(counter).length;
 		}
 	}
+	
 	return max;
 }
 
 function playAllSequences() {
+
     console.log("max length = "  + findMaxLength());
-    	console.log("start index = " + startPlayingFrom);
-    //playSequence(0, startPlayingFrom, playUntil);
-	if(findMaxLength() > 1 && playUntil==0){
+    console.log("start index = " + startPlayingFrom);
+		
+	if(playUntil == -1){
 	    playUntil = findMaxLength() - 1;
 	}
 	
 	var numOfTracks = composition.getAllTracks().length;
 	
 	for (counter = 0; counter < numOfTracks; counter++) {
+	
 	    var tempEnd = Math.min(composition.getTrack(counter).length - 1, playUntil);
 		console.log('tempEnd at ' + tempEnd + "for track " + counter);
-		if(tempEnd > -1) {playSequence(counter, startPlayingFrom, tempEnd);}
+		
+		if(tempEnd > -1) {
+		    playSequence(counter, startPlayingFrom, tempEnd);
+		}
 	}
-	playUntil = 0;
 }
 
   /*  
@@ -452,6 +410,7 @@ function playAllSequences() {
 
 //empty the note array    
 function clearAllSound(){
+
 	var numOfTracks = composition.getAllTracks().length;
 	
 	for (i = 0; i < numOfTracks; i++) {
@@ -461,7 +420,7 @@ function clearAllSound(){
 	
 	piano.stop("playing");
     synthGuitar.stop("playing");
-	violin.stop("playing");
+	string.stop("playing");
 	
     if(enableLooping){
 	    document.getElementById("startLoop").value = "Start Looping";
@@ -473,8 +432,10 @@ function clearAllSound(){
 
 
 function loopAll(){
+
     if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
-    	composition.setEnablePlaying(0, true);
+    	
+		composition.setEnablePlaying(0, true);
     	// The above statement mimics this statement, but only sets the first track '0'
     	// enablePlaying = true;
     	/* 
@@ -484,18 +445,27 @@ function loopAll(){
 		enableLooping = true;
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
-	    //playSequence(0, startPlayingFrom, playUntil);
+	
 		playAllSequences();
-		if(findMaxLength() > 0 && playUntil == 0){ playUntil = findMaxLength();}
-        loopId = setInterval("playAllSequences()", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);   		
+		/*
+		if(playUntil == -1){ 
+		    playUntil = findMaxLength() - 1;
+		}  
+		*/
+		loopId = setInterval("playAllSequences()", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);  
+ 		
 	} else {//if we want to stop
+	
 	    enableLooping = false;
 	    document.getElementById("startLoop").value = "Start Looping";
 		document.getElementById("startLoop").innerHTML = "Start Looping";
-	    clearInterval(loopId);
+	    clearInterval(loopId);		
+		
 		startPlayingFrom = 0;//change back to default
-	    playUntil = composition.getTrack(0).length - 1;//change back to default
+	    playUntil = -1;//change back to default
 	}
+	
+	
 }
 
 
@@ -503,6 +473,7 @@ function loopAll(){
 //Takes in num of divs to generate and cssClass to associate
 // with each div and outputs a string of representing those divs
 function generateDivs(numOfDivs, cssClass, text) {
+
 	var divString = "";
 	
 	if (cssClass == "") {
@@ -568,6 +539,8 @@ $(document).ready(function() {
 		
 		$("#all").on("click", function() {
 			playAllSequences();
+			startPlayingFrom = 0; //change back to default
+			playUntil = -1; //change back to default
 		});
 		
 	  /*  
@@ -597,10 +570,9 @@ $(document).ready(function() {
 			
 		    piano.stop("playing");
 		    synthGuitar.stop("playing");
-			
-		    violin.stop("playing");
+			string.stop("playing");
 		    startPlayingFrom = 0;//change back to default
-			playUntil = findMaxLength() - 1;//change back to default
+			playUntil = -1;//change back to default
 		    animation.stopAnimation();
 			    
 		    	document.getElementById("startLoop").value = "Start Looping";
@@ -617,7 +589,7 @@ $(document).ready(function() {
 			
 			animation.stopAnimation();
 			startPlayingFrom = 0;//change back to default
-			playUntil = findMaxLength() - 1;//change back to default
+			playUntil = -1;//change back to default
 			    document.getElementById("startLoop").value = "Start Looping";
 			    document.getElementById("startLoop").innerHTML = "Start Looping";
 		        clearInterval(loopId);
@@ -670,6 +642,7 @@ $(document).ready(function() {
 		});
 		//piano- guitar- violin
 		$(".chooseInstrument").on("click", function(){
+		
 		    var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
 			//var name = "trackNum" + trackNum;
 			//console.log(name);
@@ -680,12 +653,13 @@ $(document).ready(function() {
 			console.log("currently playing " + self.value);
 			
 			var currIndex = allInstrument.indexOf(self.value);
-			var nextInstrument = allInstrument[(currIndex + 1)%allInstrument.length];
+			var nextInstrument = allInstrument[(currIndex + 1) % allInstrument.length];
 			
 			instruments[trackNum] = nextInstrument;
 			self.value = nextInstrument;
 			self.innerHTML = nextInstrument;
-			console.log(trackNum + " play " + instruments[trackNum]);			
+			console.log(trackNum + " play " + instruments[trackNum]);	
+			
 		});
 		/*
 		$("#chooseInstrument").on("click", function(){
@@ -754,7 +728,7 @@ $(document).ready(function() {
 			var trackLength = composition.getTrack(trackNum).length;
 			console.log(startPlayingFrom);
 			console.log(playUntil);
-			if(trackLength > 1 && (playUntil == 0)) {
+			if(playUntil == -1) {
 				    playUntil = trackLength - 1;
 			}
 		    
@@ -762,7 +736,7 @@ $(document).ready(function() {
 			
 			playSequence(trackNum, startPlayingFrom, playUntil);
 			startPlayingFrom = 0;//change back to default
-			playUntil = trackLength - 1;//change back to default
+			playUntil = -1;//change back to default
 			
 			//debugging
 			/*
@@ -1075,16 +1049,88 @@ function setSortable() {
    // }
 	
 	*/
+
+//Preparing for our random PI song	
+
+//generating the song of PI
+var piSong = function(pivot, numOfNotes){//num of notes to add on top of the pivot
+    var timesTen = pi * Math.pow(10, numOfNotes - 1);
+	songOfPi.push(notes[pivot]);
+	
+	for(count = numOfNotes; count >= 0; count--) {
+        var div = Math.floor(timesTen / (Math.pow(10, count - 1)));
+		console.log("div" + div);
+		var mod = timesTen % (Math.pow(10, count - 1));
+		
+		timesTen = mod;
+		songOfPi.push(notes[pivot + div]);
+	}
+}				
+
+var randomStart;
+	
+var playSongOfPi = function(){
+    //initiate random variables
+    var randomLength = function(){
+        var result;
+        if(Math.random() > 0.5 ) { 
+	        result = Math.floor(Math.random() * Math.random() * 1099) % 41;
+	    } else {
+	        result = Math.floor(Math.random() * Math.random() * 1099) % 41 + 20;
+	    }
+    if(result < 10){
+	    result += 15;
+	}
+	
+	return result;
+	
+    }
+	
+	console.log("done choosing length");
+	
+    var randomPivot = function(){
+	  
+	  var result = Math.floor(Math.random() * Math.random() * 2999) % 60;
+	
+      if(result < 10){
+	    console.log("too low!!");
+	    result += 5;
+      } else if(result > 55){
+	    console.log("too high!!");
+	    result -= 10;
+       }
+	   
+	   return result;
+    }
+	
+	console.log("done choosing pivot");
+    piSong(randomPivot(), randomLength());
+	console.log(songOfPi.length);	
+    //play out from any index of the song of PI	
+    randomStart = Math.floor(Math.random() * 1099) % randomLength(); 
+	console.log("randomStart = " + randomStart);
+    console.log("random pivot " + randomPivot());
+    console.log("random length " + randomLength());
+    for(count = randomStart; count < songOfPi.length; count++){
+    	console.log(songOfPi[count]);
+    	
+    	piano.play({
+    		wait : beatDuration * count,
+    		pitch: songOfPi[count],
+			label: 'playing'
+    	});
+    }
+}
+		
 	$("#randomPI").on("click", function(){
 		   console.log("before for loop");
 		   playSongOfPi();
-		   //console.log("length " + songOfPi.length);
-		   
-		   for(index = 0; index < songOfPi.length; index++){
+        	   
+		   for(index = randomStart; index < songOfPi.length; index++){
 			   console.log("in for loop");
 			   $("div").each(function(){
 				   if($(this).hasClass("col-md-1")){
-					   if($(this).attr("data-note") != "silence" && parseInt($(this).attr("data-note")) == ((notes.indexOf(songOfPi[index])))){
+					   if($(this).attr("data-note") != "silence" && parseInt($(this).attr("data-note")) == notes.indexOf(songOfPi[index])){
 						   console.log($(this).attr("data-note") + " and " + songOfPi[index]);
 						   var tempNote = $(this).clone();
 						   tempNote.css({ //to be the same as a regular note on the timeline
@@ -1113,10 +1159,9 @@ function setSortable() {
 			
 		  // console.log("after for loop");
 			console.log("end at " + playUntil);
-			songOfPi = [];
-		
+			songOfPi = [];	
 	});
-	
+
 });
 
 
