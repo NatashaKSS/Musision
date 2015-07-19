@@ -37,7 +37,57 @@ var instruments = [];//to keep track of which instrument play what track
 instruments[0] = "Piano";
 //console.log(pi);
 
+var piSong = function(pivot, numOfNotes) {//num of notes to add on top of the pivot
+    var timesTen = pi * Math.pow(10, numOfNotes - 1);
+	songOfPi.push(notes[pivot]);
+	
+	for(count = numOfNotes; count >= 0; count--) {
+		var div = Math.floor(timesTen / (Math.pow(10, count - 1)));
+		console.log("div" + div);
+		var mod = timesTen % (Math.pow(10, count - 1));
+		
+		timesTen = mod;
+		songOfPi.push(notes[pivot + div]);
+	}
+}
 
+var randomLength = function(){
+    if(Math.random() > 0.5 ) { 
+	    return Math.floor(Math.random() * Math.random() * 1099) % 41;
+	} else {
+	    return Math.floor(Math.random() * Math.random() * 1099) % 41 + 20;
+	}
+    console.log("random length " + randomLength());
+}
+var randomPivot = Math.floor(Math.random() * Math.random() * 2999) % 79;
+if(randomPivot < 40){
+	    randomPivot += 15;
+}
+if(randomPivot > 80){
+	    randomPivot -= 10;
+}
+console.log("random pivot " + randomPivot);
+
+var playSongOfPi = function(){
+    
+	if(randomLength() < 10){
+	    randomLength() += 15;
+	}
+	
+    piSong(randomPivot, randomLength());
+    console.log(songOfPi.length);
+    var randomStart = Math.floor(Math.random() * 1099) % randomLength(); 
+	console.log("randomStart = " + randomStart);
+    for(count = randomStart; count < songOfPi.length; count++){
+    	console.log(songOfPi[count]);
+    	
+    	synthGuitar.play({
+    		wait : beatDuration * count,
+    		pitch: songOfPi[count],
+			label: 'playing'
+    	});
+   }
+}
 
 
 /*
@@ -207,7 +257,6 @@ Animation.prototype.stopAnimation = function() {
 
 
 ////To pause and play again 
-/*
 function Timer(func, delay) {
     this.func = func;
     this.timerId = setTimeout(func, delay); 
@@ -226,7 +275,7 @@ function Timer(func, delay) {
     this.start = new Date();
     this.timerId = setTimeout(this.func, this.remaining);
 }
-*/
+
  /* Initialisation of objects */
 //Any user's new composition contains, by default, one track.
 var composition = new Composition([]);
@@ -308,11 +357,10 @@ function playSequence(trackNumber, startIndex, endIndex) {
 	    }
 	}
 	$(".sortable-system div").css({ "border": "none" });
-	
+
 }
 
 function findMaxLength(){
-
     var max = 0;
 	var numOfTracks = composition.getAllTracks().length;
 	
@@ -410,7 +458,6 @@ function playAllSequences() {
 
 //empty the note array    
 function clearAllSound(){
-
 	var numOfTracks = composition.getAllTracks().length;
 	
 	for (i = 0; i < numOfTracks; i++) {
@@ -429,7 +476,6 @@ function clearAllSound(){
 	}
 	
 }
-
 
 function loopAll(){
 
@@ -463,8 +509,8 @@ function loopAll(){
 		
 		startPlayingFrom = 0;//change back to default
 	    playUntil = -1;//change back to default
-	}
 	
+	}
 	
 }
 
@@ -473,7 +519,6 @@ function loopAll(){
 //Takes in num of divs to generate and cssClass to associate
 // with each div and outputs a string of representing those divs
 function generateDivs(numOfDivs, cssClass, text) {
-
 	var divString = "";
 	
 	if (cssClass == "") {
@@ -489,10 +534,38 @@ function generateDivs(numOfDivs, cssClass, text) {
 	return divString;
 }
 
+function generateOctaveColour(colour) {
+	var coloursList = [["#005C99", "#007ACC", "#0099FF", "#33ADFF", "#66C2FF", "#99D6FF"], // Blue
+	                   ["#1A661A", "#248F24", "#2EB82E", "#47D147", "#70DB70", "#D1FFC2"], // Green
+	                   ["#B24700", "#E65C00", "#FF6600", "#FF8533", "#FFA366", "#FFB280"], // Orange
+	                   ["#B20000", "#E60000", "#FF0000", "#FF3333", "#FF4D4D", "#FF8080"]]; // Red
+	var numOfOctaves = 6;
+	var octaveHolder = $(".octave-holder");
+	var chosenColour = 0; //Blue by default
+
+	if (colour == "blue") {
+		chosenColour = 0;
+	} else if (colour == "green") {
+		chosenColour = 1;
+	} else if (colour == "orange") {
+		chosenColour = 2;
+	} else if (colour == "red") {
+		chosenColour = 3;
+	}
+	
+	for (octaveNum = 0; octaveNum < numOfOctaves; octaveNum++) {
+		octaveHolder.eq(octaveNum).find(".col-md-1").css({
+			"background": coloursList[chosenColour][octaveNum]
+		});
+	}
+	
+}
+
 /*------------------------------------------------*/
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
 $(document).ready(function() {
+	
 	function initialize() {
 		initializeTrackSettings();
 		
@@ -570,9 +643,10 @@ $(document).ready(function() {
 			
 		    piano.stop("playing");
 		    synthGuitar.stop("playing");
-			string.stop("playing");
+			
+		    string.stop("playing");
 		    startPlayingFrom = 0;//change back to default
-			playUntil = -1;//change back to default
+			playUntil = - 1;//change back to default
 		    animation.stopAnimation();
 			    
 		    	document.getElementById("startLoop").value = "Start Looping";
@@ -589,7 +663,7 @@ $(document).ready(function() {
 			
 			animation.stopAnimation();
 			startPlayingFrom = 0;//change back to default
-			playUntil = -1;//change back to default
+			playUntil = - 1;//change back to default
 			    document.getElementById("startLoop").value = "Start Looping";
 			    document.getElementById("startLoop").innerHTML = "Start Looping";
 		        clearInterval(loopId);
@@ -642,7 +716,6 @@ $(document).ready(function() {
 		});
 		//piano- guitar- violin
 		$(".chooseInstrument").on("click", function(){
-		
 		    var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
 			//var name = "trackNum" + trackNum;
 			//console.log(name);
@@ -658,8 +731,7 @@ $(document).ready(function() {
 			instruments[trackNum] = nextInstrument;
 			self.value = nextInstrument;
 			self.innerHTML = nextInstrument;
-			console.log(trackNum + " play " + instruments[trackNum]);	
-			
+			console.log(trackNum + " play " + instruments[trackNum]);			
 		});
 		/*
 		$("#chooseInstrument").on("click", function(){
@@ -682,7 +754,6 @@ $(document).ready(function() {
 	function initializeTrackSettings() {
 		$(".muteButton").unbind().on("click", function() {
 			var trackNum = parseInt($(this).prev().attr('id').substring(10));
-			console.log("mute trackNum: " + trackNum);
 			
 			composition.setEnablePlaying(trackNum, !composition.isEnablePlaying(trackNum));
 			// Toggles whether a track is playing or not in composition's list of boolean values
@@ -736,7 +807,7 @@ $(document).ready(function() {
 			
 			playSequence(trackNum, startPlayingFrom, playUntil);
 			startPlayingFrom = 0;//change back to default
-			playUntil = -1;//change back to default
+			playUntil = - 1;//change back to default
 			
 			//debugging
 			/*
@@ -786,7 +857,7 @@ $(document).ready(function() {
 	setSortable();
 	initialize();
 	initializeTrackSettings();
-	
+	generateOctaveColour("red");
 	
 	
 	
@@ -1049,83 +1120,83 @@ function setSortable() {
    // }
 	
 	*/
-
-//Preparing for our random PI song	
-
-//generating the song of PI
-var piSong = function(pivot, numOfNotes){//num of notes to add on top of the pivot
-    var timesTen = pi * Math.pow(10, numOfNotes - 1);
-	songOfPi.push(notes[pivot]);
 	
-	for(count = numOfNotes; count >= 0; count--) {
-        var div = Math.floor(timesTen / (Math.pow(10, count - 1)));
-		console.log("div" + div);
-		var mod = timesTen % (Math.pow(10, count - 1));
+	//Preparing for our random PI song	
+	
+	//generating the song of PI
+	var piSong = function(pivot, numOfNotes){//num of notes to add on top of the pivot
+	    var timesTen = pi * Math.pow(10, numOfNotes - 1);
+		songOfPi.push(notes[pivot]);
 		
-		timesTen = mod;
-		songOfPi.push(notes[pivot + div]);
-	}
-}				
-
-var randomStart;
+		for(count = numOfNotes; count >= 0; count--) {
+	        var div = Math.floor(timesTen / (Math.pow(10, count - 1)));
+			console.log("div" + div);
+			var mod = timesTen % (Math.pow(10, count - 1));
+			
+			timesTen = mod;
+			songOfPi.push(notes[pivot + div]);
+		}
+	}				
 	
-var playSongOfPi = function(){
-    //initiate random variables
-    var randomLength = function(){
-        var result;
-        if(Math.random() > 0.5 ) { 
-	        result = Math.floor(Math.random() * Math.random() * 1099) % 41;
-	    } else {
-	        result = Math.floor(Math.random() * Math.random() * 1099) % 41 + 20;
+	var randomStart;
+		
+	var playSongOfPi = function(){
+	    //initiate random variables
+	    var randomLength = function(){
+	        var result;
+	        if(Math.random() > 0.5 ) { 
+		        result = Math.floor(Math.random() * Math.random() * 1099) % 41;
+		    } else {
+		        result = Math.floor(Math.random() * Math.random() * 1099) % 41 + 20;
+		    }
+	    if(result < 10){
+		    result += 15;
+		}
+		
+		return result;
+		
 	    }
-    if(result < 10){
-	    result += 15;
-	}
-	
-	return result;
-	
-    }
-	
-	console.log("done choosing length");
-	
-    var randomPivot = function(){
-	  
-	  var result = Math.floor(Math.random() * Math.random() * 2999) % 60;
-	
-      if(result < 10){
-	    console.log("too low!!");
-	    result += 5;
-      } else if(result > 55){
-	    console.log("too high!!");
-	    result -= 10;
-       }
-	   
-	   return result;
-    }
-	
-	console.log("done choosing pivot");
-    piSong(randomPivot(), randomLength());
-	console.log(songOfPi.length);	
-    //play out from any index of the song of PI	
-    randomStart = Math.floor(Math.random() * 1099) % randomLength(); 
-	console.log("randomStart = " + randomStart);
-    console.log("random pivot " + randomPivot());
-    console.log("random length " + randomLength());
-    for(count = randomStart; count < songOfPi.length; count++){
-    	console.log(songOfPi[count]);
-    	
-    	piano.play({
-    		wait : beatDuration * count,
-    		pitch: songOfPi[count],
-			label: 'playing'
-    	});
-    }
-}
 		
+		console.log("done choosing length");
+		
+	    var randomPivot = function(){
+		  
+		  var result = Math.floor(Math.random() * Math.random() * 2999) % 60;
+		
+	      if(result < 10){
+		    console.log("too low!!");
+		    result += 5;
+	      } else if(result > 55){
+		    console.log("too high!!");
+		    result -= 10;
+	       }
+		   
+		   return result;
+	    }
+		
+		console.log("done choosing pivot");
+	    piSong(randomPivot(), randomLength());
+		console.log(songOfPi.length);	
+	    //play out from any index of the song of PI	
+	    randomStart = Math.floor(Math.random() * 1099) % randomLength(); 
+		console.log("randomStart = " + randomStart);
+	    console.log("random pivot " + randomPivot());
+	    console.log("random length " + randomLength());
+	    for(count = randomStart; count < songOfPi.length; count++){
+	    	console.log(songOfPi[count]);
+	    	
+	    	piano.play({
+	    		wait : beatDuration * count,
+	    		pitch: songOfPi[count],
+				label: 'playing'
+	    	});
+	    }
+	}
+			
 	$("#randomPI").on("click", function(){
 		   console.log("before for loop");
 		   playSongOfPi();
-        	   
+     	   
 		   for(index = randomStart; index < songOfPi.length; index++){
 			   console.log("in for loop");
 			   $("div").each(function(){
@@ -1157,13 +1228,12 @@ var playSongOfPi = function(){
 			   });
 		   }
 			
-		  // console.log("after for loop");
-			console.log("end at " + playUntil);
-			songOfPi = [];	
+		   //console.log("after for loop");
+		   console.log("end at " + playUntil);
+		   songOfPi = [];	
 	});
-
+	
 });
-
 
 
 /*
