@@ -37,59 +37,6 @@ var instruments = [];//to keep track of which instrument play what track
 instruments[0] = "Piano";
 //console.log(pi);
 
-var piSong = function(pivot, numOfNotes) {//num of notes to add on top of the pivot
-    var timesTen = pi * Math.pow(10, numOfNotes - 1);
-	songOfPi.push(notes[pivot]);
-	
-	for(count = numOfNotes; count >= 0; count--) {
-		var div = Math.floor(timesTen / (Math.pow(10, count - 1)));
-		console.log("div" + div);
-		var mod = timesTen % (Math.pow(10, count - 1));
-		
-		timesTen = mod;
-		songOfPi.push(notes[pivot + div]);
-	}
-}
-
-var randomLength = function(){
-    if(Math.random() > 0.5 ) { 
-	    return Math.floor(Math.random() * Math.random() * 1099) % 41;
-	} else {
-	    return Math.floor(Math.random() * Math.random() * 1099) % 41 + 20;
-	}
-    console.log("random length " + randomLength());
-}
-var randomPivot = Math.floor(Math.random() * Math.random() * 2999) % 79;
-if(randomPivot < 40){
-	    randomPivot += 15;
-}
-if(randomPivot > 80){
-	    randomPivot -= 10;
-}
-console.log("random pivot " + randomPivot);
-
-var playSongOfPi = function(){
-    
-	if(randomLength() < 10){
-	    randomLength() += 15;
-	}
-	
-    piSong(randomPivot, randomLength());
-    console.log(songOfPi.length);
-    var randomStart = Math.floor(Math.random() * 1099) % randomLength(); 
-	console.log("randomStart = " + randomStart);
-    for(count = randomStart; count < songOfPi.length; count++){
-    	console.log(songOfPi[count]);
-    	
-    	synthGuitar.play({
-    		wait : beatDuration * count,
-    		pitch: songOfPi[count],
-			label: 'playing'
-    	});
-   }
-}
-
-
 /*
  * User Tracks Constructor, named a composition
  * 
