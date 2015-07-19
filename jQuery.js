@@ -127,7 +127,6 @@ Composition.prototype.addTrack = function(track) {
 // Adds a note to a specified track in a user's composition
 Composition.prototype.addNote = function(trackNum, note) {
 	this.tracks[trackNum].push(note);
-	console.log("track " + trackNum + "has length " + this.tracks[trackNum].length);
 }
 
 Composition.prototype.deleteTrack = function(trackIndexToDelete) {
@@ -141,7 +140,11 @@ Composition.prototype.emptyTrack = function(trackNum) {
 
 //Empty a specified track 
 Composition.prototype.emptyAllTracks = function(trackNum) {
-	this.tracks = [[]];
+	var numOfTracks = this.tracks.length;
+	
+	for (i = 0; i < numOfTracks; i++) {
+		this.tracks[i] = [];
+	}
 }
 
 //Gets the boolean value for whether a track has 'playing' enabled or not
@@ -316,37 +319,41 @@ function playSequence(trackNumber, startIndex, endIndex) {
         console.log("length " + (endIndex - startIndex + 1));
 		
 		for(indx = startIndex; indx <= endIndex; indx++) {
-	    	var currentPitch = composition.getTrack(trackNumber)[indx].getPitch();
-			console.log("composition " + currentPitch);
-
-	    	if(currentPitch != "silence"){
-			var inst = instruments[trackNumber];
-			if(inst == "Piano"){
-	    		piano.play({ 
-	    			wait : (indx - startIndex) * beatDuration,
-	 			    pitch : currentPitch,
-	 				label : "playing" 
-	 		    });
-	 		  }  else if(inst == "Guitar"){
-	    		synthGuitar.play({ 
-	    			wait : (indx - startIndex) * beatDuration,
-	 			    pitch : currentPitch,
-	 				label : "playing" 
-	 		    });
-			  
-			  } else if(inst == "Violin"){
-	    		string.play({ 
-	    			wait : (indx - startIndex) * beatDuration,
-	 			    pitch : currentPitch,
-	 				label : "playing" 
-	 		    });
-				}
-	 		} else {
-	 			quarterRest.play({
-				    wait : indx * beatDuration,
-					label : "playing" 
-	 			});
-	 		}
+		    if (composition.getTrack(trackNumber)[indx] != undefined) {	
+				var currentPitch = composition.getTrack(trackNumber)[indx].getPitch();
+				console.log("composition " + currentPitch);
+	
+		    	if(currentPitch != "silence") {
+					var inst = instruments[trackNumber];
+					
+					if(inst == "Piano"){
+			    		piano.play({ 
+			    			wait : (indx - startIndex) * beatDuration,
+			 			    pitch : currentPitch,
+			 				label : "playing" 
+			 		    });
+			 		  }  else if(inst == "Guitar"){
+			    		synthGuitar.play({ 
+			    			wait : (indx - startIndex) * beatDuration,
+			 			    pitch : currentPitch,
+			 				label : "playing" 
+			 		    });
+					  
+					  } else if(inst == "Violin"){
+			    		string.play({ 
+			    			wait : (indx - startIndex) * beatDuration,
+			 			    pitch : currentPitch,
+			 				label : "playing" 
+			 		    });
+					  }
+					
+		 		} else {
+		 			quarterRest.play({
+					    wait : indx * beatDuration,
+						label : "playing" 
+		 			});
+		 		}
+		    }
 	    }
 	}
 	$(".sortable-system div").css({ "border": "none" });
@@ -747,20 +754,26 @@ $(document).ready(function() {
 			var trackLength = composition.getTrack(trackNum).length;
 			console.log(startPlayingFrom);
 			console.log(playUntil);
-			if(trackLength > 1 && playUntil == 0) {
+			if(trackLength > 1 && (playUntil == 0)) {
 				    playUntil = trackLength - 1;
 			}
 		    
+			console.log("playUntil in play-button: " + playUntil);
+			
 			playSequence(trackNum, startPlayingFrom, playUntil);
 			startPlayingFrom = 0;//change back to default
 			playUntil = trackLength - 1;//change back to default
+			
 			//debugging
+			/*
 			console.log("check play length " + trackLength + 
 						" and start from " + composition.getTrack(trackNum)[startPlayingFrom].getPitch() + 
 						" to " + composition.getTrack(trackNum)[playUntil].getPitch());
+			*/
 		});
 		
 		$(".close-panel").unbind().hover(function(event) {
+			// Controls the animation of close track button
 			$(this).children(".close-button").stop().animate({
 				width: event.type=="mouseenter" ? 20: 0,
 				fontSize: event.type=="mouseenter" ? "15px": 0
@@ -779,9 +792,9 @@ $(document).ready(function() {
 				$(this).parents(".track").remove();
 				
 				// To update all the IDs of the remaining tracks
-				var numOfTracksToDelete = numOfTracks - 1;
+				var numOfTracksRemaining = numOfTracks - 1;
 				
-				for (trackIndex = 0; trackIndex < numOfTracksToDelete; trackIndex++) {
+				for (trackIndex = 0; trackIndex < numOfTracksRemaining; trackIndex++) {
 					// Change ID of all tracks' play buttons
 					trackSystem.children().eq(trackIndex).find(".play-button").attr('id', "play-track" + trackIndex);
 					// Change ID of each track
@@ -838,11 +851,39 @@ $(document).ready(function() {
 /*------------------------------------------------*/
 /*------------ Draggables & Sortables-------------*/
 /*------------------------------------------------*/
+// Function to update composition's tracks and notes for the user
+// Whenever a note is inserted or swapped in sortable.
+// This checks for objects in the DOM and updates our backend composition
+// respectively.
+function updateComposition() {
+	var numOfTracks = $(".timeline").length;
+	var trackNotes, dataNoteIndex, currentTrack, currentNote;
+	
+	composition.emptyAllTracks();
+	
+	for (trackNum = 0; trackNum < numOfTracks; trackNum++) {
+		
+		currentTrack = $("#track" + trackNum + " > :nth-child(2)");
+		// nth-child(2) because our sortable system is always 2nd child
+		
+		trackNotes = currentTrack.children();
+		// list of a track's notes
+		
+		for (noteNum = 0; noteNum < trackNotes.length; noteNum++) {
+			dataNoteIndex = parseInt(trackNotes.eq(noteNum).attr('data-note'));
+			// Index of a note corresponds to the div's "data-note" attribute
+			
+			currentNote = new Note(notes[dataNoteIndex]);
+			composition.addNote(trackNum, currentNote);
+		}
+	}
+}
+	
 function setSortable() {	
 	$(function() {
 		var inBox = false; // Flag that facilitates removal of note
 		var inBeforeStop = false; // Flag that facilitates colour of note when removed
-		var trackNumInSortable = 0; // Default trackNum
+		var trackNumInSortable = 0; // Current/default trackNum
 		
 		$(".sortable-system").sortable({
 			scroll: false,
@@ -866,50 +907,21 @@ function setSortable() {
 			},
 			
 			start: function(event, ui) {
-				//console.log("start");
 				
 				var startPosition = ui.item.index(); //original index
 				ui.item.data('startPos', startPosition); //create data called startPos and set it to startPosition
 				
 				trackNumInSortable = parseInt(ui.item.parent().parent().attr("id").substring(5));
-				//Every ID of a track is in the format "track0", "track1", "track23", so substring works here
 				
 			},
 			
 			// Whenever user has stopped sorting and the DOM element (HTML) has changed
 			update: function(event, ui) {
-				//console.log("update");
-				
-				var startPosition = ui.item.data('startPos');
-				var endPosition = ui.item.index();//new position
-				ui.item.data('endPos', endPosition);//update and save item's latest data attribute
-				var grabbedNote = "";
-				
-				if (ui.item.attr('data-note') != "silence") { 
-					grabbedNote = new Note(notes[parseInt(ui.item.attr('data-note'))]);
-				} else {
-					grabbedNote = new Note(ui.item.attr('data-note')); //refers to silence
-				}
-				
-				// When position of a note changes on the timeline, follow up 
-				// with appropriate swap in position of notes in the array as well
-				if (startPosition < endPosition) {
-					// When swapping from left to right
-					composition.getTrack(trackNumInSortable).splice(endPosition + 1, 0, grabbedNote);
-					composition.getTrack(trackNumInSortable).splice(startPosition, 1);
-				
-				} else if (startPosition > endPosition) {
-					// When swapping from right  to left
-					composition.getTrack(trackNumInSortable).splice(endPosition, 0, grabbedNote);
-					composition.getTrack(trackNumInSortable).splice(startPosition + 1, 1);
-				
-				}
-				
+				updateComposition();
 			},
 			
 			// If item is hovering over timeline
 			over: function(event, ui) {
-				//console.log("over");
 				
 				inBox = true;
 				inBeforeStop = false;
@@ -919,13 +931,12 @@ function setSortable() {
 					"border":"none"
 				});
 				
+				
 			},
 			 
 			// If item is dragged outside timeline OR if item is dropped
 			// onto timeline
 			out: function(event, ui) {
-				//console.log("out");
-				
 				inBox = false;
 				
 				if (!inBeforeStop) {
@@ -939,42 +950,22 @@ function setSortable() {
 			
 			// Just before releasing dragging and item is outside timeline
 			beforeStop: function(event, ui) {
-				//console.log("beforeStop");
-				
+
 				inBeforeStop = true;
 				
+				// If a note is not swapped to another track or user decides
+				// not to delete a note, the note will not enter this and be removed
 				if (!inBox) {
-					
 					var startPosition = ui.item.data('startPos');
 					composition.getTrack(trackNumInSortable).splice(startPosition, 1);
-					ui.item.remove();
-					
-				}				
+					ui.item.remove();		
+				}		
+			
 			},
 			
 			// When timeline receives the user-dragged note
 			receive: function(event, ui) {
-				//console.log("receive");
-				
-				if(ui.item.attr('data-note') != "silence"){
-		      		
-					var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note'))]);
-		      		//console.log(insertedNote.getDuration());
-					composition.addNote(trackNumInSortable, insertedNote);
-					
-				} else {
-					
-					var insertedSilence = new Note(ui.item.attr('data-note'));
-					// Pitch for silence is just "silence"
-					// ui.item.attr('data-note')) is just the string "silence"
-					
-					composition.addNote(trackNumInSortable, insertedSilence);
-					
-				}
-				
-				//console.log("end position " + ui.item.data('endPos'));
-				
-				
+
 				// Change the look of a note on the timeline
 				$(".sortable-system div").not(".ui-sortable-placeholder").removeClass().css({
 					"height": grid.noteHeight,
@@ -995,8 +986,7 @@ function setSortable() {
 				    //$(".sortable-system div").css({ "border": "none" });    //comment this line first to allow choosing of starting and ending note
 					// To ensure if user clicks on more than 1 note, the prev note click
 					// will have its border color reverted.
-				    
-					piano.play({
+				    piano.play({
 					    pitch : notes[parseInt($(e.target).attr('data-note'))]
 					});
 					
@@ -1016,9 +1006,10 @@ function setSortable() {
 					}
 				});
 			
-				$(".sortable-system div").on("dblclick", function(e){	
+				$(".sortable-system div").on("dblclick", function(e){
 					$(e.target).css({ "border": "1px solid yellow" });
-                    playUntil = $(e.target).index();;
+                    playUntil = $(e.target).index();
+                    
 					console.log("first note " + startPlayingFrom);
 					console.log("last note " + playUntil);
 				});
