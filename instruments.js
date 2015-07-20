@@ -71,7 +71,7 @@ var sine1 = new Wad({
 	*/
     filter : { 
             type : 'lowpass',
-            frequency : 1700,
+            frequency : 1600,
             env : {
                 attack : .4,
                 frequency : 700
@@ -85,17 +85,17 @@ source : 'triangle',
 env : {
         attack : .4,
         decay : .1,
-        sustain : .9,
+        sustain : .8,
         hold : .2,
         release : .1
      },
 	 
 	filter : { 
             type : 'lowpass',
-            frequency : 1400,
+            frequency : 1600,
             env : {
                 attack : .4,
-                frequency : 300
+                frequency : 600
             }
         }
 });
@@ -112,10 +112,10 @@ env : {
 	 
 	filter : { 
             type : 'lowpass',
-            frequency : 1400,
+            frequency : 1700,
             env : {
                 attack : .4,
-                frequency : 300
+                frequency : 700
             }
         }
 });
@@ -125,7 +125,7 @@ source : 'square',
 env : {
         attack : .4,
         decay : .1,
-        sustain : .8,
+        sustain : .5,
         hold : .2,
         release : .1
      },
@@ -135,7 +135,7 @@ env : {
             frequency : 1600,
             env : {
                 attack : .4,
-                frequency : 300
+                frequency : 700
             }
         }
 });
@@ -143,7 +143,7 @@ env : {
 
 var string = new Wad.Poly();
 string.add(sine1).add(triangle1).add(square1).add(saw1);
-string.setVolume(0.3);
+string.setVolume(0.1);
 
 
 
@@ -168,7 +168,7 @@ var snare = new Wad ({
 var flute = new Wad({
     source : 'square', 
     env : {
-        attack : .015, 
+        attack : .075, 
         decay : .002, 
         sustain : .5, 
         hold : .2, 
@@ -176,19 +176,21 @@ var flute = new Wad({
     }, 
     filter : {
         type : 'lowpass', 
-        frequency : 600, 
+        frequency : 800, 
         q : 7, 
         env : { 
             attack : .7, 
-            frequency : 1600
+            frequency : 3000
         }
     }, 
     vibrato : {
-        attack : 8, 
-        speed : 8, 
+        attack : 5, 
+        speed : 10, 
         magnitude : 100 
     }
 });
+
+flute.setVolume(0.3);
 
 // Hihat Cymbals
 var hihat = new Wad( Wad.presets.hiHatClosed );

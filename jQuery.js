@@ -34,7 +34,7 @@ var playUntil = -1;
 var pi = Math.PI;
 var songOfPi = [];  //to prepare for the song using PI's numbers
 var instruments = [];//to keep track of which instrument play what track
-instruments[0] = "Piano";
+instruments[0] = "Piano";//default first instrument for each track
 //console.log(pi);
 
 /*
@@ -421,6 +421,7 @@ function playAllSequences() {
 
 //empty the note array    
 function clearAllSound(){
+
 	var numOfTracks = composition.getAllTracks().length;
 	
 	for (i = 0; i < numOfTracks; i++) {
@@ -437,7 +438,7 @@ function clearAllSound(){
 	    document.getElementById("startLoop").value = "Start Looping";
         document.getElementById("startLoop").innerHTML = "Start Looping";
 	    clearInterval(loopId);
-	}
+	}	
 	
 }
 
@@ -680,14 +681,26 @@ $(document).ready(function() {
 			setSortable();
 			initializeTrackSettings();
 			
+			//debugging
+		$(".chooseInstrument").each(function(){
+		    console.log("checking instr " + $(this).attr("id") + " played with " + instruments[$(this).attr("id").substring(10)]);
+		});//end debugging
+		
+			
 		});
 		
-		//piano- guitar- violin
-		$(".chooseInstrument").on("click", function(){
+		//piano- guitar- violin- flute
+//	$("button").each(function(){
+		
+		
+		$(".chooseInstrument").click(function(){
+		//if($(this).hasClass("chooseInstrument")){
+		    //$(this).click(function(){
+		    console.log("BOOM!");
 		    console.log("in choose inst " + $(this).attr('id'));
 		    var trackNum = parseInt($(this).attr('id').substring(10));
-			var name = "trackNum" + trackNum;
-		    var self = document.getElementById("Instrument"+trackNum);
+	
+		    var self = document.getElementById("Instrument" + trackNum);
 			
 		    var allInstrument = ["Piano", "Guitar", "Violin", "Flute"];
 		    
@@ -700,9 +713,12 @@ $(document).ready(function() {
 			instruments[trackNum] = nextInstrument;
 			self.value = nextInstrument;
 			self.innerHTML = nextInstrument;
-			console.log(trackNum + " next play " + instruments[trackNum]);			
-		});
-	}
+			console.log(trackNum + " next play " + instruments[trackNum]);
+         //  });		
+       // }		
+	   });
+	   
+}
 	
 	function initializeTrackSettings() {
 		$(".muteButton").unbind().on("click", function() {
@@ -785,6 +801,12 @@ $(document).ready(function() {
 				// To remove track from our backend first
 				var trackNumToBeRemoved = parseInt($(this).parent().attr("id").substring(5));
 				composition.deleteTrack(trackNumToBeRemoved);
+				instruments.splice(trackNumToBeRemoved, 1);
+				
+				//show all instruments
+				for(count = 0; count < instruments.length; count++){
+				    console.log("instruments left " + instruments[count]);
+				}
 				
 				// To actually remove track from DOM in html
 				$(this).parents(".track").remove();
@@ -1029,9 +1051,11 @@ function setSortable() {
 	}
 	
 	setSortable();
-	/* from recorder.js
-	$("#download").on("click", function(){
-	    var mixerTrack = new Wad.Poly({
+	
+	// from recorder.js
+	/*
+	
+	var mixerTrack = new Wad.Poly({
             recConfig : { // The Recorder configuration object. The only required property is 'workerPath'.
             workerPath : '/src/Recorderjs/recorderWorker.js' // The path to the Recorder.js web worker script.
             }
@@ -1040,9 +1064,67 @@ function setSortable() {
 		mixerTrack.rec.record();
 		    playAllSequences();
 		mixerTrack.rec.stop();
-        mixerTrack.rec.exportWAV();          	
-	});
+        mixerTrack.rec.exportWAV();      
+	
 	*/
+	//https://truongtx.me/2014/08/09/record-and-export-audio-video-files-in-browser-using-web-audio-api/
+	$("#download").on("click", function(){
+	    var navigator = window.navigator;
+        navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+
+        var Context = window.AudioContext || window.webkitAudioContext;
+        var context = new Context();
+    	
+		// we need these variables for later use with the stop function
+        var mediaStream;
+        var rec;
+		//for the playing, recording and saving of the file
+		record();
+		setTimeout(function(){
+		     stop();
+			 }, findMaxLength() * beatDuration * 1000);
+
+        function record() {
+        // ask for permission and start recording
+            navigator.getUserMedia({audio: true}, function(localMediaStream){
+                mediaStream = localMediaStream;
+
+        // create a stream source to pass to Recorder.js
+                var mediaStreamSource = context.createMediaStreamSource(localMediaStream);
+
+        // create new instance of Recorder.js using the mediaStreamSource
+                rec = new Recorder(mediaStreamSource, {
+        // pass the path to recorderWorker.js file here
+                workerPath: '/bower_components/Recorderjs/recorderWorker.js'
+                });
+
+        // start recording
+            rec.record();
+			
+			playAllSequences();
+			
+			console.log("recording");
+            }, function(err){
+                    console.log('Browser not supported');
+               });
+        }
+		
+		function stop() {
+        // stop the media stream
+            mediaStream.stop();
+
+        // stop Recorder.js
+            rec.stop();
+
+        // export it to WAV
+            rec.exportWAV(function(e){
+                rec.clear();
+                Recorder.forceDownload(e, "filename.wav");
+            });
+        }
+		
+	});
+	//end recorder.js
 	/*
 	//from p5.js  at http://p5js.org/examples/examples/Sound__Record_Save_Audio.php
 	

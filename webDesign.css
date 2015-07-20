@@ -361,3 +361,7 @@ a {
 #randomPI:hover{
     background: crimson;
 }
+
+.chooseInstrument {
+    background: orange;
+}
