@@ -53,6 +53,9 @@ function Composition(track) {
 	
 	// List of booleans for indicating if this track has enabled playing.
 	this.enablePlaying = [true];
+	
+	// Tracks number of tracks on timeline
+	this.numOfTracks = 1; // By Default, should have 1 track on timeline
 }
 
 // Gets the array of tracks a user has made
@@ -69,6 +72,7 @@ Composition.prototype.getTrack = function(trackNum) {
 Composition.prototype.addTrack = function(track) {
 	this.tracks.push(track);
 	this.enablePlaying.push(true);
+	this.numOfTracks++;
 }
 
 // Adds a note to a specified track in a user's composition
@@ -78,6 +82,7 @@ Composition.prototype.addNote = function(trackNum, note) {
 
 Composition.prototype.deleteTrack = function(trackIndexToDelete) {
 	this.tracks.splice(trackIndexToDelete, 1);
+	this.numOfTracks--;
 }
 
 // Empty a specified track 
@@ -92,6 +97,7 @@ Composition.prototype.emptyAllTracks = function(trackNum) {
 	for (i = 0; i < numOfTracks; i++) {
 		this.tracks[i] = [];
 	}
+
 }
 
 //Gets the boolean value for whether a track has 'playing' enabled or not
@@ -102,6 +108,10 @@ Composition.prototype.isEnablePlaying = function(trackNum) {
 // Enable/Disable playing, must accept only boolean values true/false.
 Composition.prototype.setEnablePlaying = function(trackNum, bool) {
 	this.enablePlaying[trackNum] = bool;
+}
+
+Composition.prototype.getNumTracks = function() {
+	return this.numOfTracks;
 }
 
 
@@ -632,14 +642,15 @@ $(document).ready(function() {
 		});
 		 */
 		
-		var addTrackNum = $("#timeline-system").children().length; // Which is 1 now since by default
-		
-		
 		$("#addTrack").on("click", function() {
-		    console.log("debugging track num " + addTrackNum);
+			//  First add a new track to our composition
+			composition.addTrack([]);
 			
 			var newTrack = $(".track").first().clone();
-			instruments[addTrackNum] = "Piano";
+		    var currentNumOfTracks = composition.getNumTracks();
+		    var currentTrackIndex = currentNumOfTracks - 1;
+		    
+		    instruments[currentTrackIndex] = "Piano";
 			
 			console.log("num of instruments " + instruments.length);
 			for(count = 0; count < instruments.length; count++){
@@ -651,27 +662,23 @@ $(document).ready(function() {
 			// more tracks are added. NOTE THAT WE START COUNTING FROM 0.
 			
 			// For play button
-			newTrack.children().eq(0).children().attr('id', "play-track" + addTrackNum);
+			newTrack.children().eq(0).children().attr('id', "play-track" + currentTrackIndex);
 			
 			//Instrument
-			newTrack.children().eq(0).children().eq(2).attr('id', "Instrument" + addTrackNum);
+			newTrack.children().eq(0).children().eq(2).attr('id', "Instrument" + currentTrackIndex);
 			newTrack.children().eq(0).children().eq(2).html("Piano");
 			console.log("debugging cloning instruments " + newTrack.children().eq(0).children().eq(2).attr('id') + "under class " + newTrack.children().eq(0).children().eq(2).attr("class"));
+			
 			// For track number
-			newTrack.children().eq(1).attr('id', "track" + addTrackNum);
+			newTrack.children().eq(1).attr('id', "track" + currentTrackIndex);
 		
 			// Appending to timeline-system
 			newTrack.appendTo("#timeline-system");
-			$("#track" + addTrackNum + " .sortable-system div").remove();
+			$("#track" + currentTrackIndex + " .sortable-system div").remove();
 			
 			// Must reintialise the sortables
 			setSortable();
 			initializeTrackSettings();
-			
-			// Correspondingly add a new track to our composition
-			composition.addTrack([]);
-			
-			addTrackNum++;
 			
 		});
 		
