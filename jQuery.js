@@ -421,7 +421,6 @@ function playAllSequences() {
 
 //empty the note array    
 function clearAllSound(){
-
 	var numOfTracks = composition.getAllTracks().length;
 	
 	for (i = 0; i < numOfTracks; i++) {
@@ -438,7 +437,8 @@ function clearAllSound(){
 	    document.getElementById("startLoop").value = "Start Looping";
         document.getElementById("startLoop").innerHTML = "Start Looping";
 	    clearInterval(loopId);
-	}	
+	
+    }
 	
 }
 
@@ -682,24 +682,23 @@ $(document).ready(function() {
 			initializeTrackSettings();
 			
 			//debugging
-		$(".chooseInstrument").each(function(){
-		    console.log("checking instr " + $(this).attr("id") + " played with " + instruments[$(this).attr("id").substring(10)]);
-		});//end debugging
-		
+			$(".chooseInstrument").each(function(){
+			    console.log("checking instr " + $(this).attr("id") + " played with " + instruments[$(this).attr("id").substring(10)]);
+			});//end debugging
 			
 		});
 		
 		//piano- guitar- violin- flute
-//	$("button").each(function(){
+//		$("button").each(function(){
 		
-		
-		$(".chooseInstrument").click(function(){
+		//piano- guitar- violin
+		$(".chooseInstrument").on("click", function(){
 		//if($(this).hasClass("chooseInstrument")){
 		    //$(this).click(function(){
 		    console.log("BOOM!");
 		    console.log("in choose inst " + $(this).attr('id'));
 		    var trackNum = parseInt($(this).attr('id').substring(10));
-	
+		    
 		    var self = document.getElementById("Instrument" + trackNum);
 			
 		    var allInstrument = ["Piano", "Guitar", "Violin", "Flute"];
@@ -715,10 +714,50 @@ $(document).ready(function() {
 			self.innerHTML = nextInstrument;
 			console.log(trackNum + " next play " + instruments[trackNum]);
          //  });		
-       // }		
-	   });
-	   
-}
+       // }					
+		});
+		
+		// Selecting the octaves for show less view
+		$("#octave-num li a").on("click", function() {
+			var octaveDisplaySelector = $("#dropdown-selection");
+			var dropdownList = $("#octave-num li a");
+			var octaveNum = parseInt($(this).text());
+			var octaveDisplayed = octaveDisplaySelector.text();
+			var dropdownIndex = $(this).parent().attr("data-index");
+			
+			octaveDisplaySelector.html(octaveNum + " <span class='caret'></span>");
+			
+			dropdownList.eq(dropdownIndex).text(octaveDisplayed + ""); // Update octave num displayed to new
+			dropdownList = $("#octave-num li a"); // Update to new dropdown list
+			
+			/* Rearranging the dropdown list in ascending order */
+			var dropdownListNums = [];
+			
+			for (index = 0; index < 5; index++) {
+				dropdownListNums.push(parseInt(dropdownList.eq(index).text()));
+			}
+			
+			dropdownListNums.sort();
+			
+			for (index = 0; index < 5; index++) {
+				dropdownList.eq(index).text(dropdownListNums[index]);
+			}
+			
+			/* Making the notes play the correct pitches & octaves */
+			var notesInCurrentOctave = $(".octave-holder-less .col-md-1");
+			
+			for (noteIndex = 0; noteIndex < 12; noteIndex++) {
+				notesInCurrentOctave.eq(noteIndex).attr('data-note', noteIndex + (octaveNum - 2) * 12);
+			}
+			
+		});
+		
+		$("#show-button").on("click", function() {
+			$("#show-less-view").toggle();
+			$("#show-more-view").toggle();
+		});
+		
+	}
 	
 	function initializeTrackSettings() {
 		$(".muteButton").unbind().on("click", function() {
@@ -832,8 +871,8 @@ $(document).ready(function() {
 	setSortable();
 	initialize();
 	initializeTrackSettings();
-	generateOctaveColour("red");
-	
+	generateOctaveColour("blue");
+	$("#show-less-view").hide();
 	
 	
 /*------------------------------------------------*/
@@ -1269,7 +1308,6 @@ function setSortable() {
 	});
 	
 });
-
 
 /*
  * How to use the below 2 functions for notes div generation:

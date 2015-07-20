@@ -190,8 +190,6 @@ var flute = new Wad({
     }
 });
 
-flute.setVolume(0.3);
-
 // Hihat Cymbals
 var hihat = new Wad( Wad.presets.hiHatClosed );
 
