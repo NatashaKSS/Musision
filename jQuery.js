@@ -256,7 +256,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
     //endIndex = Math.min(endIndex, findMaxLength());
     var noteDuration = (beatDuration) * 1000;
     var wholeDuration = (beatDuration) * 1000 * (Math.max(endIndex, playUntil) - startIndex + 1);
-    //var arr = [];
+
     console.log("play Until " + playUntil);
     // Whether this track (with the trackNumber) has enabled playing or not
     if(composition.isEnablePlaying(trackNumber)){
@@ -288,6 +288,12 @@ function playSequence(trackNumber, startIndex, endIndex) {
 					  
 					  } else if(inst == "Violin"){
 			    		string.play({ 
+			    			wait : (indx - startIndex) * beatDuration,
+			 			    pitch : currentPitch,
+			 				label : "playing" 
+			 		    });
+					  }  else if(inst == "Flute"){
+			    		flute.play({ 
 			    			wait : (indx - startIndex) * beatDuration,
 			 			    pitch : currentPitch,
 			 				label : "playing" 
@@ -415,6 +421,7 @@ function clearAllSound(){
 	piano.stop("playing");
     synthGuitar.stop("playing");
 	string.stop("playing");
+	flute.stop("playing");
 	
     if(enableLooping){
 	    document.getElementById("startLoop").value = "Start Looping";
@@ -440,11 +447,6 @@ function loopAll(){
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
 	
 		playAllSequences();
-		/*
-		if(playUntil == -1){ 
-		    playUntil = findMaxLength() - 1;
-		}  
-		*/
 		loopId = setInterval("playAllSequences()", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);  
  		
 	} else {//if we want to stop
@@ -590,8 +592,9 @@ $(document).ready(function() {
 			
 		    piano.stop("playing");
 		    synthGuitar.stop("playing");
+			string.stop("playing");
+			flute.stop("playing");
 			
-		    string.stop("playing");
 		    startPlayingFrom = 0;//change back to default
 			playUntil = - 1;//change back to default
 		    animation.stopAnimation();
@@ -631,9 +634,18 @@ $(document).ready(function() {
 		
 		var addTrackNum = $("#timeline-system").children().length; // Which is 1 now since by default
 		
+		
 		$("#addTrack").on("click", function() {
+		    console.log("debugging track num " + addTrackNum);
+			
 			var newTrack = $(".track").first().clone();
 			instruments[addTrackNum] = "Piano";
+			
+			console.log("num of instruments " + instruments.length);
+			for(count = 0; count < instruments.length; count++){
+			    console.log(instruments[count] + " ");
+			}
+			
 			// Setting the id of tracks added and appending them to correct place
 			// Every new track added will have a unique ID which increments by 1 as
 			// more tracks are added. NOTE THAT WE START COUNTING FROM 0.
@@ -643,10 +655,11 @@ $(document).ready(function() {
 			
 			//Instrument
 			newTrack.children().eq(0).children().eq(2).attr('id', "Instrument" + addTrackNum);
-			
+			newTrack.children().eq(0).children().eq(2).html("Piano");
+			console.log("debugging cloning instruments " + newTrack.children().eq(0).children().eq(2).attr('id') + "under class " + newTrack.children().eq(0).children().eq(2).attr("class"));
 			// For track number
 			newTrack.children().eq(1).attr('id', "track" + addTrackNum);
-			
+		
 			// Appending to timeline-system
 			newTrack.appendTo("#timeline-system");
 			$("#track" + addTrackNum + " .sortable-system div").remove();
@@ -661,13 +674,15 @@ $(document).ready(function() {
 			addTrackNum++;
 			
 		});
+		
 		//piano- guitar- violin
 		$(".chooseInstrument").on("click", function(){
-		    var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
-			//var name = "trackNum" + trackNum;
-			//console.log(name);
+		    console.log("in choose inst " + $(this).attr('id'));
+		    var trackNum = parseInt($(this).attr('id').substring(10));
+			var name = "trackNum" + trackNum;
 		    var self = document.getElementById("Instrument"+trackNum);
-		    var allInstrument = ["Piano", "Guitar", "Violin"];
+			
+		    var allInstrument = ["Piano", "Guitar", "Violin", "Flute"];
 		    
 			console.log("trackNum " + trackNum);
 			console.log("currently playing " + self.value);
@@ -678,24 +693,8 @@ $(document).ready(function() {
 			instruments[trackNum] = nextInstrument;
 			self.value = nextInstrument;
 			self.innerHTML = nextInstrument;
-			console.log(trackNum + " play " + instruments[trackNum]);			
+			console.log(trackNum + " next play " + instruments[trackNum]);			
 		});
-		/*
-		$("#chooseInstrument").on("click", function(){
-		    var trackNum = parseInt($(this).parent().prev().parent().prev().prev().attr('id').substring(10));
-			
-			instruments[trackNum] = "piano";
-			$("#chooseInstrument").innerHTML = "Piano";
-			console.log(trackNum + " play " + instruments[trackNum]);
-		});
-		
-		$("#violin").on("click", function(){
-		    var trackNum = parseInt($(this).parent().prev().parent().prev().prev().attr('id').substring(10));	
-			instruments[trackNum] = "string";
-			$("#chooseInstrument").innerHTML = "Violin";
-			console.log(trackNum + " play " + instruments[trackNum]);
-		});
-		*/
 	}
 	
 	function initializeTrackSettings() {
