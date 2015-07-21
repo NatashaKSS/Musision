@@ -440,13 +440,17 @@ function clearAllSound(){
 	
     }
 	
+	for (i = 0; i < numOfTracks; i++) {
+		composition.setEnablePlaying(i, true);
+    //set back to normal
+	}
 }
 
 function loopAll(){
 
     if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
     	
-		composition.setEnablePlaying(0, true);
+		//composition.setEnablePlaying(0, true);
     	// The above statement mimics this statement, but only sets the first track '0'
     	// enablePlaying = true;
     	/* 
@@ -1108,6 +1112,7 @@ function setSortable() {
 	*/
 	//https://truongtx.me/2014/08/09/record-and-export-audio-video-files-in-browser-using-web-audio-api/
 	$("#download").on("click", function(){
+
 	    var navigator = window.navigator;
         navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
 
@@ -1117,13 +1122,22 @@ function setSortable() {
 		// we need these variables for later use with the stop function
         var mediaStream;
         var rec;
+		
 		//for the playing, recording and saving of the file
-		record();
+		//record();		
+		
 		setTimeout(function(){
-		     stop();
+		     //stop();
+			 //function stop() {
+        // stop the media stream
+            mediaStream.stop();//mediaStream is undefined =(
+
+        // stop Recorder.js
+            rec.stop();
+			 
 			 }, findMaxLength() * beatDuration * 1000);
 
-        function record() {
+        //function record() {
         // ask for permission and start recording
             navigator.getUserMedia({audio: true}, function(localMediaStream){
                 mediaStream = localMediaStream;
@@ -1134,35 +1148,52 @@ function setSortable() {
         // create new instance of Recorder.js using the mediaStreamSource
                 rec = new Recorder(mediaStreamSource, {
         // pass the path to recorderWorker.js file here
-                workerPath: '/bower_components/Recorderjs/recorderWorker.js'
+                workerPath: 'Recorderjs/recorderWorker.js'
                 });
 
         // start recording
             rec.record();
-			
 			playAllSequences();
+	
 			
 			console.log("recording");
             }, function(err){
                     console.log('Browser not supported');
                });
-        }
-		
-		function stop() {
-        // stop the media stream
-            mediaStream.stop();
-
-        // stop Recorder.js
-            rec.stop();
-
-        // export it to WAV
-            rec.exportWAV(function(e){
+   //     }
+		// export it to WAV
+            rec.exportWAV(function(e){//rec is undefined =(
                 rec.clear();
                 Recorder.forceDownload(e, "filename.wav");
             });
-        }
+       // }		
+   });	
+/*	
+	
+
+	//from wad.js documentation
+		var mixerTrack = new Wad.Poly({
+            recConfig : { // The Recorder configuration object. The only required property is 'workerPath'.
+            workerPath : 'Recorderjs/recorderWorker.js' // The path to the Recorder.js web worker script.
+            }
+        });
 		
+		mixerTrack.rec.record();
+        
+        playAllSequences();		
+		
+		setTimeout(function(){
+            mixerTrack.rec.stop();  
+		}, findMaxLength() * beatDuration * 1000);
+
+        // export it to WAV
+            mixerTrack.rec.exportWAV(function(e){
+                mixerTrack.rec.clear();
+                Recorder.forceDownload(e, "filename.wav");
+            });
+       // }		
 	});
+	*/
 	//end recorder.js
 	/*
 	//from p5.js  at http://p5js.org/examples/examples/Sound__Record_Save_Audio.php
