@@ -420,6 +420,16 @@ a {
     background: crimson;
 }
 
-.chooseInstrument {
+.instrumentMenu{
+    display: none;
+}
+
+#displayInstrument {
 	background: orange;
 }
+/*
+.chooseInstrument:hover.instrumentMenu{
+    position: absolute;
+    display: block;
+}
+*/

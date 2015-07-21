@@ -33,6 +33,7 @@ var startPlayingFrom = 0;
 var playUntil = -1;
 var pi = Math.PI;
 var songOfPi = [];  //to prepare for the song using PI's numbers
+var allInstruments = ["Piano", "Guitar", "Violin", "Flute", "Bell"];
 var instruments = [];//to keep track of which instrument play what track
 instruments[0] = "Piano";//default first instrument for each track
 //console.log(pi);
@@ -270,7 +271,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
     console.log("play Until " + playUntil);
     // Whether this track (with the trackNumber) has enabled playing or not
     if(composition.isEnablePlaying(trackNumber)){
-    	animation.playAnimation(noteDuration, wholeDuration, startIndex, Math.max(endIndex, playUntil), trackNumber);
+    	animation.playAnimation(noteDuration, wholeDuration, startIndex, Math.min(endIndex, playUntil), trackNumber);
 		console.log("start " + startIndex);
 		console.log("end " + endIndex);
         console.log("length " + (endIndex - startIndex + 1));
@@ -304,6 +305,12 @@ function playSequence(trackNumber, startIndex, endIndex) {
 			 		    });
 					  }  else if(inst == "Flute"){
 			    		flute.play({ 
+			    			wait : (indx - startIndex) * beatDuration,
+			 			    pitch : currentPitch,
+			 				label : "playing" 
+			 		    });
+					  }  else if(inst == "Bell"){
+			    		bell.play({ 
 			    			wait : (indx - startIndex) * beatDuration,
 			 			    pitch : currentPitch,
 			 				label : "playing" 
@@ -432,6 +439,7 @@ function clearAllSound(){
     synthGuitar.stop("playing");
 	string.stop("playing");
 	flute.stop("playing");
+	bell.stop("playing");
 	
     if(enableLooping){
 	    document.getElementById("startLoop").value = "Start Looping";
@@ -609,6 +617,7 @@ $(document).ready(function() {
 		    synthGuitar.stop("playing");
 			string.stop("playing");
 			flute.stop("playing");
+		    bell.stop("playing");
 			
 		    startPlayingFrom = 0;//change back to default
 			playUntil = - 1;//change back to default
@@ -687,40 +696,47 @@ $(document).ready(function() {
 			
 			//debugging
 			$(".chooseInstrument").each(function(){
-			    console.log("checking instr " + $(this).attr("id") + " played with " + instruments[$(this).attr("id").substring(10)]);
-			});//end debugging
-			
+		        console.log("id " + $(this).attr('id'));
+			});
+		
 		});
-		
-		//piano- guitar- violin- flute
-//		$("button").each(function(){
-		
+        /*
 		//piano- guitar- violin
-		$(".chooseInstrument").on("click", function(){
-		//if($(this).hasClass("chooseInstrument")){
-		    //$(this).click(function(){
-		    console.log("BOOM!");
-		    console.log("in choose inst " + $(this).attr('id'));
+		$(".chooseInstrument").click(function(){
 		    var trackNum = parseInt($(this).attr('id').substring(10));
-		    
-		    var self = document.getElementById("Instrument" + trackNum);
-			
-		    var allInstrument = ["Piano", "Guitar", "Violin", "Flute"];
-		    
-			console.log("trackNum " + trackNum);
-			console.log("currently playing " + self.value);
-			
-			var currIndex = allInstrument.indexOf(self.value);
-			var nextInstrument = allInstrument[(currIndex + 1) % allInstrument.length];
-			
-			instruments[trackNum] = nextInstrument;
-			self.value = nextInstrument;
-			self.innerHTML = nextInstrument;
-			console.log(trackNum + " next play " + instruments[trackNum]);
-         //  });		
-       // }					
+		   	
+				$(".chooseInstrument").each(function(){
+				    var self = $(this);
+		         console.log("check inside chooseInstrument " + $(self).attr('id'));
+				 });
+				 
+		            console.log("after check, in choose inst " + $(this).attr('id'));
+			        var currIndex = allInstruments.indexOf($(this).value);
+			        var nextInstrument = allInstruments[(currIndex + 1) % allInstruments.length];
+		
+			        instruments[trackNum] = nextInstrument;
+			        $(this).value = nextInstrument;
+			        $(this).innerHTML = nextInstrument;
+          
+		        
+		 });   
+		*/	   
+						
+	    $("#displayInstrument").click(function(){
+		    $(".instrumentMenu").css({
+			    display: block
+			});	
 		});
 		
+		
+		$(".instrumentMenu").each(function(){
+			    $(this).click(function(){
+				  //var trackNum = $(this).parent().prev().prev().prev().attr('id').substring(10);
+				document.getElementById("displayInstrument").value = $(this).attr('id');
+			    document.getElementById("displayInstrument").innerHTML = $(this).attr('id');		
+				});
+		});
+			
 		// Selecting the octaves for show less view
 		$("#octave-num li a").on("click", function() {
 			var octaveDisplaySelector = $("#dropdown-selection");
@@ -1049,9 +1065,11 @@ function setSortable() {
 				    //$(".sortable-system div").css({ "border": "none" });    //comment this line first to allow choosing of starting and ending note
 					// To ensure if user clicks on more than 1 note, the prev note click
 					// will have its border color reverted.
-				    piano.play({
+				    
+					piano.play({
 					    pitch : notes[parseInt($(e.target).attr('data-note'))]
 					});
+					
 					
 					$(e.target).css({ 
 				        "background": "#80ffff" //change color to light blue
@@ -1125,6 +1143,30 @@ function setSortable() {
 		
 		//for the playing, recording and saving of the file
 		//record();		
+
+        //function record() {
+        // ask for permission and start recording
+        navigator.getUserMedia({audio: true}, function(localMediaStream){
+            mediaStream = localMediaStream;
+
+        // create a stream source to pass to Recorder.js
+        var mediaStreamSource = context.createMediaStreamSource(localMediaStream);
+
+        // create new instance of Recorder.js using the mediaStreamSource
+        rec = new Recorder(mediaStreamSource, {
+        // pass the path to recorderWorker.js file here
+                workerPath: 'Recorderjs/recorderWorker.js'
+        });
+        console.log("after rec");
+        // start recording
+        rec.record();
+		playAllSequences();
+	
+			
+	    console.log("recording");
+        }, function(err){
+                    console.log('Browser not supported');
+        });
 		
 		setTimeout(function(){
 		     //stop();
@@ -1136,30 +1178,7 @@ function setSortable() {
             rec.stop();
 			 
 			 }, findMaxLength() * beatDuration * 1000);
-
-        //function record() {
-        // ask for permission and start recording
-            navigator.getUserMedia({audio: true}, function(localMediaStream){
-                mediaStream = localMediaStream;
-
-        // create a stream source to pass to Recorder.js
-                var mediaStreamSource = context.createMediaStreamSource(localMediaStream);
-
-        // create new instance of Recorder.js using the mediaStreamSource
-                rec = new Recorder(mediaStreamSource, {
-        // pass the path to recorderWorker.js file here
-                workerPath: 'Recorderjs/recorderWorker.js'
-                });
-
-        // start recording
-            rec.record();
-			playAllSequences();
-	
-			
-			console.log("recording");
-            }, function(err){
-                    console.log('Browser not supported');
-               });
+		
    //     }
 		// export it to WAV
             rec.exportWAV(function(e){//rec is undefined =(

@@ -190,6 +190,53 @@ var flute = new Wad({
     }
 });
 
+flute.setVolume(0.1);
+
+//Bell
+var squareBell = new Wad({
+    source : 'square', 
+    env : {
+        attack : .001, 
+        decay : .001, 
+        sustain : .01, 
+        hold : .1, 
+        release : .3
+    }, 
+    filter : {
+        type : 'lowpass', 
+        frequency : 10000, 
+        q : 10, 
+        env : { 
+            attack : .001, 
+            frequency : 15000
+        }
+    } 
+});
+
+var sineBell = new Wad({
+    source : 'sine', 
+    env : {
+        attack : .001, 
+        decay : .001, 
+        sustain : .5, 
+        hold : .1, 
+        release : .3
+    }, 
+    filter : {
+        type : 'lowpass', 
+        frequency : 13000, 
+        q : 10, 
+        env : { 
+            attack : .001, 
+            frequency : 15000
+        }
+    } 
+});
+
+var bell = new Wad.Poly();
+bell.add(squareBell).add(sineBell);
+bell.setVolume(0.5);
+
 // Hihat Cymbals
 var hihat = new Wad( Wad.presets.hiHatClosed );
 
