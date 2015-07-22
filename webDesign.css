@@ -422,14 +422,17 @@ a {
 
 .instrumentMenu{
     display: none;
+	height: 75px;
+    overflow: auto;
+    width: 200px;
 }
 
-#displayInstrument {
+.displayInstrument {
 	background: orange;
 }
-/*
-.chooseInstrument:hover.instrumentMenu{
-    position: absolute;
+
+.displayInstrument:hover.instrumentMenu{
+    position: relative;
+	margin-left:10px;
     display: block;
 }
-*/

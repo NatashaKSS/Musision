@@ -679,9 +679,9 @@ $(document).ready(function() {
 			newTrack.children().eq(0).children().attr('id', "play-track" + currentTrackIndex);
 			
 			//Instrument
-			newTrack.children().eq(0).children().eq(2).attr('id', "Instrument" + currentTrackIndex);
-			newTrack.children().eq(0).children().eq(2).html("Piano");
-			console.log("debugging cloning instruments " + newTrack.children().eq(0).children().eq(2).attr('id') + "under class " + newTrack.children().eq(0).children().eq(2).attr("class"));
+			//newTrack.children().eq(0).children().eq(2).attr('id', "Instrument" + currentTrackIndex);
+			//newTrack.children().eq(0).children().eq(2).html("Piano");
+			//console.log("debugging cloning instruments " + newTrack.children().eq(0).children().eq(2).attr('id') + "under class " + newTrack.children().eq(0).children().eq(2).attr("class"));
 			
 			// For track number
 			newTrack.children().eq(1).attr('id', "track" + currentTrackIndex);
@@ -690,15 +690,15 @@ $(document).ready(function() {
 			newTrack.appendTo("#timeline-system");
 			$("#track" + currentTrackIndex + " .sortable-system div").remove();
 			
-			// Must reintialise the sortables
+			// Must reinitialise the sortables
 			setSortable();
 			initializeTrackSettings();
-			
+		/*	
 			//debugging
 			$(".chooseInstrument").each(function(){
 		        console.log("id " + $(this).attr('id'));
 			});
-		
+		*/
 		});
         /*
 		//piano- guitar- violin
@@ -722,19 +722,28 @@ $(document).ready(function() {
 		 });   
 		*/	   
 						
-	    $("#displayInstrument").click(function(){
-		    $(".instrumentMenu").css({
-			    display: block
+	    $(".displayInstrument").each(function(){
+		    /*
+			$(".instrumentMenu").css({
+			    display: block;
 			});	
+			*/
+			$(this).on("click", function(){
+			var trackNum = $(this).parent().prev().prev().attr('id').substring(10);
+			console.log("trackNum " + trackNum);
+			console.log("this instrument " + $(this).innerHTML);
+			console.log("current instrument " + $("#timeline-system").children().eq(trackNum).find(".displayInstrument").value);
+		    });
 		});
 		
 		
-		$(".instrumentMenu").each(function(){
-			    $(this).click(function(){
-				  //var trackNum = $(this).parent().prev().prev().prev().attr('id').substring(10);
-				document.getElementById("displayInstrument").value = $(this).attr('id');
-			    document.getElementById("displayInstrument").innerHTML = $(this).attr('id');		
-				});
+		$(".instrumentMenu").on("click", function(){
+			    //$(this).click(function(){
+				var trackNum = $(this).parent().prev().prev().prev().attr('id').substring(10);
+				$("#timeline-system").children().eq(trackNum).find(".displayInstrument").value = $(this).attr('id');
+			    $("#timeline-system").children().eq(trackNum).find(".displayInstrument").innerHTML = $(this).attr('id');
+                instruments[trackNum] = $(this).attr('id');				
+				//});
 		});
 			
 		// Selecting the octaves for show less view
