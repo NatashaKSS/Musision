@@ -26,9 +26,6 @@ var notes = ["C2","C#2","D2","D#2","E2","F2","F#2","G2","G#2","A2","A#2","B2",
 var beatDuration = 0.3;//Default duration of 1 beat
 var enableLooping = false;
 var loopId = 0;
-var enablePlaying = true;//<----  can use this to mute/unmute a track
-//var playingMusic;<-- this one was supposed to be used for Pause
-var pause = false;
 var startPlayingFrom = 0;
 var playUntil = -1;
 var pi = Math.PI;
@@ -541,7 +538,7 @@ $(document).ready(function() {
 	function initialize() {
 		initializeTrackSettings();
 		
-		$(".col-md-1").on("click", function() {
+		$(".col-md-1").unbind("click").on("click", function() {
 			var noteName = $(this).attr('data-note');
 			console.log(noteName);
 			
@@ -557,7 +554,7 @@ $(document).ready(function() {
 		
 		// On drag start for a note, prevent the window from annoyingly
 		// scrolling as user drags note.
-		$(".col-md-1").on("mousedown",function() {
+		$(".col-md-1").unbind("mousedown").on("mousedown",function() {
 			$(".notes-buttons-holder").css({
 				"overflow": "hidden"
 			});
@@ -803,8 +800,6 @@ $(document).ready(function() {
 					"background-color": "white"
 				});
 			}
-			
-			
 			
 		});
 		
