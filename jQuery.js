@@ -665,12 +665,12 @@ $(document).ready(function() {
 		    var currentTrackIndex = currentNumOfTracks - 1;
 		    
 		    instruments[currentTrackIndex] = "Piano";
-			
-			console.log("num of instruments " + instruments.length);
+			/*
+			console.log("num of instruments " + currentNumOfTracks);
 			for(count = 0; count < instruments.length; count++){
 			    console.log(instruments[count] + " ");
 			}
-			
+			*/
 			// Setting the id of tracks added and appending them to correct place
 			// Every new track added will have a unique ID which increments by 1 as
 			// more tracks are added. NOTE THAT WE START COUNTING FROM 0.
@@ -722,29 +722,7 @@ $(document).ready(function() {
 		 });   
 		*/	   
 						
-	    $(".displayInstrument").each(function(){
-		    /*
-			$(".instrumentMenu").css({
-			    display: block;
-			});	
-			*/
-			$(this).on("click", function(){
-			var trackNum = $(this).parent().prev().prev().attr('id').substring(10);
-			console.log("trackNum " + trackNum);
-			console.log("this instrument " + $(this).innerHTML);
-			console.log("current instrument " + $("#timeline-system").children().eq(trackNum).find(".displayInstrument").value);
-		    });
-		});
-		
-		
-		$(".instrumentMenu").on("click", function(){
-			    //$(this).click(function(){
-				var trackNum = $(this).parent().prev().prev().prev().attr('id').substring(10);
-				$("#timeline-system").children().eq(trackNum).find(".displayInstrument").value = $(this).attr('id');
-			    $("#timeline-system").children().eq(trackNum).find(".displayInstrument").innerHTML = $(this).attr('id');
-                instruments[trackNum] = $(this).attr('id');				
-				//});
-		});
+	    
 			
 		// Selecting the octaves for show less view
 		$("#octave-num li a").on("click", function() {
@@ -826,7 +804,48 @@ $(document).ready(function() {
 				});
 			}
 			
+			
+			
 		});
+		
+	
+		    $(".displayInstrument").unbind().on("click", function(){
+		        
+				var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
+			    console.log("trackNum " + trackNum);
+			    console.log("this instrument " + $(this).innerHTML);
+			    console.log("current instrument " + $("#timeline-system").children().eq(trackNum).find(".displayInstrument").value);
+				var currIndex = allInstruments.indexOf($(this).value);
+			    var nextInstrument = allInstruments[(currIndex + 1) % allInstruments.length];
+		        console.log("currIndex " + currIndex);
+				console.log("nextInstrumentIndex " + nextInstrument);
+			    instruments[trackNum] = nextInstrument;
+			    $(this).value = nextInstrument;
+			    $(this).innerHTML = nextInstrument;
+          
+		    });
+		/*
+		    $(".displayInstrument").unbind().hover(function(event){
+			    console.log("YAHA!");
+				var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
+			    $("#timeline-system").children().eq(trackNum).find(".instrumentMenu").stop().animate({
+				height: event.type=="mouseenter" ? 50: 0,
+				//fontSize: event.type=="mouseenter" ? "15px": 0
+			}, 100);
+			});
+		*/
+		
+		/*
+		    $(".track-settings ul.instrumentMenu li a").unbind().on("click", function(){
+			    console.log($(this).attr('id'));
+				var trackNum = parseInt($(this).parent().prev().prev().attr('id').substring(10));
+				$("#timeline-system").children().eq(trackNum).find(".displayInstrument").value = $(this).attr('id');
+			    $("#timeline-system").children().eq(trackNum).find(".displayInstrument").innerHTML = $(this).attr('id');
+                instruments[trackNum] = $(this).attr('id');				
+				//});
+		    });
+		
+		*/
 		
 		//to select a note to play FROM, click the note and hold the Shift key
 		//to select a note to play UNTIL, double click the note 

@@ -103,7 +103,7 @@ a {
 	background-color: #3d3d3d!important; 
 }
 
-/* Choose Instrucment button */
+/* Choose Instrucment button 
 .chooseInstrument {
 	margin: 3px 0px 0px 29px;
 	height: 25px;
@@ -121,7 +121,7 @@ a {
 .chooseInstrument:hover {
 	background-color: #3d3d3d;
 }
-
+*/
 /*
 .play-button {
 	position: relative;
@@ -422,17 +422,18 @@ a {
 
 .instrumentMenu{
     display: none;
-	height: 75px;
-    overflow: auto;
-    width: 200px;
 }
 
 .displayInstrument {
+    position: relative;
+	margin-top: 10px;
+	margin-left: 30px;
 	background: orange;
 }
 
-.displayInstrument:hover.instrumentMenu{
-    position: relative;
-	margin-left:10px;
-    display: block;
+
+.displayInstrument:hover > ul.instrumentMenu{
+    position: absolute;
+	display: block;
+	background : crimson;
 }
