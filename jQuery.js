@@ -273,7 +273,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
 		console.log("end " + endIndex);
         console.log("length " + (endIndex - startIndex + 1));
 		
-		for(indx = startIndex; indx <= endIndex; indx++) {
+        for(indx = startIndex; indx <= endIndex; indx++) {
 		    if (composition.getTrack(trackNumber)[indx] != undefined) {	
 				var currentPitch = composition.getTrack(trackNumber)[indx].getPitch();
 				console.log("in composition " + currentPitch);
@@ -718,9 +718,7 @@ $(document).ready(function() {
 		        
 		 });   
 		*/	   
-						
-	    
-			
+
 		// Selecting the octaves for show less view
 		$("#octave-num li a").on("click", function() {
 			var octaveDisplaySelector = $("#dropdown-selection");
@@ -959,7 +957,7 @@ $(document).ready(function() {
 // respectively.
 function updateComposition() {
 	var numOfTracks = $(".timeline").length;
-	var trackNotes, dataNoteIndex, currentTrack, currentNote;
+	var trackNotes, dataNoteIndex, currentTrack, currentNote, noteDataAttr;
 	
 	composition.emptyAllTracks();
 	
@@ -972,10 +970,16 @@ function updateComposition() {
 		// list of a track's notes
 		
 		for (noteNum = 0; noteNum < trackNotes.length; noteNum++) {
-			dataNoteIndex = parseInt(trackNotes.eq(noteNum).attr('data-note'));
-			// Index of a note corresponds to the div's "data-note" attribute
+			noteDataAttr = trackNotes.eq(noteNum).attr('data-note');
 			
-			currentNote = new Note(notes[dataNoteIndex]);
+			if (noteDataAttr != "silence") {
+				dataNoteIndex = parseInt(noteDataAttr);
+				currentNote = new Note(notes[dataNoteIndex]);
+				
+			} else {
+				currentNote = new Note(noteDataAttr);
+			}
+				
 			composition.addNote(trackNum, currentNote);
 		}
 	}
@@ -1067,7 +1071,18 @@ function setSortable() {
 			
 			// When timeline receives the user-dragged note
 			receive: function(event, ui) {
-
+				
+				if(ui.item.attr('data-note') != "silence"){
+		      		var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12]);
+					composition.addNote(trackNumInSortable, insertedNote);
+					
+				} else {
+					var insertedSilence = new Note(ui.item.attr('data-note'));
+					// Pitch for silence is just "silence"
+					// ui.item.attr('data-note')) is just the string "silence"
+					composition.addNote(trackNumInSortable, insertedSilence);
+				}
+				
 				// Change the look of a note on the timeline
 				$(".sortable-system div").not(".ui-sortable-placeholder").removeClass().css({
 					"height": grid.noteHeight,
