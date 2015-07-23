@@ -1158,7 +1158,7 @@ function setSortable() {
 	*/
 	//https://truongtx.me/2014/08/09/record-and-export-audio-video-files-in-browser-using-web-audio-api/
 	$("#download").on("click", function(){
-
+        
 	    var navigator = window.navigator;
         navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
 
@@ -1168,52 +1168,51 @@ function setSortable() {
 		// we need these variables for later use with the stop function
         var mediaStream;
         var rec;
-		
+      
 		//for the playing, recording and saving of the file
-		//record();		
-
-        //function record() {
-        // ask for permission and start recording
-        navigator.getUserMedia({audio: true}, function(localMediaStream){
+		record();		
+        setTimeout(function(){
+		     stop();
+			 }, findMaxLength() * beatDuration * 1000);
+		
+       
+        function record() {
+            // ask for permission and start recording
+            navigator.getUserMedia({audio: true}, function(localMediaStream){
             mediaStream = localMediaStream;
 
-        // create a stream source to pass to Recorder.js
-        var mediaStreamSource = context.createMediaStreamSource(localMediaStream);
+            // create a stream source to pass to Recorder.js
+            var mediaStreamSource = context.createMediaStreamSource(localMediaStream);
 
-        // create new instance of Recorder.js using the mediaStreamSource
-        rec = new Recorder(mediaStreamSource, {
-        // pass the path to recorderWorker.js file here
-                workerPath: 'Recorderjs/recorderWorker.js'
-        });
-        console.log("after rec");
-        // start recording
-        rec.record();
-		playAllSequences();
-	
+            // create new instance of Recorder.js using the mediaStreamSource
+            rec = new Recorder(mediaStreamSource, {
+            // pass the path to recorderWorker.js file here
+            workerPath: 'Recorderjs/recorderWorker.js'
+            });
+
+             // start recording
+            rec.record();
 			
-	    console.log("recording");
-        }, function(err){
-                    console.log('Browser not supported');
-        });
+			playAllSequences();
+			
+            }, function(err){
+                console.log('Browser not supported');
+            });
+        }
 		
-		setTimeout(function(){
-		     //stop();
-			 //function stop() {
-        // stop the media stream
-            mediaStream.stop();//mediaStream is undefined =(
+		
+		function stop(){
+		    mediaStream.stop();//mediaStream is undefined =(
 
         // stop Recorder.js
             rec.stop();
-			 
-			 }, findMaxLength() * beatDuration * 1000);
+		}
 		
-   //     }
 		// export it to WAV
-            rec.exportWAV(function(e){//rec is undefined =(
+        rec.exportWAV(function(e){//rec is undefined =(
                 rec.clear();
                 Recorder.forceDownload(e, "filename.wav");
-            });
-       // }		
+            });	
    });	
 /*	
 	
