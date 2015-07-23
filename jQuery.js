@@ -679,8 +679,8 @@ $(document).ready(function() {
 			newTrack.children().eq(0).children().attr('id', "play-track" + currentTrackIndex);
 			
 			//Instrument
-			//newTrack.children().eq(0).children().eq(2).attr('id', "Instrument" + currentTrackIndex);
-			//newTrack.children().eq(0).children().eq(2).html("Piano");
+			newTrack.children().eq(0).children().eq(2).attr('id', "Instrument" + currentTrackIndex);
+			newTrack.children().eq(0).children().eq(2).html("Piano");
 			//console.log("debugging cloning instruments " + newTrack.children().eq(0).children().eq(2).attr('id') + "under class " + newTrack.children().eq(0).children().eq(2).attr("class"));
 			
 			// For track number
@@ -810,18 +810,18 @@ $(document).ready(function() {
 		
 	
 		    $(".displayInstrument").unbind().on("click", function(){
-		        
-				var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
-			    console.log("trackNum " + trackNum);
-			    console.log("this instrument " + $(this).innerHTML);
-			    console.log("current instrument " + $("#timeline-system").children().eq(trackNum).find(".displayInstrument").value);
-				var currIndex = allInstruments.indexOf($(this).value);
+		        var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
+				var instrument = document.getElementById("Instrument" + trackNum);
+			    console.log("this instrument " + "Instrument" + trackNum + " " + instrument.textContent);
+				var currentInstrument = instrument.textContent;
+			  //  console.log("current instrument " + $("#timeline-system").children().eq(trackNum).find(".displayInstrument").firstChild.data);
+				var currIndex = allInstruments.indexOf(currentInstrument);
 			    var nextInstrument = allInstruments[(currIndex + 1) % allInstruments.length];
 		        console.log("currIndex " + currIndex);
 				console.log("nextInstrumentIndex " + nextInstrument);
 			    instruments[trackNum] = nextInstrument;
-			    $(this).value = nextInstrument;
-			    $(this).innerHTML = nextInstrument;
+			    instrument.textContent = nextInstrument;
+			    instrument.textContent = nextInstrument;
           
 		    });
 		/*

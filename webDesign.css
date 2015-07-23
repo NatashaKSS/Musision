@@ -423,17 +423,20 @@ a {
 .instrumentMenu{
     display: none;
 }
-
+/*the button*/
 .displayInstrument {
     position: relative;
 	margin-top: 10px;
-	margin-left: 30px;
-	background: orange;
+	margin-left: 20px;
+	background: #A9A9A9;
+	font-family: Verdana;
+	border-radius: 30%;
 }
 
-
+/*
 .displayInstrument:hover > ul.instrumentMenu{
     position: absolute;
 	display: block;
 	background : crimson;
 }
+*/
