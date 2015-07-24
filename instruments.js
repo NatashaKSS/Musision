@@ -1,13 +1,23 @@
 var piano = new Wad({
     source : 'sine', 
     env : {
-    	volume: 1.0,
+    	volume: 3.0,
         attack : .01, 
-        decay : .005, 
-        sustain : .2, 
-        hold : (0.5 - 0.01 - 0.005 - 0.3), // Default duration of quarter-note or beat 0.5s
-        release : .3
-    }
+        decay : .01, 
+        sustain : .5, 
+        hold : (0.5 - 0.01 - 0.01 - 0.5), // Default duration of quarter-note or beat 0.5s
+        release : .5
+    },
+	
+	filter : { 
+            type : 'lowpass',
+            frequency : 1300,
+            env : {
+                attack : .01,
+                frequency : 400
+            }
+        }
+	
 });
 
 // All about that bass

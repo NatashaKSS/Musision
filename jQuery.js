@@ -31,9 +31,7 @@ var playUntil = -1;
 var pi = Math.PI;
 var songOfPi = [];  //to prepare for the song using PI's numbers
 var allInstruments = ["Piano", "Guitar", "Violin", "Flute", "Bell"];
-var instruments = [];//to keep track of which instrument play what track
-instruments[0] = "Piano";//default first instrument for each track
-//console.log(pi);
+
 
 /*
  * User Tracks Constructor, named a composition
@@ -54,6 +52,10 @@ function Composition(track) {
 	
 	// Tracks number of tracks on timeline
 	this.numOfTracks = 1; // By Default, should have 1 track on timeline
+	
+	this.instruments = [];
+	
+	this.instruments[0] = "Piano";
 }
 
 // Gets the array of tracks a user has made
@@ -66,10 +68,22 @@ Composition.prototype.getTrack = function(trackNum) {
 	return this.tracks[trackNum];
 }
 
+Composition.prototype.getAllInstruments = function() {
+	return this.instruments;
+}
+
+Composition.prototype.getInstrument = function(trackNum) {
+	return this.instruments[trackNum];
+}
+
+Composition.prototype.setInstrument = function(trackNum, instrument) {
+	 this.instruments[trackNum] = instrument;
+}
 // Adds a track to a user's composition
 Composition.prototype.addTrack = function(track) {
 	this.tracks.push(track);
 	this.enablePlaying.push(true);
+	this.instruments.push("Piano");
 	this.numOfTracks++;
 }
 
@@ -80,6 +94,7 @@ Composition.prototype.addNote = function(trackNum, note) {
 
 Composition.prototype.deleteTrack = function(trackIndexToDelete) {
 	this.tracks.splice(trackIndexToDelete, 1);
+	this.instruments.splice(trackIndexToDelete, 1);
 	this.numOfTracks--;
 }
 
@@ -88,7 +103,7 @@ Composition.prototype.emptyTrack = function(trackNum) {
 	this.tracks[trackNum] = [];
 }
 
-//Empty a specified track 
+//Empty all tracks 
 Composition.prototype.emptyAllTracks = function(trackNum) {
 	var numOfTracks = this.tracks.length;
 	
@@ -209,7 +224,7 @@ Animation.prototype.stopAnimation = function() {
 		"border": "none"
 	});
 }
-
+/*
 
 ////To pause and play again 
 function Timer(func, delay) {
@@ -230,7 +245,7 @@ function Timer(func, delay) {
     this.start = new Date();
     this.timerId = setTimeout(this.func, this.remaining);
 }
-
+*/
  /* Initialisation of objects */
 //Any user's new composition contains, by default, one track.
 var composition = new Composition([]);
@@ -273,13 +288,17 @@ function playSequence(trackNumber, startIndex, endIndex) {
 		console.log("end " + endIndex);
         console.log("length " + (endIndex - startIndex + 1));
 		
+		setTimeout(function(){
+		    animation.stopAnimation();
+			}, wholeDuration);
+		
         for(indx = startIndex; indx <= endIndex; indx++) {
 		    if (composition.getTrack(trackNumber)[indx] != undefined) {	
 				var currentPitch = composition.getTrack(trackNumber)[indx].getPitch();
 				console.log("in composition " + currentPitch);
 	
 		    	if(currentPitch != "silence") {
-					var inst = instruments[trackNumber];
+					var inst = composition.getInstrument(trackNumber);
 					
 					if(inst == "Piano"){
 			    		piano.play({ 
@@ -449,6 +468,7 @@ function clearAllSound(){
 		composition.setEnablePlaying(i, true);
     //set back to normal
 	}
+	
 }
 
 function loopAll(){
@@ -660,8 +680,7 @@ $(document).ready(function() {
 			var newTrack = $(".track").first().clone();
 		    var currentNumOfTracks = composition.getNumTracks();
 		    var currentTrackIndex = currentNumOfTracks - 1;
-		    
-		    instruments[currentTrackIndex] = "Piano";
+		   
 			/*
 			console.log("num of instruments " + currentNumOfTracks);
 			for(count = 0; count < instruments.length; count++){
@@ -804,7 +823,7 @@ $(document).ready(function() {
 	
 		    $(".displayInstrument").unbind().on("click", function(){
 		        var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
-				var instrument = document.getElementById("Instrument" + trackNum);
+				var instrument = document.getElementById("Instrument" + trackNum);//current instrument at the specific track number
 			    console.log("this instrument " + "Instrument" + trackNum + " " + instrument.textContent);
 				var currentInstrument = instrument.textContent;
 			  //  console.log("current instrument " + $("#timeline-system").children().eq(trackNum).find(".displayInstrument").firstChild.data);
@@ -812,7 +831,7 @@ $(document).ready(function() {
 			    var nextInstrument = allInstruments[(currIndex + 1) % allInstruments.length];
 		        console.log("currIndex " + currIndex);
 				console.log("nextInstrumentIndex " + nextInstrument);
-			    instruments[trackNum] = nextInstrument;
+			    composition.setInstrument(trackNum, nextInstrument);
 			    instrument.textContent = nextInstrument;
 			    instrument.textContent = nextInstrument;
           
@@ -881,12 +900,6 @@ $(document).ready(function() {
 				// To remove track from our backend first
 				var trackNumToBeRemoved = parseInt($(this).parent().attr("id").substring(5));
 				composition.deleteTrack(trackNumToBeRemoved);
-				instruments.splice(trackNumToBeRemoved, 1);
-				
-				//show all instruments
-				for(count = 0; count < instruments.length; count++){
-				    console.log("instruments left " + instruments[count]);
-				}
 				
 				// To actually remove track from DOM in html
 				$(this).parents(".track").remove();
