@@ -94,6 +94,7 @@ Composition.prototype.addNote = function(trackNum, note) {
 	this.tracks[trackNum].push(note);
 }
 
+// Removes a track from composition 
 Composition.prototype.deleteTrack = function(trackIndexToDelete) {
 	this.tracks.splice(trackIndexToDelete, 1);
 	this.instruments.splice(trackIndexToDelete, 1);
