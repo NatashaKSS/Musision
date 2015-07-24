@@ -31,7 +31,9 @@ var playUntil = -1;
 var pi = Math.PI;
 var songOfPi = [];  //to prepare for the song using PI's numbers
 var allInstruments = ["Piano", "Guitar", "Violin", "Flute", "Bell"];
-
+var goldenRatio = (1 + Math.sqrt(5))/2;
+console.log("PI= " + pi);
+console.log("PHI= " + goldenRatio);
 
 /*
  * User Tracks Constructor, named a composition
