@@ -1000,6 +1000,23 @@ function updateComposition() {
 		}
 	}
 }
+
+//Change the look of a note on the timeline
+function updateTimelineNotes() {
+	$(".sortable-system div").not(".ui-sortable-placeholder").removeClass().css({
+		"height": grid.noteHeight,
+		"width": grid.noteWidth,
+		"padding-top": "15px",
+		"background": "#109bce", //default light blue-ish #109bce
+    	"border-radius": "1em",
+		"display": "inline-block",
+		"vertical-align": "top",
+		"text-align": "center",
+		"font-size": "20px",
+		"color": "#FFFFFF",
+		"text-shadow": "1px 1px 2px #000000"
+	});
+}
 	
 function setSortable() {	
 	$(function() {
@@ -1088,6 +1105,8 @@ function setSortable() {
 			// When timeline receives the user-dragged note
 			receive: function(event, ui) {
 				
+				updateTimelineNotes();
+				
 				if(ui.item.attr('data-note') != "silence"){
 		      		var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12]);
 					composition.addNote(trackNumInSortable, insertedNote);
@@ -1099,22 +1118,6 @@ function setSortable() {
 					composition.addNote(trackNumInSortable, insertedSilence);
 				}
 				
-				// Change the look of a note on the timeline
-				$(".sortable-system div").not(".ui-sortable-placeholder").removeClass().css({
-					"height": grid.noteHeight,
-					"width": grid.noteWidth,
-					"padding-top": "15px",
-					"background": "#109bce", //default light blue-ish #109bce
-			    	"border-radius": "1em",
-					"display": "inline-block",
-					"vertical-align": "top",
-					"text-align": "center",
-					"font-size": "20px",
-					"color": "#FFFFFF",
-					"text-shadow": "1px 1px 2px #000000"
-				});
-				
-				
 				$(".sortable-system div").on("click", function(e){
 				    //$(".sortable-system div").css({ "border": "none" });    //comment this line first to allow choosing of starting and ending note
 					// To ensure if user clicks on more than 1 note, the prev note click
@@ -1123,7 +1126,6 @@ function setSortable() {
 					piano.play({
 					    pitch : notes[parseInt($(e.target).attr('data-note'))]
 					});
-					
 					
 					$(e.target).css({ 
 				        "background": "#80ffff" //change color to light blue
@@ -1163,7 +1165,7 @@ function setSortable() {
 			}
 		});
 	});
-	}
+}
 	
 	setSortable();
 	
@@ -1317,38 +1319,39 @@ function setSortable() {
 	
 	var randomStart;
 		
-	var playSongOfPi = function(){
+	var playSongOfPi = function() {
 	    //initiate random variables
 	    var randomLength = function(){
 	        var result;
+	        
 	        if(Math.random() > 0.5 ) { 
 		        result = Math.floor(Math.random() * Math.random() * 1099) % 41;
 		    } else {
 		        result = Math.floor(Math.random() * Math.random() * 1099) % 41 + 20;
 		    }
-	    if(result < 10){
-		    result += 15;
-		}
+	        
+		    if(result < 10) {
+			    result += 15;
+			}
 		
-		return result;
+			return result;
 		
 	    }
 		
 		console.log("done choosing length");
 		
 	    var randomPivot = function(){
-		  
-		  var result = Math.floor(Math.random() * Math.random() * 2999) % 60;
-		
-	      if(result < 10){
-		    console.log("too low!!");
-		    result += 5;
-	      } else if(result > 55){
-		    console.log("too high!!");
-		    result -= 10;
-	       }
-		   
-		   return result;
+		    var result = Math.floor(Math.random() * Math.random() * 2999) % 60;
+			
+			if(result < 10) {
+			  console.log("too low!!");
+			  result += 5;
+			} else if(result > 55) {
+			  console.log("too high!!");
+			  result -= 10;
+			}
+			   
+			return result;
 	    }
 		
 		console.log("done choosing pivot");
@@ -1377,27 +1380,17 @@ function setSortable() {
 		   for(index = randomStart; index < songOfPi.length; index++){
 			   console.log("in for loop");
 			   $("div").each(function(){
-				   if($(this).hasClass("col-md-1")){
+				   if($(this).hasClass("col-md-1")) {
 					   if($(this).attr("data-note") != "silence" && parseInt($(this).attr("data-note")) == notes.indexOf(songOfPi[index])){
 						   console.log($(this).attr("data-note") + " and " + songOfPi[index]);
+						   
 						   var tempNote = $(this).clone();
-						   tempNote.css({ //to be the same as a regular note on the timeline
-						        "height": grid.noteHeight,
-					            "width": grid.noteWidth,
-					            "padding-top": "15px",
-					            "background": "#109bce", //default light blue-ish #109bce
-			    	            "border-radius": "1em",
-					            "display": "inline-block",
-					            "vertical-align": "top",
-					            "text-align": "center",
-					            "font-size": "20px",
-					            "color": "#FFFFFF",
-					            "text-shadow": "1px 1px 2px #000000"
-					
-						   });
-						   $("#track0").children().eq(1).append(tempNote); 
+						   
+						   $("#track0").children().eq(1).append(tempNote);
+						   updateTimelineNotes();
 						   console.log("index " + tempNote.index());
 						   composition.getTrack(0).push(new Note(notes[parseInt(tempNote.attr('data-note'))], beatDuration));
+					   
 					   }
 					
 				   }
@@ -1411,6 +1404,9 @@ function setSortable() {
 	});
 	
 });
+
+
+
 
 /*
  * How to use the below 2 functions for notes div generation:
