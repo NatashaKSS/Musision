@@ -192,7 +192,7 @@ a {
 	display: inline-block;
 	border-radius: 1em;
 	height: 0px; /* This is like...the most important line LOL*/
-	width: 45px; /* Just the right size 5px */
+	width: 45px; /* Just the right size */
 	background-color: #109bce;
 	opacity: 0.5;
 }

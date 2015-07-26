@@ -249,14 +249,20 @@ function Timer(func, delay) {
     this.timerId = setTimeout(this.func, this.remaining);
 }
 */
- /* Initialisation of objects */
-//Any user's new composition contains, by default, one track.
+
+/*------------------------------------------------*/
+/*------------ Initialize Objects-----------------*/
+/*------------------------------------------------*/
+
 var composition = new Composition([]);
 var animation = new Animation();
 
-/*------------------------------------------------*/
-/*-----------------Main Functions-----------------*/
-/*------------------------------------------------*/
+
+
+
+/*--------------------------------------------------------*/
+/*--------------------Main Functions----------------------*/
+/*--------------------------------------------------------*/
 function changeBPM(){
 	beatDuration = 0.5; // Flushes the previous values of beatDuration
     var ans = document.getElementById("bpm-input").value;
@@ -384,67 +390,6 @@ function playAllSequences() {
 	}
 }
 
-  /*  
-	while(count < composition.getTrack(0).length){
-	    if(composition.getTrack(0)[count].getPitch() != "silence"){
-		    piano.play({ 
-	    	    wait : count * beatDuration,
-	    	    // noteDuration should be arr[count].getDur(), but need to 
-			    // change other things first.
-			    pitch : composition.getTrack(0)[count].getPitch(),
-				label : "playing" 
-		    });
-		    
-		} else {
-		    quarterRest.play({
-			    wait : count * noteDuration, 
-			    // noteDuration should be arr[count].getDur(), but need to 
-			    // change other things first.
-				label : "playing" 
-			});
-		}
-		count = count + 1;
-    }
-	*/
-
-/* FOR VAN: IN CASE YOU NEED THIS *******************
- * 
- * 
- * function playAnimation(duration, wholeDuration) {///////This needs debugging and cleaning up
-	jQuery(function($) {
-		// This offset timing makes the animation smoother
-		var offset = -200;
-		
-		// Change each div's colour as note plays
-		// Applies setTimeout function to every div in the timeline
-		$(".sortable-system div").map(function() {
-			var that = $(this);			    
-			playId = setTimeout(function () {
-			   if(enablePlaying){
-	            //  console.log("in if, enable " + enablePlaying);
-		          that.css({ 
-		            "background": "#80ffff" //change color to light blue
-			      });
-		        } else {//if pause/stop/clearAll is pressed. 
-			       clearTimeout(playId);
-	             //  console.log("in else, enable " + enablePlaying);
-				  setTimeout(function () {
-	                $(".sortable-system div").css({ "background-color": "#109bce" });
-                    }, 100);
-			    }
-			}, duration + offset);
-				offset += duration;
-		});
-		
-        setTimeout(function () {
-            $(".sortable-system div").css({ "background-color": "#109bce" });
-        }, wholeDuration);
-		
-
-	});    
-}
- * */
-
 //empty the note array    
 function clearAllSound(){
 	var numOfTracks = composition.getAllTracks().length;
@@ -475,17 +420,8 @@ function clearAllSound(){
 }
 
 function loopAll(){
-
-    if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
-    	
-		//composition.setEnablePlaying(0, true);
-    	// The above statement mimics this statement, but only sets the first track '0'
-    	// enablePlaying = true;
-    	/* 
-    	 * ^^^^Above Just for the time being ^^^^
-    	 * */
-    	
-		enableLooping = true;
+	if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
+    	enableLooping = true;
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
 	
@@ -503,11 +439,49 @@ function loopAll(){
 	    playUntil = -1;//change back to default
 	
 	}
+}
+
+// Adds a track to user composition and updates user interface
+// respectively
+function addTrack() {
+	var newTrack = $(".track").first().clone();
+    var currentNumOfTracks = composition.getNumTracks();
+    var currentTrackIndex = currentNumOfTracks - 1;
+   
+	/*
+	console.log("num of instruments " + currentNumOfTracks);
+	for(count = 0; count < instruments.length; count++){
+	    console.log(instruments[count] + " ");
+	}
+	*/
+    
+	// For play button
+	newTrack.children().eq(0).children().attr('id', "play-track" + currentTrackIndex);
 	
+	//Instrument
+	newTrack.children().eq(0).children().eq(2).attr('id', "Instrument" + currentTrackIndex);
+	newTrack.children().eq(0).children().eq(2).html("Piano");
+	//console.log("debugging cloning instruments " + newTrack.children().eq(0).children().eq(2).attr('id') + "under class " + newTrack.children().eq(0).children().eq(2).attr("class"));
+	
+	// For track number
+	newTrack.children().eq(1).attr('id', "track" + currentTrackIndex);
+
+	// Appending to timeline-system
+	newTrack.appendTo("#timeline-system");
+	$("#track" + currentTrackIndex + " .sortable-system div").remove();
+	
+	
+	/*	//debugging
+		$(".chooseInstrument").each(function(){
+	        console.log("id " + $(this).attr('id'));
+		});
+	*/
 }
 
 
-/* Utility Functions */
+/*--------------------------------------------------------*/
+/*-----------------Utility Functions----------------------*/
+/*--------------------------------------------------------*/
 //Takes in num of divs to generate and cssClass to associate
 // with each div and outputs a string of representing those divs
 function generateDivs(numOfDivs, cssClass, text) {
@@ -553,11 +527,11 @@ function generateOctaveColour(colour) {
 	
 }
 
+
 /*------------------------------------------------*/
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
 $(document).ready(function() {
-	
 	function initialize() {
 		initializeTrackSettings();
 		
@@ -669,55 +643,15 @@ $(document).ready(function() {
 		    if(findMaxLength() > 0)loopAll();
 	    });	
 		
-		/* Might not want this
-		$(".sortable-system").mousewheel(function(event, delta) {
-			this.scrollLeft -= (delta * 15);
-			event.preventDefault(); // Prevent scrolling down
-		});
-		 */
-		
 		$("#addTrack").on("click", function() {
 			//  First add a new track to our composition
 			composition.addTrack([]);
 			
-			var newTrack = $(".track").first().clone();
-		    var currentNumOfTracks = composition.getNumTracks();
-		    var currentTrackIndex = currentNumOfTracks - 1;
-		   
-			/*
-			console.log("num of instruments " + currentNumOfTracks);
-			for(count = 0; count < instruments.length; count++){
-			    console.log(instruments[count] + " ");
-			}
-			*/
-			// Setting the id of tracks added and appending them to correct place
-			// Every new track added will have a unique ID which increments by 1 as
-			// more tracks are added. NOTE THAT WE START COUNTING FROM 0.
-			
-			// For play button
-			newTrack.children().eq(0).children().attr('id', "play-track" + currentTrackIndex);
-			
-			//Instrument
-			newTrack.children().eq(0).children().eq(2).attr('id', "Instrument" + currentTrackIndex);
-			newTrack.children().eq(0).children().eq(2).html("Piano");
-			//console.log("debugging cloning instruments " + newTrack.children().eq(0).children().eq(2).attr('id') + "under class " + newTrack.children().eq(0).children().eq(2).attr("class"));
-			
-			// For track number
-			newTrack.children().eq(1).attr('id', "track" + currentTrackIndex);
-		
-			// Appending to timeline-system
-			newTrack.appendTo("#timeline-system");
-			$("#track" + currentTrackIndex + " .sortable-system div").remove();
+			addTrack();
 			
 			// Must reinitialise the sortables
 			setSortable();
 			initializeTrackSettings();
-		/*	
-			//debugging
-			$(".chooseInstrument").each(function(){
-		        console.log("id " + $(this).attr('id'));
-			});
-		*/
 		});
         /*
 		//piano- guitar- violin
@@ -823,22 +757,21 @@ $(document).ready(function() {
 			
 		});
 		
-	
-		    $(".displayInstrument").unbind().on("click", function(){
-		        var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
-				var instrument = document.getElementById("Instrument" + trackNum);//current instrument at the specific track number
-			    console.log("this instrument " + "Instrument" + trackNum + " " + instrument.textContent);
-				var currentInstrument = instrument.textContent;
-			  //  console.log("current instrument " + $("#timeline-system").children().eq(trackNum).find(".displayInstrument").firstChild.data);
-				var currIndex = allInstruments.indexOf(currentInstrument);
-			    var nextInstrument = allInstruments[(currIndex + 1) % allInstruments.length];
-		        console.log("currIndex " + currIndex);
-				console.log("nextInstrumentIndex " + nextInstrument);
-			    composition.setInstrument(trackNum, nextInstrument);
-			    instrument.textContent = nextInstrument;
-			    instrument.textContent = nextInstrument;
-          
-		    });
+	    $(".displayInstrument").unbind().on("click", function(){
+	        var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
+			var instrument = document.getElementById("Instrument" + trackNum);//current instrument at the specific track number
+		    console.log("this instrument " + "Instrument" + trackNum + " " + instrument.textContent);
+			var currentInstrument = instrument.textContent;
+		  //  console.log("current instrument " + $("#timeline-system").children().eq(trackNum).find(".displayInstrument").firstChild.data);
+			var currIndex = allInstruments.indexOf(currentInstrument);
+		    var nextInstrument = allInstruments[(currIndex + 1) % allInstruments.length];
+	        console.log("currIndex " + currIndex);
+			console.log("nextInstrumentIndex " + nextInstrument);
+		    composition.setInstrument(trackNum, nextInstrument);
+		    instrument.textContent = nextInstrument;
+		    instrument.textContent = nextInstrument;
+      
+	    });
 		/*
 		    $(".displayInstrument").unbind().hover(function(event){
 			    console.log("YAHA!");
@@ -923,7 +856,13 @@ $(document).ready(function() {
 		
 	}
 	
-	/* INITIALIZE EVERYTHINGGGG */
+	
+	
+	
+	/*------------------------------------------------*/
+	/*------------ Initialize EVERYTHINGG-------------*/
+	/*------------------------------------------------*/
+
 	//introJs("body").start();
 	setSortable();
 	initialize();
@@ -932,20 +871,21 @@ $(document).ready(function() {
 	$("#show-less-view").hide();
 	
 	
-/*------------------------------------------------*/
-/*------------- Generate dynamic grid-------------*/
-/*------------------------------------------------*/
+	
+	/*------------------------------------------------*/
+	/*------------- Generate dynamic grid-------------*/
+	/*------------------------------------------------*/
 	var scrollbarWidth = 20; 
 	// scrollbarWidth to debug instance where notes would fly to
 	// the bottom because scrollbar (usually 17px on all browsers) 
 	// takes up its space -- trust me LOL
-
+	
 	var numOfDivisions = 16;
 	var timelineHeight = $(".timeline").height() + 
 						 parseInt($(".timeline").css("border-top-width")) + 
 						 parseInt($(".timeline").css("border-bottom-width"));
 	var timelineWidth = $(".timeline").width();
-
+	
 	var grid = new GridSystem(composition.getTrack(0).length,
 							  scrollbarWidth,
 							  numOfDivisions,
@@ -964,208 +904,208 @@ $(document).ready(function() {
 		grid.resizeGrid();
 	});
 
-/*------------------------------------------------*/
-/*------------ Draggables & Sortables-------------*/
-/*------------------------------------------------*/
-// Function to update composition's tracks and notes for the user
-// Whenever a note is inserted or swapped in sortable.
-// This checks for objects in the DOM and updates our backend composition
-// respectively.
-function updateComposition() {
-	var numOfTracks = $(".timeline").length;
-	var trackNotes, dataNoteIndex, currentTrack, currentNote, noteDataAttr;
-	
-	composition.emptyAllTracks();
-	
-	for (trackNum = 0; trackNum < numOfTracks; trackNum++) {
+	/*------------------------------------------------*/
+	/*------------ Draggables & Sortables-------------*/
+	/*------------------------------------------------*/
+	// Function to update composition's tracks and notes for the user
+	// Whenever a note is inserted or swapped in sortable.
+	// This checks for objects in the DOM and updates our backend composition
+	// respectively.
+	function updateComposition() {
+		var numOfTracks = $(".timeline").length;
+		var trackNotes, dataNoteIndex, currentTrack, currentNote, noteDataAttr;
 		
-		currentTrack = $("#track" + trackNum + " > :nth-child(2)");
-		// nth-child(2) because our sortable system is always 2nd child
+		composition.emptyAllTracks();
 		
-		trackNotes = currentTrack.children();
-		// list of a track's notes
-		
-		for (noteNum = 0; noteNum < trackNotes.length; noteNum++) {
-			noteDataAttr = trackNotes.eq(noteNum).attr('data-note');
+		for (trackNum = 0; trackNum < numOfTracks; trackNum++) {
 			
-			if (noteDataAttr != "silence") {
-				dataNoteIndex = parseInt(noteDataAttr);
-				currentNote = new Note(notes[dataNoteIndex]);
-				
-			} else {
-				currentNote = new Note(noteDataAttr);
-			}
-				
-			composition.addNote(trackNum, currentNote);
-		}
-	}
-}
-
-//Change the look of a note on the timeline
-function updateTimelineNotes() {
-	$(".sortable-system div").not(".ui-sortable-placeholder").removeClass().css({
-		"height": grid.noteHeight,
-		"width": grid.noteWidth,
-		"padding-top": "15px",
-		"background": "#109bce", //default light blue-ish #109bce
-    	"border-radius": "1em",
-		"display": "inline-block",
-		"vertical-align": "top",
-		"text-align": "center",
-		"font-size": "20px",
-		"color": "#FFFFFF",
-		"text-shadow": "1px 1px 2px #000000"
-	});
-}
-	
-function setSortable() {	
-	$(function() {
-		var inBox = false; // Flag that facilitates removal of note
-		var inBeforeStop = false; // Flag that facilitates colour of note when removed
-		var trackNumInSortable = 0; // Current/default trackNum
-		
-		$(".sortable-system").sortable({
-			scroll: false,
-			revert: false,
-			snap: false,
-			connectWith: $(".sortable-system"),
+			currentTrack = $("#track" + trackNum + " > :nth-child(2)");
+			// nth-child(2) because our sortable system is always 2nd child
 			
-			placeholder: {
-				element: function() {
-		            return $("<div class='ui-sortable-placeholder'></div>")[0];
-		        },
-		        
-		        update: function() {
-		        	$(".ui-sortable-placeholder").css({
-			    		"height": grid.noteHeight,
-			    		"width": grid.noteWidth
-			    	});
-		        	
-		            return;
-		        }
-			},
+			trackNotes = currentTrack.children();
+			// list of a track's notes
 			
-			start: function(event, ui) {
+			for (noteNum = 0; noteNum < trackNotes.length; noteNum++) {
+				noteDataAttr = trackNotes.eq(noteNum).attr('data-note');
 				
-				var startPosition = ui.item.index(); //original index
-				ui.item.data('startPos', startPosition); //create data called startPos and set it to startPosition
-				
-				trackNumInSortable = parseInt(ui.item.parent().parent().attr("id").substring(5));
-				
-			},
-			
-			// Whenever user has stopped sorting and the DOM element (HTML) has changed
-			update: function(event, ui) {
-				updateComposition();
-			},
-			
-			// If item is hovering over timeline
-			over: function(event, ui) {
-				
-				inBox = true;
-				inBeforeStop = false;
-				
-				ui.item.css({
-					"background-color":"#109bce", // Light blue
-					"border":"none"
-				});
-				
-				
-			},
-			 
-			// If item is dragged outside timeline OR if item is dropped
-			// onto timeline
-			out: function(event, ui) {
-				inBox = false;
-				
-				if (!inBeforeStop) {
-					ui.item.css({
-						"background-color":"red",
-						"border":"2px solid yellow"
-					});
-				}
-				
-			},
-			
-			// Just before releasing dragging and item is outside timeline
-			beforeStop: function(event, ui) {
-
-				inBeforeStop = true;
-				
-				// If a note is not swapped to another track or user decides
-				// not to delete a note, the note will not enter this and be removed
-				if (!inBox) {
-					var startPosition = ui.item.data('startPos');
-					composition.getTrack(trackNumInSortable).splice(startPosition, 1);
-					ui.item.remove();		
-				}		
-			
-			},
-			
-			// When timeline receives the user-dragged note
-			receive: function(event, ui) {
-				
-				updateTimelineNotes();
-				
-				if(ui.item.attr('data-note') != "silence"){
-		      		var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12]);
-					composition.addNote(trackNumInSortable, insertedNote);
+				if (noteDataAttr != "silence") {
+					dataNoteIndex = parseInt(noteDataAttr);
+					currentNote = new Note(notes[dataNoteIndex]);
 					
 				} else {
-					var insertedSilence = new Note(ui.item.attr('data-note'));
-					// Pitch for silence is just "silence"
-					// ui.item.attr('data-note')) is just the string "silence"
-					composition.addNote(trackNumInSortable, insertedSilence);
+					currentNote = new Note(noteDataAttr);
 				}
+					
+				composition.addNote(trackNum, currentNote);
+			}
+		}
+	}
+	
+	//Change the look of all notes on the timeline
+	function updateTimelineNotes() {
+		$(".sortable-system div").not(".ui-sortable-placeholder").removeClass().css({
+			"height": grid.noteHeight,
+			"width": grid.noteWidth,
+			"padding-top": "15px",
+			"background": "#109bce", //default light blue-ish #109bce
+			"border-radius": "1em",
+			"display": "inline-block",
+			"vertical-align": "top",
+			"text-align": "center",
+			"font-size": "20px",
+			"color": "#FFFFFF",
+			"text-shadow": "1px 1px 2px #000000"
+		});
+	}
+		
+	function setSortable() {	
+		$(function() {
+			var inBox = false; // Flag that facilitates removal of note
+			var inBeforeStop = false; // Flag that facilitates colour of note when removed
+			var trackNumInSortable = 0; // Current/default trackNum
+			
+			$(".sortable-system").sortable({
+				scroll: false,
+				revert: false,
+				snap: false,
+				connectWith: $(".sortable-system"),
 				
-				$(".sortable-system div").on("click", function(e){
-				    //$(".sortable-system div").css({ "border": "none" });    //comment this line first to allow choosing of starting and ending note
-					// To ensure if user clicks on more than 1 note, the prev note click
-					// will have its border color reverted.
-				    
-					piano.play({
-					    pitch : notes[parseInt($(e.target).attr('data-note'))]
+				placeholder: {
+					element: function() {
+			            return $("<div class='ui-sortable-placeholder'></div>")[0];
+			        },
+			        
+			        update: function() {
+			        	$(".ui-sortable-placeholder").css({
+				    		"height": grid.noteHeight,
+				    		"width": grid.noteWidth
+				    	});
+			        	
+			            return;
+			        }
+				},
+				
+				start: function(event, ui) {
+					
+					var startPosition = ui.item.index(); //original index
+					ui.item.data('startPos', startPosition); //create data called startPos and set it to startPosition
+					
+					trackNumInSortable = parseInt(ui.item.parent().parent().attr("id").substring(5));
+					
+				},
+				
+				// Whenever user has stopped sorting and the DOM element (HTML) has changed
+				update: function(event, ui) {
+					updateComposition();
+				},
+				
+				// If item is hovering over timeline
+				over: function(event, ui) {
+					
+					inBox = true;
+					inBeforeStop = false;
+					
+					ui.item.css({
+						"background-color":"#109bce", // Light blue
+						"border":"none"
 					});
 					
-					$(e.target).css({ 
-				        "background": "#80ffff" //change color to light blue
-				    });
-					setTimeout(function(){
-					    $(e.target).css({ 
-				        "background": "#109bce" //change color back to original
-				    });
-
-					}, 400);
 					
-					if(e.shiftKey){//Mouse Click+shift event to choose the first note to play
-						$(e.target).css({ "border": "1px solid red" });
-						startPlayingFrom = $(e.target).index();
+				},
+				 
+				// If item is dragged outside timeline OR if item is dropped
+				// onto timeline
+				out: function(event, ui) {
+					inBox = false;
+					
+					if (!inBeforeStop) {
+						ui.item.css({
+							"background-color":"red",
+							"border":"2px solid yellow"
+						});
 					}
-				});
-			
-				$(".sortable-system div").on("dblclick", function(e){
-					$(e.target).css({ "border": "1px solid yellow" });
-                    playUntil = $(e.target).index();
-                    
-					console.log("first note " + startPlayingFrom);
-					console.log("last note " + playUntil);
-				});
-			}
-			
-		}).disableSelection();
-			 
-		$(".col-md-1").draggable({
-			cursor: "pointer",
-			connectToSortable: ".sortable-system",
-			helper: "clone",
-			opacity: 0.7,
-			revert: false,
-			start: function(event, ui) {
-				ui.helper.hide();
-			}
+					
+				},
+				
+				// Just before releasing dragging and item is outside timeline
+				beforeStop: function(event, ui) {
+	
+					inBeforeStop = true;
+					
+					// If a note is not swapped to another track or user decides
+					// not to delete a note, the note will not enter this and be removed
+					if (!inBox) {
+						var startPosition = ui.item.data('startPos');
+						composition.getTrack(trackNumInSortable).splice(startPosition, 1);
+						ui.item.remove();		
+					}		
+				
+				},
+				
+				// When timeline receives the user-dragged note
+				receive: function(event, ui) {
+					
+					updateTimelineNotes();
+					
+					if(ui.item.attr('data-note') != "silence"){
+			      		var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12]);
+						composition.addNote(trackNumInSortable, insertedNote);
+						
+					} else {
+						var insertedSilence = new Note(ui.item.attr('data-note'));
+						// Pitch for silence is just "silence"
+						// ui.item.attr('data-note')) is just the string "silence"
+						composition.addNote(trackNumInSortable, insertedSilence);
+					}
+					
+					$(".sortable-system div").on("click", function(e){
+					    //$(".sortable-system div").css({ "border": "none" });    //comment this line first to allow choosing of starting and ending note
+						// To ensure if user clicks on more than 1 note, the prev note click
+						// will have its border color reverted.
+					    
+						piano.play({
+						    pitch : notes[parseInt($(e.target).attr('data-note'))]
+						});
+						
+						$(e.target).css({ 
+					        "background": "#80ffff" //change color to light blue
+					    });
+						setTimeout(function(){
+						    $(e.target).css({ 
+					        "background": "#109bce" //change color back to original
+					    });
+	
+						}, 400);
+						
+						if(e.shiftKey){//Mouse Click+shift event to choose the first note to play
+							$(e.target).css({ "border": "1px solid red" });
+							startPlayingFrom = $(e.target).index();
+						}
+					});
+				
+					$(".sortable-system div").on("dblclick", function(e){
+						$(e.target).css({ "border": "1px solid yellow" });
+	                    playUntil = $(e.target).index();
+	                    
+						console.log("first note " + startPlayingFrom);
+						console.log("last note " + playUntil);
+					});
+				}
+				
+			}).disableSelection();
+				 
+			$(".col-md-1").draggable({
+				cursor: "pointer",
+				connectToSortable: ".sortable-system",
+				helper: "clone",
+				opacity: 0.7,
+				revert: false,
+				start: function(event, ui) {
+					ui.helper.hide();
+				}
+			});
 		});
-	});
-}
+	}
 	
 	setSortable();
 	
@@ -1201,7 +1141,7 @@ function setSortable() {
 		record();		
         setTimeout(function(){
 		     stop();
-			 }, findMaxLength() * beatDuration * 1000);
+		}, findMaxLength() * beatDuration * 1000);
 		
        
         function record() {
@@ -1238,9 +1178,9 @@ function setSortable() {
 		
 		// export it to WAV
         rec.exportWAV(function(e){//rec is undefined =(
-                rec.clear();
-                Recorder.forceDownload(e, "filename.wav");
-            });	
+            rec.clear();
+            Recorder.forceDownload(e, "filename.wav");
+        });	
    });	
 /*	
 	
