@@ -577,6 +577,7 @@ $(document).ready(function() {
 		});
 		
 		$("#all").on("click", function() {
+			readSaveData();
 			playAllSequences();
 			startPlayingFrom = 0; //change back to default
 			playUntil = -1; //change back to default
@@ -605,6 +606,7 @@ $(document).ready(function() {
 		//end pause
 		
 		$("#stop").on("click", function() {
+			writeSaveData();
 			enableLooping = false;
 			
 		    piano.stop("playing");
@@ -735,7 +737,7 @@ $(document).ready(function() {
 					"background-color": "#c0c0c0", // Greyed out effect
 					"color": "#FFFFFF"
 				}).html("Unmute");
-				
+				$()
 				// Grey out the timeline that is muted
 				$(this).parent().parent().css({
 					"background-color": "grey"
@@ -755,6 +757,32 @@ $(document).ready(function() {
 				});
 			}
 			
+		});
+		
+		//to select a note to play FROM, click the note and hold the Shift key
+		//to select a note to play UNTIL, double click the note 
+		//to delete all the colors, press Stop and start all over again fresh!!!
+		$(".play-button").unbind().on("click", function() {
+			var trackNum = parseInt($(this).attr('id').substring(10));
+			var trackLength = composition.getTrack(trackNum).length;
+			console.log(startPlayingFrom);
+			console.log(playUntil);
+			if(playUntil == -1) {
+				    playUntil = trackLength - 1;
+			}
+		    
+			console.log("playUntil in play-button: " + playUntil);
+			
+			playSequence(trackNum, startPlayingFrom, playUntil);
+			startPlayingFrom = 0;//change back to default
+			playUntil = - 1;//change back to default
+			
+			//debugging
+			/*
+			console.log("check play length " + trackLength + 
+						" and start from " + composition.getTrack(trackNum)[startPlayingFrom].getPitch() + 
+						" to " + composition.getTrack(trackNum)[playUntil].getPitch());
+			*/
 		});
 		
 	    $(".displayInstrument").unbind().on("click", function(){
@@ -795,32 +823,6 @@ $(document).ready(function() {
 		
 		*/
 		
-		//to select a note to play FROM, click the note and hold the Shift key
-		//to select a note to play UNTIL, double click the note 
-		//to delete all the colors, press Stop and start all over again fresh!!!
-		$(".play-button").unbind().on("click", function() {
-			var trackNum = parseInt($(this).attr('id').substring(10));
-			var trackLength = composition.getTrack(trackNum).length;
-			console.log(startPlayingFrom);
-			console.log(playUntil);
-			if(playUntil == -1) {
-				    playUntil = trackLength - 1;
-			}
-		    
-			console.log("playUntil in play-button: " + playUntil);
-			
-			playSequence(trackNum, startPlayingFrom, playUntil);
-			startPlayingFrom = 0;//change back to default
-			playUntil = - 1;//change back to default
-			
-			//debugging
-			/*
-			console.log("check play length " + trackLength + 
-						" and start from " + composition.getTrack(trackNum)[startPlayingFrom].getPitch() + 
-						" to " + composition.getTrack(trackNum)[playUntil].getPitch());
-			*/
-		});
-		
 		$(".close-panel").unbind().hover(function(event) {
 			// Controls the animation of close track button
 			$(this).children(".close-button").stop().animate({
@@ -855,8 +857,6 @@ $(document).ready(function() {
 		});
 		
 	}
-	
-	
 	
 	
 	/*------------------------------------------------*/
@@ -1342,6 +1342,102 @@ $(document).ready(function() {
 		   console.log("end at " + playUntil);
 		   songOfPi = [];	
 	});
+
+	/*------------------------------------------------*/
+	/*------------- User save/read data---------------*/
+	/*------------------------------------------------*/
+	// User save data/ read data to/from localStorage of 
+	// browser for future sessions
+
+	var key = "userComposition";
+
+	// Checks if user's browser configuration accepts local storage
+	function supportsLocalStorage() {
+		try {
+		  return "localStorage" in window && window["localStorage"] !== null;
+		} catch (error) {
+		  return false;
+		}
+	}
+
+	// Writes user's composition to localStorage with a corresponding key. This key
+	// can be used to retrieve that user's composition saved in another session.
+	function writeSaveData() {
+		try {
+			localStorage.setItem(key, JSON.stringify(composition));
+		} catch(error) {
+			alert("You've exceeded your local storage capacity! " +
+					"Clear your browser cookies/cache and try again!");
+		}
+	}
+
+	// Reads user's composition from localStorage with the corresponding key. It gets the 
+	// JSON-stringified version of the user's saved composition object and converts it to 
+	// the Composition and Note classes for immediate use.
+	function readSaveData() {
+		var localDataComposition = JSON.parse(localStorage.getItem(key));
+		composition = $.extend(new Composition([]), localDataComposition);
+		// explicitly associates localDataComposition with Composition class.
+		
+		var numOfTracks = composition.getNumTracks();
+		
+		for (track = 0; track < numOfTracks; track++) {
+			
+			if (track >= 1) {
+				addTrack();
+			}
+				
+			for (note = 0; note < composition.getTrack(track).length; note++) {
+				
+				composition.getTrack(track)[note] = $.extend(new Note(), composition.getTrack(track)[note]);
+				// explicitly associates noteOnTrack with Note class for every note in the composition.
+				
+				var noteOnTrack = composition.getTrack(track)[note];
+				// reference to the new note object
+				
+				var notePitch = noteOnTrack.getPitch();
+				
+				var noteHTML = "<div class data-note='" + notes.indexOf(notePitch) + 
+							   "' style='opacity: 1; display: inline-block; width: 39.0625px; " +
+							   "height: 61px; z-index: 0; border: none; padding-top: 15px; " +
+							   "border-radius: 1em; vertical-align: top; text-align: center; " +
+							   "font-size: 20px; color: rgb(255, 255, 255); " +
+							   "text-shadow: rgb(0, 0, 0) 1px 1px 2px; background: rgb(16, 155, 206); '>" +  
+							   notePitch + "</div>";
+				// Mimics the style of a note on timeline
+				
+				$("#track" + track).children().eq(1).append(noteHTML);
+				
+			}
+			
+		}
+		
+		var tracksEnablePlaying = composition.enablePlaying;
+		var trackMuteButton;
+		
+		for (mutedTrack = 0; mutedTrack < tracksEnablePlaying.length; mutedTrack++) {
+			if (!tracksEnablePlaying[mutedTrack]) { //false --> Contains a muted track
+				trackMuteButton = $("#timeline-system").children().eq(mutedTrack).find(".muteButton");
+				
+				// CSS of a muted track.
+				trackMuteButton.css({
+					"padding": "3px 10px 3px 2px",
+					"border": "none",
+					"background-color": "#c0c0c0", // Greyed out effect
+					"color": "#FFFFFF"
+				}).html("Unmute");
+				
+				// Grey out the timeline that is muted
+				trackMuteButton.parent().parent().css({
+					"background-color": "grey"
+				});
+			}
+		}
+		
+		// Reinitialise track settings and sortables for all newly made tracks
+		initializeTrackSettings();
+		setSortable();
+	}
 	
 });
 
