@@ -1,12 +1,12 @@
 var piano = new Wad({
     source : 'sine', 
     env : {
-    	volume: 3.0,
+    	volume: 1.0,
         attack : .01, 
-        decay : .01, 
-        sustain : .5, 
-        hold : (0.5 - 0.01 - 0.01 - 0.5), // Default duration of quarter-note or beat 0.5s
-        release : .5
+        decay : .005, 
+        sustain : .3, 
+        hold : .015, 
+        release : .3
     },
 	
 	filter : { 
@@ -19,6 +19,17 @@ var piano = new Wad({
         }
 	
 });
+
+/* This envelope causes a CHZZT CHZZT sound
+ * env : {
+    	volume: 1.0,
+        attack : .01, 
+        decay : .01, 
+        sustain : .5, 
+        hold : (0.5 - 0.01 - 0.01), // Default duration of quarter-note or beat is 0.5s
+        release : .5
+    },
+ * */
 
 // All about that bass
 var bass = new Wad({

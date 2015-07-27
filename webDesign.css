@@ -31,7 +31,8 @@ a {
 }
 
 .btn {
-	background-color: #b3b3b3; 
+	margin-top: 5px;
+	background-color: #b3b3b3;
 }
 
 .btn:hover{

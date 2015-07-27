@@ -35,7 +35,6 @@
 	<script src="instruments.js"></script>
 	<script src="gridSystem.js"></script>
 	<script src="jQuery.js"></script>
-	<script src="saveProgress.js"></script>
 	
 </head>
 
@@ -50,30 +49,37 @@
 	  <div>
 		<ul class="nav navbar-nav" style="display:inline;">
 		 <!--- To download composition --->
-		 <li><a id="download">Download</a></li> 
-		 <!--- to play all notes --->
-		 <li><a id="all" data-step="4" data-intro="Click here to play your entire song, a note at a time." data-position="bottom"> Play </a></li>
-		 <!--- to stop all notes and go back to beginning--->
-		 <li><a id="stop"> Stop </a></li>
-		 
-		 <!--<li><a id="same" href="#" data-step="5" data-intro="Click here to play all notes on the timeline simultaneously" data-position="bottom">Play All</a></li>-->
-		 
-		 <!--- to clear all notes from timeline --->
-		 <li><a id="clear" data-step="6" data-intro="Click here to clear all notes from timeline" data-position="bottom">Clear All</a></li>
-		 
-		 <!--- to add a track --->
-		 <li><a id="addTrack"> Add Track </a></li>
+		 <li><a id="download">Download</a></li>
+		 <li><a id="saveData">Save</a></li>
 		 
 		 <li>
-		  <div class="navbar-form pull-left">
-    	  <input id="bpm-input" type="text" class="input-small" placeholder=" 120" 
-    	  		 data-step="7" data-intro="Type in your preferred BPM here and click 'Set BPM'" data-position="right"/>
-  		  <button id="bpm-button" class="btn" onclick=changeBPM()>Set BPM</button>
-		  
-		  <button id ="startLoop" class="btn"> Start Looping </button>
-		  <!--<button id ="pause" class="btn"> Pause </button>--->
-		  <button id ="randomPI" class="btn" TITLE = "Click this button to hear what a melody programmed using the first few digits of PI may sound like!"> PI song! </button>
-		  </div>
+		 	 <div class="navbar-form">
+			 <!--- to play all notes --->
+			 <button id="all" class="btn" data-step="4" data-intro="Click here to play your entire song, a note at a time." data-position="bottom"> Play </button>
+			 <!--- to stop all notes and go back to beginning--->
+			 <button id="stop" class="btn"> Stop </button>
+			 
+			 <!--<li><a id="same" href="#" data-step="5" data-intro="Click here to play all notes on the timeline simultaneously" data-position="bottom">Play All</a></li>-->
+			 
+			 <!--- to clear all notes from timeline --->
+			 <button id="clear" class="btn" data-step="6" data-intro="Click here to clear all notes from timeline" data-position="bottom">Clear All</button>
+			 
+			 <!--  to loop all unmuted tracks -->
+			 <button id ="startLoop" class="btn"> Start Looping </button>
+			 
+			 <!--- to add a track --->
+			 <button id="addTrack" class="btn"> Add Track </button>
+			 </div>
+		 </li>	 
+		 <li>
+			<div class="navbar-form">
+			  <input id="bpm-input" type="text" class="input-small" placeholder=" 120" 
+				  	 data-step="7" data-intro="Type in your preferred BPM here and click 'Set BPM'" data-position="right"/>
+			  <button id="bpm-button" class="btn" onclick=changeBPM()>Set BPM</button>
+			  
+			  <!--<button id ="pause" class="btn"> Pause </button>--->
+			  <button id ="randomPI" class="btn" TITLE = "Click this button to hear what a melody programmed using the first few digits of PI may sound like!"> PI song! </button>
+			</div>
 		 </li>
 		  
 		</ul>

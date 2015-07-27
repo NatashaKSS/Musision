@@ -259,7 +259,6 @@ var animation = new Animation();
 
 
 
-
 /*--------------------------------------------------------*/
 /*--------------------Main Functions----------------------*/
 /*--------------------------------------------------------*/
@@ -443,10 +442,9 @@ function loopAll(){
 
 // Adds a track to user composition and updates user interface
 // respectively
-function addTrack() {
+function addTrack(numTracks) {
 	var newTrack = $(".track").first().clone();
-    var currentNumOfTracks = composition.getNumTracks();
-    var currentTrackIndex = currentNumOfTracks - 1;
+    var currentTrackIndex = numTracks - 1;
    
 	/*
 	console.log("num of instruments " + currentNumOfTracks);
@@ -534,6 +532,7 @@ function generateOctaveColour(colour) {
 $(document).ready(function() {
 	function initialize() {
 		initializeTrackSettings();
+		readSaveData();
 		
 		$(".col-md-1").unbind("click").on("click", function() {
 			var noteName = $(this).attr('data-note');
@@ -577,7 +576,6 @@ $(document).ready(function() {
 		});
 		
 		$("#all").on("click", function() {
-			readSaveData();
 			playAllSequences();
 			startPlayingFrom = 0; //change back to default
 			playUntil = -1; //change back to default
@@ -606,7 +604,7 @@ $(document).ready(function() {
 		//end pause
 		
 		$("#stop").on("click", function() {
-			writeSaveData();
+			readSaveData();
 			enableLooping = false;
 			
 		    piano.stop("playing");
@@ -649,12 +647,18 @@ $(document).ready(function() {
 			//  First add a new track to our composition
 			composition.addTrack([]);
 			
-			addTrack();
+			addTrack(composition.getNumTracks());
 			
 			// Must reinitialise the sortables
 			setSortable();
 			initializeTrackSettings();
 		});
+		
+		$("#saveData").on("click", function() {
+			writeSaveData();
+			$(this).html("Saved!");
+		});
+		
         /*
 		//piano- guitar- violin
 		$(".chooseInstrument").click(function(){
@@ -720,13 +724,39 @@ $(document).ready(function() {
 	}
 	
 	function initializeTrackSettings() {
+		//to select a note to play FROM, click the note and hold the Shift key
+		//to select a note to play UNTIL, double click the note 
+		//to delete all the colors, press Stop and start all over again fresh!!!
+		$(".play-button").unbind().on("click", function() {
+			var trackNum = parseInt($(this).attr('id').substring(10));
+			var trackLength = composition.getTrack(trackNum).length;
+			console.log(startPlayingFrom);
+			console.log(playUntil);
+			if(playUntil == -1) {
+				    playUntil = trackLength - 1;
+			}
+		    
+			console.log("playUntil in play-button: " + playUntil);
+			
+			playSequence(trackNum, startPlayingFrom, playUntil);
+			startPlayingFrom = 0;//change back to default
+			playUntil = - 1;//change back to default
+			
+			//debugging
+			/*
+			console.log("check play length " + trackLength + 
+						" and start from " + composition.getTrack(trackNum)[startPlayingFrom].getPitch() + 
+						" to " + composition.getTrack(trackNum)[playUntil].getPitch());
+			*/
+		});
+		
 		$(".muteButton").unbind().on("click", function() {
 			var trackNum = parseInt($(this).prev().attr('id').substring(10));
 			
 			composition.setEnablePlaying(trackNum, !composition.isEnablePlaying(trackNum));
 			// Toggles whether a track is playing or not in composition's list of boolean values
 			// for each track
-			
+					
 			console.log("track num: " + trackNum + " can play? " + composition.isEnablePlaying(trackNum));
 			
 			if (!composition.isEnablePlaying(trackNum)) {
@@ -757,32 +787,6 @@ $(document).ready(function() {
 				});
 			}
 			
-		});
-		
-		//to select a note to play FROM, click the note and hold the Shift key
-		//to select a note to play UNTIL, double click the note 
-		//to delete all the colors, press Stop and start all over again fresh!!!
-		$(".play-button").unbind().on("click", function() {
-			var trackNum = parseInt($(this).attr('id').substring(10));
-			var trackLength = composition.getTrack(trackNum).length;
-			console.log(startPlayingFrom);
-			console.log(playUntil);
-			if(playUntil == -1) {
-				    playUntil = trackLength - 1;
-			}
-		    
-			console.log("playUntil in play-button: " + playUntil);
-			
-			playSequence(trackNum, startPlayingFrom, playUntil);
-			startPlayingFrom = 0;//change back to default
-			playUntil = - 1;//change back to default
-			
-			//debugging
-			/*
-			console.log("check play length " + trackLength + 
-						" and start from " + composition.getTrack(trackNum)[startPlayingFrom].getPitch() + 
-						" to " + composition.getTrack(trackNum)[playUntil].getPitch());
-			*/
 		});
 		
 	    $(".displayInstrument").unbind().on("click", function(){
@@ -858,20 +862,6 @@ $(document).ready(function() {
 		
 	}
 	
-	
-	/*------------------------------------------------*/
-	/*------------ Initialize EVERYTHINGG-------------*/
-	/*------------------------------------------------*/
-
-	//introJs("body").start();
-	setSortable();
-	initialize();
-	initializeTrackSettings();
-	generateOctaveColour("blue");
-	$("#show-less-view").hide();
-	
-	
-	
 	/*------------------------------------------------*/
 	/*------------- Generate dynamic grid-------------*/
 	/*------------------------------------------------*/
@@ -894,7 +884,7 @@ $(document).ready(function() {
 							  timelineHeight,
 							  timelineWidth,
 							  timelineWidth / numOfDivisions,
-							  timelineHeight - 17); //17 is scrollbarWidth(20) - timeline border widths(3)
+							  timelineHeight - 17);
 	
 	// Generate initial grid
 	grid.generateGrid(1, numOfDivisions);
@@ -904,6 +894,22 @@ $(document).ready(function() {
 		grid.resizeGrid();
 	});
 
+	
+	/*------------------------------------------------*/
+	/*------------ Initialize EVERYTHINGG-------------*/
+	/*------------------------------------------------*/
+
+	//introJs("body").start();
+
+	setSortable();
+	initialize();
+	initializeTrackSettings();
+	generateOctaveColour("blue");
+	$("#show-less-view").hide();
+	
+	
+	
+	
 	/*------------------------------------------------*/
 	/*------------ Draggables & Sortables-------------*/
 	/*------------------------------------------------*/
@@ -986,22 +992,21 @@ $(document).ready(function() {
 				},
 				
 				start: function(event, ui) {
-					
 					var startPosition = ui.item.index(); //original index
 					ui.item.data('startPos', startPosition); //create data called startPos and set it to startPosition
 					
 					trackNumInSortable = parseInt(ui.item.parent().parent().attr("id").substring(5));
-					
 				},
 				
 				// Whenever user has stopped sorting and the DOM element (HTML) has changed
 				update: function(event, ui) {
 					updateComposition();
+					
+					$("#saveData").html("Save");
 				},
 				
 				// If item is hovering over timeline
 				over: function(event, ui) {
-					
 					inBox = true;
 					inBeforeStop = false;
 					
@@ -1009,8 +1014,6 @@ $(document).ready(function() {
 						"background-color":"#109bce", // Light blue
 						"border":"none"
 					});
-					
-					
 				},
 				 
 				// If item is dragged outside timeline OR if item is dropped
@@ -1024,7 +1027,6 @@ $(document).ready(function() {
 							"border":"2px solid yellow"
 						});
 					}
-					
 				},
 				
 				// Just before releasing dragging and item is outside timeline
@@ -1106,8 +1108,6 @@ $(document).ready(function() {
 			});
 		});
 	}
-	
-	setSortable();
 	
 	// from recorder.js
 	/*
@@ -1363,6 +1363,7 @@ $(document).ready(function() {
 	// Writes user's composition to localStorage with a corresponding key. This key
 	// can be used to retrieve that user's composition saved in another session.
 	function writeSaveData() {
+		console.log("written save data");
 		try {
 			localStorage.setItem(key, JSON.stringify(composition));
 		} catch(error) {
@@ -1381,14 +1382,19 @@ $(document).ready(function() {
 		
 		var numOfTracks = composition.getNumTracks();
 		
+		// Add a track for every track in composition and populate those tracks
+		// with the user's notes
 		for (track = 0; track < numOfTracks; track++) {
 			
+			//Doesn't work yet
+			//var instrument = document.getElementById("Instrument" + track);
+			//instrument.textContent = composition.instruments[track];
+			
 			if (track >= 1) {
-				addTrack();
+				addTrack(track + 1);
 			}
 				
 			for (note = 0; note < composition.getTrack(track).length; note++) {
-				
 				composition.getTrack(track)[note] = $.extend(new Note(), composition.getTrack(track)[note]);
 				// explicitly associates noteOnTrack with Note class for every note in the composition.
 				
@@ -1412,6 +1418,7 @@ $(document).ready(function() {
 			
 		}
 		
+		// This section settles muted tracks
 		var tracksEnablePlaying = composition.enablePlaying;
 		var trackMuteButton;
 		
@@ -1437,6 +1444,7 @@ $(document).ready(function() {
 		// Reinitialise track settings and sortables for all newly made tracks
 		initializeTrackSettings();
 		setSortable();
+		console.log("read save data");
 	}
 	
 });
