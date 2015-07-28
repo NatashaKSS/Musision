@@ -614,7 +614,6 @@ $(document).ready(function() {
 		//end pause
 		
 		$("#stop").on("click", function() {
-			readSaveData();
 			enableLooping = false;
 			
 		    piano.stop("playing");
