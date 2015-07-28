@@ -572,7 +572,17 @@ $(document).ready(function() {
 			axis: "y",
 			cursor: "row-resize",
 			containment: "body",
-			handle: "#move-vertical-button"
+			handle: "#move-vertical-button",
+			start: function(event, ui) {
+				$(this).animate({
+					opacity: '0.5'
+				});
+			},
+			stop: function(event, ui) {
+				$(this).animate({
+					opacity: '1.0'
+				});
+			}
 		});
 		
 		$("#all").on("click", function() {
@@ -900,7 +910,6 @@ $(document).ready(function() {
 	/*------------------------------------------------*/
 
 	//introJs("body").start();
-
 	setSortable();
 	initialize();
 	initializeTrackSettings();
@@ -1386,14 +1395,14 @@ $(document).ready(function() {
 		// with the user's notes
 		for (track = 0; track < numOfTracks; track++) {
 			
-			//Doesn't work yet
-			//var instrument = document.getElementById("Instrument" + track);
-			//instrument.textContent = composition.instruments[track];
-			
+			// Add a track first
 			if (track >= 1) {
 				addTrack(track + 1);
 			}
-				
+			
+			// Change instruments to the right ones for each track
+			$("#Instrument" + track).html(composition.instruments[track]);
+			
 			for (note = 0; note < composition.getTrack(track).length; note++) {
 				composition.getTrack(track)[note] = $.extend(new Note(), composition.getTrack(track)[note]);
 				// explicitly associates noteOnTrack with Note class for every note in the composition.
@@ -1444,8 +1453,12 @@ $(document).ready(function() {
 		// Reinitialise track settings and sortables for all newly made tracks
 		initializeTrackSettings();
 		setSortable();
-		console.log("read save data");
+		grid.resizeGrid();
+		
 	}
+
+	readSaveData(); // Should be put last after all user 
+					// interface DOM elements have been set up
 	
 });
 
@@ -1455,9 +1468,10 @@ $(document).ready(function() {
 /*
  * How to use the below 2 functions for notes div generation:
  * Uncomment the "console.log(generateNotes);"
- * Copy n Paste the code from the console on Chrome/Firefox and paste DIRECTLY to the html.
+ * Copy n Paste the generate string of divs from the console on Chrome/Firefox 
+ * and paste DIRECTLY to the correct place in index.html.
  * This is to speed up page load ups - it improves performance.
- * 
+ *
 // Generate notes divs
 function generateNotes() {
 	var allNotesDivs = "";
@@ -1465,6 +1479,7 @@ function generateNotes() {
 	var octaveClassName = "octave-holder";
 	var numOfOctaves = 6;
 	var numOfNotesInOctave = 12;
+	var restDiv = "<div style='font-size: 20px;' class='col-md-1' data-note='silence'>Rest</div>";
 	
 	for (octaveNum = 0; octaveNum < numOfOctaves; octaveNum++) {
 		
@@ -1477,7 +1492,7 @@ function generateNotes() {
 			allNotesDivs += generateNotesDivs(noteIndex, notes[noteIndex]);
 		}
 		
-		result += allNotesDivs + "</div>";
+		result += allNotesDivs + restDiv + "</div>";
 		
 	}
 	
@@ -1490,9 +1505,8 @@ function generateNotesDivs(dataNote, noteName) {
 	return result;
 }
 
-//console.log(generateNotes());
- * */
-
+console.log(generateNotes());
+*/
 
 /*
 ------------------------------------

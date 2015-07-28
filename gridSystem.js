@@ -54,24 +54,18 @@ GridSystem.prototype.generateGrid = function(numRows, numCols) {
 // resolutions
 GridSystem.prototype.resizeGrid = function() {
 	this.timelinePosTop = $(".timeline").position().top;
-	//console.log("timeline top: " + this.timelinePosTop);
 	
 	this.timelinePosLeft = $(".timeline").position().left;
-	//console.log("timeline left: " + this.timelinePosLeft);
 	
 	this.timelineHeight = $(".timeline").height() + 
 					 	  parseInt($(".timeline").css("border-top-width")) + 
 					 	  parseInt($(".timeline").css("border-bottom-width"));
-	//console.log("timeline height: " + this.timelineHeight);
 	
 	this.timelineWidth = $(".timeline").width();
-	//console.log("timeline width: " + this.timelineWidth);
 	
 	this.noteWidth = (this.timelineWidth/this.numOfDivisions);
-	//console.log("note width: " + this.noteWidth);
 	
 	this.noteHeight = this.timelineHeight - 17; //17 is scrollbarWidth(20) - timeline border widths(3)
-	//console.log("note height: " + this.noteHeight);
 	
 	$(".sortable-system").css({
 		"height": this.timelineHeight,
@@ -89,7 +83,6 @@ GridSystem.prototype.resizeGrid = function() {
 		"width": this.noteWidth,
 	});
 	
-	//console.log("--End resize--");
 }
 
 
