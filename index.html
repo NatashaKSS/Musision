@@ -39,46 +39,64 @@
 </head>
 
 <body>
-	<nav class="navbar navbar-inverse" data-step="8" data-intro="Alright, you're all set! Click me into oblivion!" data-position="bottom">
+	<nav class="navbar navbar-inverse" data-step="15" data-intro="Alright, you're all set to make your own music! 
+	 Click me into oblivion!" data-position="bottom">
 	 <div class="container-fluid">
 	  <div class="navbar-header">
 		<a class="navbar-brand"
-		   data-step="1" data-intro="Hi! Welcome to Musision! Feel free to compose your own music! But before that, 
-		   let's give you a tour of Musision. You can click anywhere to skip this tutorial too." data-position="right">Musision</a>
+		   data-step="1" data-intro="Hi! Welcome to Musision, where you can be free to compose your own music! 
+		   Let's go on a tour of Musision, but you can click anywhere to skip this tutorial too." data-position="right">
+		   Musision
+		</a>
 	  </div>
 	  <div>
 		<ul class="nav navbar-nav" style="display:inline;">
 		 <!--- To download composition --->
-		 <li><a id="download">Download</a></li>
-		 <li><a id="saveData">Save</a></li>
+		 <!-- <li><a id="download">Download</a></li> -->
+		 <li><a id="saveData" data-step="14" data-intro="Click here to save your entire composition. You can come back 
+		 	  and you'll continue from where you left off in your previous session. To delete your save data, delete your 
+		 	  browser's cookies and cached data." data-position="bottom">Save</a></li>
 		 
 		 <li>
-		 	 <div class="navbar-form">
+		 	 <div class="navbar-form" 
+		 	  data-step="6" data-intro="Here, you can find your composition's settings." data-position="bottom">
+			 
 			 <!--- to play all notes --->
-			 <button id="all" class="btn" data-step="4" data-intro="Click here to play your entire song, a note at a time." data-position="bottom"> Play </button>
+			 <button id="all" class="btn" data-step="7" data-intro="Click here to play your entire song - 
+			  all the tracks you've made and all the notes you've arranged." data-position="right"> Play </button>
+			 
 			 <!--- to stop all notes and go back to beginning--->
-			 <button id="stop" class="btn"> Stop </button>
+			 <button id="stop" class="btn" data-step="8" data-intro="Click here to stop playing everything." data-position="right"> Stop </button>
 			 
 			 <!--<li><a id="same" href="#" data-step="5" data-intro="Click here to play all notes on the timeline simultaneously" data-position="bottom">Play All</a></li>-->
 			 
-			 <!--- to clear all notes from timeline --->
-			 <button id="clear" class="btn" data-step="6" data-intro="Click here to clear all notes from timeline" data-position="bottom">Clear All</button>
-			 
 			 <!--  to loop all unmuted tracks -->
-			 <button id ="startLoop" class="btn"> Start Looping </button>
+			 <button id ="startLoop" class="btn" 
+			  data-step="9" data-intro="Click here to loop your entire composition. Loop a selection of notes by shift-clicking 
+			  on the starting note and double-clicking on the note you want to loop to." data-position="right"> Start Looping </button>
 			 
 			 <!--- to add a track --->
-			 <button id="addTrack" class="btn"> Add Track </button>
+			 <button id="addTrack" class="btn" data-step="10" data-intro="Click here to add a track to your composition."
+			  data-position="right"> Add Track </button>
+			 
+			 <!--- to clear all notes from timeline --->
+			 <button id="clear" class="btn" data-step="11" data-intro="Click here to clear all notes from 
+			  all of your tracks." data-position="right">Clear All</button>
+			 
 			 </div>
 		 </li>	 
 		 <li>
 			<div class="navbar-form">
 			  <input id="bpm-input" type="text" class="input-small" placeholder=" 120" 
-				  	 data-step="7" data-intro="Type in your preferred BPM here and click 'Set BPM'" data-position="right"/>
+				  	 data-step="12" data-intro="Type in your preferred BPM here and click on 'Set BPM' to change 
+				  	 your composition's beats per minute." data-position="right">
 			  <button id="bpm-button" class="btn" onclick=changeBPM()>Set BPM</button>
 			  
 			  <!--<button id ="pause" class="btn"> Pause </button>--->
-			  <button id ="randomPI" class="btn" TITLE = "Click this button to hear what a melody programmed using the first few digits of PI may sound like!"> PI song! </button>
+			  <button id ="randomPI" class="btn" TITLE = "Click this button to hear what a melody programmed using 
+			   the first few digits of PI may sound like!" 
+			   data-step="13" data-intro="Click this button to hear what a melody programmed using the 
+			   first few digits of PI may sound like!" data-position="right"> PI song! </button>
 			</div>
 		 </li>
 		  
@@ -92,7 +110,8 @@
 	 
 	 <div class="track">
 	  
-	  <div class="track-settings">
+	  <div class="track-settings" data-step="3" data-intro="Here's where you can play, 
+	   mute or change the instrument of your music track." data-position="right">
 	    <div id="play-track0" class="glyphicon glyphicon-play play-button">
 	    
 	    </div>
@@ -113,7 +132,8 @@
 	    <!---</div>--->
 	  </div>
 	  
-	  <div id="track0" class="timeline" data-step="3" data-intro="Drag any note here and start composing!" data-position="bottom">
+	  <div id="track0" class="timeline" data-step="2" data-intro="Drag any note here to start composing! 
+	   To remove a note, drag it out of here." data-position="bottom">
 	   
 	    <div class="grid-system">
 	  
@@ -136,15 +156,19 @@
 	<div id="buttons" class="">
 	 <div class="toolbar-left">
 	  
+	  <!-- Notes left sidebar -->
 	  <div id="move-vertical-button" class="toolbar-button"> 
-	   <span class="glyphicon glyphicon-resize-vertical"></span>
+	   <span class="glyphicon glyphicon-resize-vertical" data-step="4" 
+	    data-intro="You can drag this entire notes-frame around too." data-position="right"></span>
 	  </div>
-	  <div id="show-button" class="toolbar-button">
+	  <div id="show-button" class="toolbar-button" 
+	   data-step="5" data-intro="If you don't like the clutter of all the octaves you see in this view, 
+	   you can always change the view by clicking here!" data-position="right">
 	   View
 	  </div>
 	 </div>
-	 <!--  <div id="rest" class="col-md-1" data-note="silence" >Rest</div> 
-	 -->
+	 
+	 <!--  Show more show less views -->
 	 <div id="show-more-view" class="notes-buttons-holder">
 	  <!-- All the buttons will go here i.e. generateNotesDiv function output-->
 	  <div class='octave-holder'><div class="col-md-1" data-note=0>C2</div><div class="col-md-1" data-note=1>C#2</div><div class="col-md-1" data-note=2>D2</div><div class="col-md-1" data-note=3>D#2</div><div class="col-md-1" data-note=4>E2</div><div class="col-md-1" data-note=5>F2</div><div class="col-md-1" data-note=6>F#2</div><div class="col-md-1" data-note=7>G2</div><div class="col-md-1" data-note=8>G#2</div><div class="col-md-1" data-note=9>A2</div><div class="col-md-1" data-note=10>A#2</div><div class="col-md-1" data-note=11>B2</div><div style='font-size: 20px;' class='col-md-1' data-note='silence'>Rest</div></div><div class='octave-holder'><div class="col-md-1" data-note=12>C3</div><div class="col-md-1" data-note=13>C#3</div><div class="col-md-1" data-note=14>D3</div><div class="col-md-1" data-note=15>D#3</div><div class="col-md-1" data-note=16>E3</div><div class="col-md-1" data-note=17>F3</div><div class="col-md-1" data-note=18>F#3</div><div class="col-md-1" data-note=19>G3</div><div class="col-md-1" data-note=20>G#3</div><div class="col-md-1" data-note=21>A3</div><div class="col-md-1" data-note=22>A#3</div><div class="col-md-1" data-note=23>B3</div><div style='font-size: 20px;' class='col-md-1' data-note='silence'>Rest</div></div><div class='octave-holder'><div class="col-md-1" data-note=24>C4</div><div class="col-md-1" data-note=25>C#4</div><div class="col-md-1" data-note=26>D4</div><div class="col-md-1" data-note=27>D#4</div><div class="col-md-1" data-note=28>E4</div><div class="col-md-1" data-note=29>F4</div><div class="col-md-1" data-note=30>F#4</div><div class="col-md-1" data-note=31>G4</div><div class="col-md-1" data-note=32>G#4</div><div class="col-md-1" data-note=33>A4</div><div class="col-md-1" data-note=34>A#4</div><div class="col-md-1" data-note=35>B4</div><div style='font-size: 20px;' class='col-md-1' data-note='silence'>Rest</div></div><div class='octave-holder'><div class="col-md-1" data-note=36>C5</div><div class="col-md-1" data-note=37>C#5</div><div class="col-md-1" data-note=38>D5</div><div class="col-md-1" data-note=39>D#5</div><div class="col-md-1" data-note=40>E5</div><div class="col-md-1" data-note=41>F5</div><div class="col-md-1" data-note=42>F#5</div><div class="col-md-1" data-note=43>G5</div><div class="col-md-1" data-note=44>G#5</div><div class="col-md-1" data-note=45>A5</div><div class="col-md-1" data-note=46>A#5</div><div class="col-md-1" data-note=47>B5</div><div style='font-size: 20px;' class='col-md-1' data-note='silence'>Rest</div></div><div class='octave-holder'><div class="col-md-1" data-note=48>C6</div><div class="col-md-1" data-note=49>C#6</div><div class="col-md-1" data-note=50>D6</div><div class="col-md-1" data-note=51>D#6</div><div class="col-md-1" data-note=52>E6</div><div class="col-md-1" data-note=53>F6</div><div class="col-md-1" data-note=54>F#6</div><div class="col-md-1" data-note=55>G6</div><div class="col-md-1" data-note=56>G#6</div><div class="col-md-1" data-note=57>A6</div><div class="col-md-1" data-note=58>A#6</div><div class="col-md-1" data-note=59>B6</div><div style='font-size: 20px;' class='col-md-1' data-note='silence'>Rest</div></div><div class='octave-holder'><div class="col-md-1" data-note=60>C7</div><div class="col-md-1" data-note=61>C#7</div><div class="col-md-1" data-note=62>D7</div><div class="col-md-1" data-note=63>D#7</div><div class="col-md-1" data-note=64>E7</div><div class="col-md-1" data-note=65>F7</div><div class="col-md-1" data-note=66>F#7</div><div class="col-md-1" data-note=67>G7</div><div class="col-md-1" data-note=68>G#7</div><div class="col-md-1" data-note=69>A7</div><div class="col-md-1" data-note=70>A#7</div><div class="col-md-1" data-note=71>B7</div><div style='font-size: 20px;' class='col-md-1' data-note='silence'>Rest</div></div>
@@ -155,8 +179,7 @@
 	  
 	  <div class="octave-dropdown"> Octave
 	   <div class="dropdown">
-	    <button id="dropdown-selection" class="dropdown-toggle" type="button" data-toggle="dropdown">
-	    2<span class="caret"></span>
+	    <button id="dropdown-selection" class="dropdown-toggle" type="button" data-toggle="dropdown">2<span class="caret"></span>
 	    </button>
 	    <ul id="octave-num" class="dropdown-menu" role="menu">
 	     <li data-index="0" role="presentation"><a role="menuitem">3</a></li>

@@ -907,8 +907,12 @@ $(document).ready(function() {
 	/*------------------------------------------------*/
 	/*------------ Initialize EVERYTHINGG-------------*/
 	/*------------------------------------------------*/
-
-	//introJs("body").start();
+	
+	// If the user has saved a composition before, let's not 
+	// burden them with the tutorial again
+	if (localStorage.getItem("userComposition") == null) {
+		introJs("body").start();
+	}
 	setSortable();
 	initialize();
 	initializeTrackSettings();
@@ -1410,9 +1414,15 @@ $(document).ready(function() {
 				// reference to the new note object
 				
 				var notePitch = noteOnTrack.getPitch();
+				var noteOpacity = 1.0;
+				
+				if (notePitch == "silence") {
+					notePitch = "Rest";
+					noteOpacity = 0.5;
+				}
 				
 				var noteHTML = "<div class data-note='" + notes.indexOf(notePitch) + 
-							   "' style='opacity: 1; display: inline-block; width: 39.0625px; " +
+							   "' style='opacity: " + noteOpacity + "; display: inline-block; width: 39.0625px; " +
 							   "height: 61px; z-index: 0; border: none; padding-top: 15px; " +
 							   "border-radius: 1em; vertical-align: top; text-align: center; " +
 							   "font-size: 20px; color: rgb(255, 255, 255); " +

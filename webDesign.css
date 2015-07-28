@@ -41,6 +41,10 @@ a {
 
 /* Contains user workspace, timeline and everything else 
    below top navbar */
+.track {
+	margin-bottom: 25px;	
+}
+
 .track-settings {
 	position: absolute;
 	height: 80px;
