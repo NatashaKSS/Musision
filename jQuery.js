@@ -26,6 +26,7 @@ var notes = ["C2","C#2","D2","D#2","E2","F2","F#2","G2","G#2","A2","A#2","B2",
 var beatDuration = 0.3;//Default duration of 1 beat
 var enableLooping = false;
 var loopId = 0;
+var animationLoopId = 0;
 var startPlayingFrom = 0;
 var playUntil = -1;
 var pi = Math.PI;
@@ -185,6 +186,7 @@ Animation.prototype.playAnimation = function(duration, wholeDuration, startIndex
 		} else {
 			//this.elementsAnimated = $(trackID + ".sortable-system div:gt(" + (startIndex - 1) + ")");
 			this.elementsAnimated = $(trackID + ".sortable-system div").slice(startIndex, endIndex + 1);
+			console.log("Debugging animation " + "start at " + startIndex + " end at " + endIndex );
 		}
 		
 		// Change each div's colour as note plays
@@ -199,16 +201,17 @@ Animation.prototype.playAnimation = function(duration, wholeDuration, startIndex
 				});
 			}, duration + offset);
 			 
-			this.revertAnimationOngoing = setTimeout(function () {
+			
+				 
+			offset += duration;
+			
+		});
+		this.revertAnimationOngoing = setTimeout(function () {
 		        $(".sortable-system div").css({ 
 		        	"background-color": "#109bce",
 		        	
 		        });
 		    }, wholeDuration);
-				 
-			offset += duration;
-			
-		});
 		
 	});
 	
@@ -227,34 +230,12 @@ Animation.prototype.stopAnimation = function() {
 		"border": "none"
 	});
 }
-/*
-
-////To pause and play again 
-function Timer(func, delay) {
-    this.func = func;
-    this.timerId = setTimeout(func, delay); 
-    this.start = new Date(); 
-	this.remaining = delay;
-}
-
- Timer.prototype.pause = function() {
-    clearTimeout(this.timerId);
-    this.remaining -= new Date() - this.start;
-	console.log("time left " + this.remaining);
-}
-
- Timer.prototype.resume = function() {
-    clearTimeout(this.timerId);
-    this.start = new Date();
-    this.timerId = setTimeout(this.func, this.remaining);
-}
-*/
 
 /*------------------------------------------------*/
 /*------------ Initialize Objects-----------------*/
 /*------------------------------------------------*/
 
-var composition = new Composition([]);
+var composition = new Composition([[]]);
 var animation = new Animation();
 
 
@@ -291,7 +272,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
     console.log("play Until " + playUntil);
     // Whether this track (with the trackNumber) has enabled playing or not
     if(composition.isEnablePlaying(trackNumber)){
-    	animation.playAnimation(noteDuration, wholeDuration, startIndex, Math.min(endIndex, playUntil), trackNumber);
+    	animation.playAnimation(noteDuration, wholeDuration, startIndex, endIndex, trackNumber);
 		console.log("start " + startIndex);
 		console.log("end " + endIndex);
         console.log("length " + (endIndex - startIndex + 1));
@@ -356,7 +337,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
 
 function findMaxLength(){
     var max = 0;
-	var numOfTracks = composition.getAllTracks().length;
+	var numOfTracks = composition.getNumTracks();
 	
 	for(counter = 0; counter < numOfTracks; counter++){
 	    if(composition.getTrack(counter).length >= max){
@@ -376,15 +357,14 @@ function playAllSequences() {
 	    playUntil = findMaxLength() - 1;
 	}
 	
-	var numOfTracks = composition.getAllTracks().length;
-	
-	for (counter = 0; counter < numOfTracks; counter++) {
+	for (counter = 0; counter < composition.getNumTracks(); counter++) {
 	
 	    var tempEnd = Math.min(composition.getTrack(counter).length - 1, playUntil);
 		console.log('tempEnd at ' + tempEnd + "for track " + counter);
 		
 		if(tempEnd > -1) {
 		    playSequence(counter, startPlayingFrom, tempEnd);
+			
 		}
 	}
 }
@@ -418,6 +398,18 @@ function clearAllSound(){
 	
 }
 
+
+
+function animateAll(){
+console.log("HEY!!!!!!!!!!!!!!!!!!!!!!!!!!!" + "numOfTracks= " + composition.getNumTracks());
+    for(trackIndx = 0; trackIndx < composition.getNumTracks(); trackIndx++){
+	console.log("ENABLEPLAYING " + composition.isEnablePlaying(trackIndx));
+       if(composition.isEnablePlaying(trackIndx)){
+	        animation.playAnimation(beatDuration * 1000, beatDuration * (playUntil - startPlayingFrom + 1) * 1000, startPlayingFrom, playUntil, trackIndx);
+	    }
+	}
+}
+
 function loopAll(){
 	if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
     	enableLooping = true;
@@ -425,14 +417,20 @@ function loopAll(){
 		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
 	
 		playAllSequences();
+		//console.log("from " + startPlayingFrom + " to " + playUntil);
+		animateAll();
 		loopId = setInterval("playAllSequences()", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);  
+		animationLoopId= setInterval("animateAll()", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);
+		console.log("loopId" + loopId);
+		console.log("animationLoopId" + loopId);
  		
 	} else {//if we want to stop
 	
 	    enableLooping = false;
 	    document.getElementById("startLoop").value = "Start Looping";
 		document.getElementById("startLoop").innerHTML = "Start Looping";
-	    clearInterval(loopId);		
+	    clearInterval(loopId);
+        clearInterval(animationLoopId);		
 		
 		startPlayingFrom = 0;//change back to default
 	    playUntil = -1;//change back to default
@@ -446,12 +444,6 @@ function addTrack(numTracks) {
 	var newTrack = $(".track").first().clone();
     var currentTrackIndex = numTracks - 1;
    
-	/*
-	console.log("num of instruments " + currentNumOfTracks);
-	for(count = 0; count < instruments.length; count++){
-	    console.log(instruments[count] + " ");
-	}
-	*/
     
 	// For play button
 	newTrack.children().eq(0).children().attr('id', "play-track" + currentTrackIndex);
@@ -468,12 +460,6 @@ function addTrack(numTracks) {
 	newTrack.appendTo("#timeline-system");
 	$("#track" + currentTrackIndex + " .sortable-system div").remove();
 	
-	
-	/*	//debugging
-		$(".chooseInstrument").each(function(){
-	        console.log("id " + $(this).attr('id'));
-		});
-	*/
 }
 
 
@@ -591,27 +577,7 @@ $(document).ready(function() {
 			playUntil = -1; //change back to default
 		});
 		
-	  /*  
-		//pause is not working properly
-		$("#pause").on("click", function(){
-		    if(document.getElementById("pause").value == "Pause"){//if currently playing and pause is clicked, enablePlaying = true, pause = true
-		    document.getElementById("pause").value = "Resume";
-			document.getElementById("pause").innerHTML = "Resume";
-			enablePlaying = true;
-			pause = true;
-			//console.log("PAUSE NOW!!!!");
-			//playingMusic.pause();
-			} else {//want to resume
-			document.getElementById("pause").value = "Pause";
-			document.getElementById("pause").innerHTML = "Pause";
-			enablePlaying = false;
-			pause = false;
-			//console.log("CONTINUE!!!!");
-		    //playingMusic.resume();	
-			}
-		});
-		*/
-		//end pause
+	  
 		
 		$("#stop").on("click", function() {
 			enableLooping = false;
@@ -629,6 +595,7 @@ $(document).ready(function() {
 		    	document.getElementById("startLoop").value = "Start Looping";
 			    document.getElementById("startLoop").innerHTML = "Start Looping";
 		        clearInterval(loopId);
+				clearInterval(animationLoopId);
 			
 		});
 		
@@ -644,6 +611,7 @@ $(document).ready(function() {
 			    document.getElementById("startLoop").value = "Start Looping";
 			    document.getElementById("startLoop").innerHTML = "Start Looping";
 		        clearInterval(loopId);
+				clearInterval(animationLoopId);
 			
 		});
 		
@@ -668,27 +636,7 @@ $(document).ready(function() {
 			$(this).html("Saved!");
 		});
 		
-        /*
-		//piano- guitar- violin
-		$(".chooseInstrument").click(function(){
-		    var trackNum = parseInt($(this).attr('id').substring(10));
-		   	
-				$(".chooseInstrument").each(function(){
-				    var self = $(this);
-		         console.log("check inside chooseInstrument " + $(self).attr('id'));
-				 });
-				 
-		            console.log("after check, in choose inst " + $(this).attr('id'));
-			        var currIndex = allInstruments.indexOf($(this).value);
-			        var nextInstrument = allInstruments[(currIndex + 1) % allInstruments.length];
-		
-			        instruments[trackNum] = nextInstrument;
-			        $(this).value = nextInstrument;
-			        $(this).innerHTML = nextInstrument;
-          
-		        
-		 });   
-		*/	   
+     
 
 		// Selecting the octaves for show less view
 		$("#octave-num li a").on("click", function() {
@@ -736,6 +684,7 @@ $(document).ready(function() {
 		//to select a note to play FROM, click the note and hold the Shift key
 		//to select a note to play UNTIL, double click the note 
 		//to delete all the colors, press Stop and start all over again fresh!!!
+		
 		$(".play-button").unbind().on("click", function() {
 			var trackNum = parseInt($(this).attr('id').substring(10));
 			var trackLength = composition.getTrack(trackNum).length;
@@ -751,12 +700,7 @@ $(document).ready(function() {
 			startPlayingFrom = 0;//change back to default
 			playUntil = - 1;//change back to default
 			
-			//debugging
-			/*
-			console.log("check play length " + trackLength + 
-						" and start from " + composition.getTrack(trackNum)[startPlayingFrom].getPitch() + 
-						" to " + composition.getTrack(trackNum)[playUntil].getPitch());
-			*/
+			
 		});
 		
 		$(".muteButton").unbind().on("click", function() {
@@ -810,31 +754,8 @@ $(document).ready(function() {
 			console.log("nextInstrumentIndex " + nextInstrument);
 		    composition.setInstrument(trackNum, nextInstrument);
 		    instrument.textContent = nextInstrument;
-		    instrument.textContent = nextInstrument;
       
 	    });
-		/*
-		    $(".displayInstrument").unbind().hover(function(event){
-			    console.log("YAHA!");
-				var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
-			    $("#timeline-system").children().eq(trackNum).find(".instrumentMenu").stop().animate({
-				height: event.type=="mouseenter" ? 50: 0,
-				//fontSize: event.type=="mouseenter" ? "15px": 0
-			}, 100);
-			});
-		*/
-		
-		/*
-		    $(".track-settings ul.instrumentMenu li a").unbind().on("click", function(){
-			    console.log($(this).attr('id'));
-				var trackNum = parseInt($(this).parent().prev().prev().attr('id').substring(10));
-				$("#timeline-system").children().eq(trackNum).find(".displayInstrument").value = $(this).attr('id');
-			    $("#timeline-system").children().eq(trackNum).find(".displayInstrument").innerHTML = $(this).attr('id');
-                instruments[trackNum] = $(this).attr('id');				
-				//});
-		    });
-		
-		*/
 		
 		$(".close-panel").unbind().hover(function(event) {
 			// Controls the animation of close track button
@@ -913,6 +834,7 @@ $(document).ready(function() {
 	if (localStorage.getItem("userComposition") == null) {
 		introJs("body").start();
 	}
+	
 	setSortable();
 	initialize();
 	initializeTrackSettings();
@@ -1137,18 +1059,18 @@ $(document).ready(function() {
 	
 	*/
 	//https://truongtx.me/2014/08/09/record-and-export-audio-video-files-in-browser-using-web-audio-api/
-	$("#download").on("click", function(){
-        
-	    var navigator = window.navigator;
-        navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+ var navigator = window.navigator;
+ navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
 
-        var Context = window.AudioContext || window.webkitAudioContext;
-        var context = new Context();
+ var Context = window.AudioContext || window.webkitAudioContext;
+ var context = new Context();
     	
-		// we need these variables for later use with the stop function
-        var mediaStream;
-        var rec;
-      
+// we need these variables for later use with the stop function
+ var mediaStream;
+ var rec;	
+	
+	$("#saveData").on("click", function(){
+        
 		//for the playing, recording and saving of the file
 		record();		
         setTimeout(function(){
@@ -1183,16 +1105,17 @@ $(document).ready(function() {
 		
 		function stop(){
 		    mediaStream.stop();//mediaStream is undefined =(
-
+            console.log("media stopped");
         // stop Recorder.js
             rec.stop();
-		}
-		
-		// export it to WAV
-        rec.exportWAV(function(e){//rec is undefined =(
+			console.log("recording stopped");
+            rec.exportWAV(function(e){//rec is undefined =(
             rec.clear();
-            Recorder.forceDownload(e, "filename.wav");
+            Recorder.forceDownload(e, "musision.wav");
+			console.log("Downloading");
         });	
+		
+		}
    });	
 /*	
 	
@@ -1473,7 +1396,99 @@ $(document).ready(function() {
 
 
 
+//ABORTED CODES
 
+   /*
+		//piano- guitar- violin
+		$(".chooseInstrument").click(function(){
+		    var trackNum = parseInt($(this).attr('id').substring(10));
+		   	
+				$(".chooseInstrument").each(function(){
+				    var self = $(this);
+		         console.log("check inside chooseInstrument " + $(self).attr('id'));
+				 });
+				 
+		            console.log("after check, in choose inst " + $(this).attr('id'));
+			        var currIndex = allInstruments.indexOf($(this).value);
+			        var nextInstrument = allInstruments[(currIndex + 1) % allInstruments.length];
+		
+			        instruments[trackNum] = nextInstrument;
+			        $(this).value = nextInstrument;
+			        $(this).innerHTML = nextInstrument;
+          
+		        
+		 });   
+		*/	   
+
+/*
+
+////To pause and play again 
+function Timer(func, delay) {
+    this.func = func;
+    this.timerId = setTimeout(func, delay); 
+    this.start = new Date(); 
+	this.remaining = delay;
+}
+
+ Timer.prototype.pause = function() {
+    clearTimeout(this.timerId);
+    this.remaining -= new Date() - this.start;
+	console.log("time left " + this.remaining);
+}
+
+ Timer.prototype.resume = function() {
+    clearTimeout(this.timerId);
+    this.start = new Date();
+    this.timerId = setTimeout(this.func, this.remaining);
+}
+*/
+
+
+/*
+		    $(".displayInstrument").unbind().hover(function(event){
+			    console.log("YAHA!");
+				var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
+			    $("#timeline-system").children().eq(trackNum).find(".instrumentMenu").stop().animate({
+				height: event.type=="mouseenter" ? 50: 0,
+				//fontSize: event.type=="mouseenter" ? "15px": 0
+			}, 100);
+			});
+		*/
+		
+		/*
+		    $(".track-settings ul.instrumentMenu li a").unbind().on("click", function(){
+			    console.log($(this).attr('id'));
+				var trackNum = parseInt($(this).parent().prev().prev().attr('id').substring(10));
+				$("#timeline-system").children().eq(trackNum).find(".displayInstrument").value = $(this).attr('id');
+			    $("#timeline-system").children().eq(trackNum).find(".displayInstrument").innerHTML = $(this).attr('id');
+                instruments[trackNum] = $(this).attr('id');				
+				//});
+		    });
+		
+		*/
+		
+
+/*  
+		//pause is not working properly
+		$("#pause").on("click", function(){
+		    if(document.getElementById("pause").value == "Pause"){//if currently playing and pause is clicked, enablePlaying = true, pause = true
+		    document.getElementById("pause").value = "Resume";
+			document.getElementById("pause").innerHTML = "Resume";
+			enablePlaying = true;
+			pause = true;
+			//console.log("PAUSE NOW!!!!");
+			//playingMusic.pause();
+			} else {//want to resume
+			document.getElementById("pause").value = "Pause";
+			document.getElementById("pause").innerHTML = "Pause";
+			enablePlaying = false;
+			pause = false;
+			//console.log("CONTINUE!!!!");
+		    //playingMusic.resume();	
+			}
+		});
+		*/
+		//end pause
 /*
  * How to use the below 2 functions for notes div generation:
  * Uncomment the "console.log(generateNotes);"
