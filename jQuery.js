@@ -11,9 +11,9 @@
    "C9","C#9","D9","D#9","E9","F9","F#9","G9","G#9","A9","A#9","B9",
    "C10","C#10","D10","D#10","E10","F10","F#10","G10"*/
 
-var notes = ["C2","C#2","D2","D#2","E2","F2","F#2","G2","G#2","A2","A#2","B2",
-             "C3","C#3","D3","D#3","E3","F3","F#3","G3","G#3","A3","A#3","B3",
-             "C4","C#4","D4","D#4","E4","F4","F#4","G4","G#4","A4","A#4","B4",
+var notes = ["C2","C#2","D2","D#2","E2","F2","F#2","G2","G#2","A2","A#2","B2",  //c2 is 36
+             "C3","C#3","D3","D#3","E3","F3","F#3","G3","G#3","A3","A#3","B3",  //c3 is 48
+             "C4","C#4","D4","D#4","E4","F4","F#4","G4","G#4","A4","A#4","B4",  //c4 is 60
              "C5","C#5","D5","D#5","E5","F5","F#5","G5","G#5","A5","A#5","B5",
              "C6","C#6","D6","D#6","E6","F6","F#6","G6","G#6","A6","A#6","B6",
              "C7","C#7","D7","D#7","E7","F7","F#7","G7","G#7","A7","A#7","B7"];
@@ -668,7 +668,7 @@ $(document).ready(function() {
 			var notesInCurrentOctave = $(".octave-holder-less .col-md-1");
 			
 			for (noteIndex = 0; noteIndex < 12; noteIndex++) {
-				notesInCurrentOctave.eq(noteIndex).attr('data-note', noteIndex + (octaveNum - 2) * 12);
+				notesInCurrentOctave.eq(noteIndex).attr('data-note', noteIndex + (octaveNum - 2) * 12);//C3= 12?
 			}
 			
 		});
@@ -984,7 +984,7 @@ $(document).ready(function() {
 					updateTimelineNotes();
 					
 					if(ui.item.attr('data-note') != "silence"){
-			      		var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note')) - 12]);
+			      		var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note'))]);
 						composition.addNote(trackNumInSortable, insertedNote);
 						
 					} else {
@@ -1042,9 +1042,122 @@ $(document).ready(function() {
 			});
 		});
 	}
+//https://truongtx.me/2014/08/09/record-and-export-audio-video-files-in-browser-using-web-audio-api/	
+	var navigator = window.navigator;
+    
+	navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+
+    var Context = window.AudioContext || window.webkitAudioContext;
+    
+	var context = new Context();
+   //	$("#saveData").on("click", function(){
+	     // we need these variables for later use with the stop function
+    var mediaStream;
+    var rec;
+
+    function record() {
+     // ask for permission and start recording
+      navigator.getUserMedia({audio: true}, function(localMediaStream){
+       mediaStream = localMediaStream;
+
+    // create a stream source to pass to Recorder.js
+       var mediaStreamSource = context.createMediaStreamSource(localMediaStream);
+
+    // create new instance of Recorder.js using the mediaStreamSource
+       rec = new Recorder(mediaStreamSource, {
+      // pass the path to recorderWorker.js file here
+        workerPath: 'Recorderjs/recorderWorker.js'
+       });
+
+    // start recording
+        rec.record();
+		playAllSequences();
+		
+      }, function(err){
+           console.log('Browser not supported');
+        });
+   }
+
+
+    function stop() {
+       // stop the media stream
+       mediaStream.stop();
+
+       // stop Recorder.js
+       rec.stop();
+
+       // export it to WAV
+       rec.exportWAV(function(e){
+       rec.clear();
+       Recorder.forceDownload(e, "musision.wav");
+       });
+    }	
+//});
 	
-	// from recorder.js
+	
+	
+	
 	/*
+	$("#saveData").on("click", function(){
+	    var audio_context;
+
+        function __log(e, data) {
+          log.innerHTML += "\n" + e + " " + (data || '');
+        }
+
+        $(function() {
+
+            try {
+            // webkit shim
+                window.AudioContext = WINDOW.AudioContext || window.webkitAudioContext;
+                navigator.getUserMedia = ( navigator.getUserMedia ||
+                     navigator.webkitGetUserMedia ||
+                     navigator.mozGetUserMedia ||
+                     navigator.msGetUserMedia);
+                window.URL = window.URL || window.webkitURL;
+
+            var audio_context = new AudioContext;
+            __log('Audio context set up.');
+            __log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not  present!'));
+           } catch (e) {
+                alert('No web audio support in this browser!');
+           }
+
+        $('.recorder .start').on( 'CLICK', function() {
+            $this = $(this);
+            $recorder = $this.parent();
+
+            navigator.getUserMedia({audio: true}, function( STREAM) {
+            var recorderObject = new MP3Recorder(audio_context, STREAM, { statusContainer:  $recorder.find('.status'), statusMethod: 'replace' });
+            $recorder.data('recorderObject', recorderObject);
+
+            recorderObject.start();
+            }, function(e) { });
+        });
+
+        $('.recorder .stop').on( 'CLICK', function() {
+            $this = $(this);
+            $recorder = $this.parent();
+        
+            recorderObject = $recorder.data('recorderObject');
+            recorderObject.stop();
+        
+            recorderObject.exportMP3(function(base64_mp3_data) {
+                var url = 'data:audio/mp3;base64,' + base64_mp3_data;
+                var au  = document.createElement('audio');
+                au.controls = true;
+                au.src = url;
+                $recorder.append(au);
+          
+            recorderObject.logStatus('');
+            });
+
+        });
+
+    });
+});	
+	// from recorder.js
+
 	
 	var mixerTrack = new Wad.Poly({
             recConfig : { // The Recorder configuration object. The only required property is 'workerPath'.
@@ -1058,66 +1171,10 @@ $(document).ready(function() {
         mixerTrack.rec.exportWAV();      
 	
 	*/
-	//https://truongtx.me/2014/08/09/record-and-export-audio-video-files-in-browser-using-web-audio-api/
- var navigator = window.navigator;
- navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
-
- var Context = window.AudioContext || window.webkitAudioContext;
- var context = new Context();
-    	
-// we need these variables for later use with the stop function
- var mediaStream;
- var rec;	
+	/*
 	
-	$("#saveData").on("click", function(){
-        
-		//for the playing, recording and saving of the file
-		record();		
-        setTimeout(function(){
-		     stop();
-		}, findMaxLength() * beatDuration * 1000);
-		
-       
-        function record() {
-            // ask for permission and start recording
-            navigator.getUserMedia({audio: true}, function(localMediaStream){
-            mediaStream = localMediaStream;
+ 
 
-            // create a stream source to pass to Recorder.js
-            var mediaStreamSource = context.createMediaStreamSource(localMediaStream);
-
-            // create new instance of Recorder.js using the mediaStreamSource
-            rec = new Recorder(mediaStreamSource, {
-            // pass the path to recorderWorker.js file here
-            workerPath: 'Recorderjs/recorderWorker.js'
-            });
-
-             // start recording
-            rec.record();
-			
-			playAllSequences();
-			
-            }, function(err){
-                console.log('Browser not supported');
-            });
-        }
-		
-		
-		function stop(){
-		    mediaStream.stop();//mediaStream is undefined =(
-            console.log("media stopped");
-        // stop Recorder.js
-            rec.stop();
-			console.log("recording stopped");
-            rec.exportWAV(function(e){//rec is undefined =(
-            rec.clear();
-            Recorder.forceDownload(e, "musision.wav");
-			console.log("Downloading");
-        });	
-		
-		}
-   });	
-/*	
 	
 
 	//from wad.js documentation
