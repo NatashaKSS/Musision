@@ -1099,7 +1099,7 @@ $(document).ready(function() {
         xhr.open('POST', '/upload.aspx', true);
         xhr.onload = function (e) {
            var result = e.target.result;
-    };
+        };
 
         xhr.send(blobOrFile);
     }
@@ -1107,20 +1107,20 @@ $(document).ready(function() {
 // stop recording function calls the upload method
 // I am using recorder.js
 
-    rec.exportWAV(function (blob) {
-        var url = URL.createObjectURL(blob);
-        audio.src = url;
-        audio.controls = true;
-        var hf = document.createElement('a');
-        hf.href = url;
-        hf.download = new Date().toISOString() + '.wav';
-        upload(blob);   
-    });   
+        rec.exportWAV(function (blob) {
+            var url = URL.createObjectURL(blob);
+            audio.src = url;
+            audio.controls = true;
+            var hf = document.createElement('a');
+            hf.href = url;
+            hf.download = new Date().toISOString() + '.wav';
+            upload(blob);   
+        });   
 	   
 	   
 	   
 	   
-    }	
+ }	
 //});
 	
 	
@@ -1187,7 +1187,7 @@ $(document).ready(function() {
 });	
 	
 
-*/
+
 	//from wad.js documentation
 	$("#saveData").on("click", function(){
 		var mixerTrack = new Wad.Poly({
@@ -1216,38 +1216,8 @@ $(document).ready(function() {
 			
        // }		
 	});
-
+*/
 	//end recorder.js
-	/*
-	//from p5.js  at http://p5js.org/examples/examples/Sound__Record_Save_Audio.php
-	
-    var mic, recorder, soundFile;
-
-    var state = 0; // mousePress will increment from Record, to Stop, to Play
-
-    //function setup() {
-    //    createCanvas(400,400);
-     //   background(200);
-       // fill(0);
-        //text('Enable mic and click the mouse to begin recording', 20, 20);
-
-  // create an audio in
-        mic = new p5.AudioIn();
-
-  // users must manually enable their browser microphone for recording to work properly!
-        mic.start();
-
-  // create a sound recorder
-        recorder = new p5.SoundRecorder();
-
-  // connect the mic to the recorder
-        recorder.setInput(mic);
-
-  // create an empty sound file that we will use to playback the recording
-        soundFile = new p5.SoundFile();
-   // }
-	
-	*/
 	
 	//Preparing for our random PI song	
 	
@@ -1610,6 +1580,40 @@ console.log(generateNotes());
 ------------------------------------
 ----------CODE ON HOLD--------------
 ------------------------------------
+//RECORDING
+/*
+	//from p5.js  at http://p5js.org/examples/examples/Sound__Record_Save_Audio.php
+	
+    var mic, recorder, soundFile;
+
+    var state = 0; // mousePress will increment from Record, to Stop, to Play
+
+    //function setup() {
+    //    createCanvas(400,400);
+     //   background(200);
+       // fill(0);
+        //text('Enable mic and click the mouse to begin recording', 20, 20);
+
+  // create an audio in
+        mic = new p5.AudioIn();
+
+  // users must manually enable their browser microphone for recording to work properly!
+        mic.start();
+
+  // create a sound recorder
+        recorder = new p5.SoundRecorder();
+
+  // connect the mic to the recorder
+        recorder.setInput(mic);
+
+  // create an empty sound file that we will use to playback the recording
+        soundFile = new p5.SoundFile();
+   // }
+	
+	
+
+
+
 (BEFORE DRAGGABLES & SORTABLES HEADING)
 //Aborted functions
 function findIndex(element, count){
