@@ -1042,6 +1042,7 @@ $(document).ready(function() {
 			});
 		});
 	}
+	
 //https://truongtx.me/2014/08/09/record-and-export-audio-video-files-in-browser-using-web-audio-api/	
 	var navigator = window.navigator;
     
@@ -1085,19 +1086,47 @@ $(document).ready(function() {
 
        // stop Recorder.js
        rec.stop();
-
+/*
        // export it to WAV
        rec.exportWAV(function(e){
        rec.clear();
        Recorder.forceDownload(e, "musision.wav");
        });
+	   */
+	   
+	function upload(blobOrFile) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/upload.aspx', true);
+        xhr.onload = function (e) {
+           var result = e.target.result;
+    };
+
+        xhr.send(blobOrFile);
+    }
+
+// stop recording function calls the upload method
+// I am using recorder.js
+
+    rec.exportWAV(function (blob) {
+        var url = URL.createObjectURL(blob);
+        audio.src = url;
+        audio.controls = true;
+        var hf = document.createElement('a');
+        hf.href = url;
+        hf.download = new Date().toISOString() + '.wav';
+        upload(blob);   
+    });   
+	   
+	   
+	   
+	   
     }	
 //});
 	
 	
 	
-	
 	/*
+	
 	$("#saveData").on("click", function(){
 	    var audio_context;
 
@@ -1156,28 +1185,11 @@ $(document).ready(function() {
 
     });
 });	
-	// from recorder.js
-
-	
-	var mixerTrack = new Wad.Poly({
-            recConfig : { // The Recorder configuration object. The only required property is 'workerPath'.
-            workerPath : '/src/Recorderjs/recorderWorker.js' // The path to the Recorder.js web worker script.
-            }
-        });
-		
-		mixerTrack.rec.record();
-		    playAllSequences();
-		mixerTrack.rec.stop();
-        mixerTrack.rec.exportWAV();      
-	
-	*/
-	/*
-	
- 
-
 	
 
+*/
 	//from wad.js documentation
+	$("#saveData").on("click", function(){
 		var mixerTrack = new Wad.Poly({
             recConfig : { // The Recorder configuration object. The only required property is 'workerPath'.
             workerPath : 'Recorderjs/recorderWorker.js' // The path to the Recorder.js web worker script.
@@ -1191,15 +1203,20 @@ $(document).ready(function() {
 		setTimeout(function(){
             mixerTrack.rec.stop();  
 		}, findMaxLength() * beatDuration * 1000);
-
+        
+		//mixerTrack.rec.createWad(); 
+		//mixerTrack.rec.recordings[0].play();
         // export it to WAV
             mixerTrack.rec.exportWAV(function(e){
                 mixerTrack.rec.clear();
-                Recorder.forceDownload(e, "filename.wav");
+				//audio.src = window.URL.createObjectURL(e);
+                Recorder.forceDownload(e, "musision.wav");
             });
+			
+			
        // }		
 	});
-	*/
+
 	//end recorder.js
 	/*
 	//from p5.js  at http://p5js.org/examples/examples/Sound__Record_Save_Audio.php
