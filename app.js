@@ -1,3 +1,4 @@
+//thanks to Tran Xuan Truong https://github.com/tmtxt/web-audio-example
 var navigator = window.navigator;
 var Context = window.AudioContext || window.webkitAudioContext;
 var context = new Context();
@@ -37,7 +38,7 @@ function stop() {
 
   rec.exportWAV(function(e){
     rec.clear();
-    Recorder.forceDownload(e, "test.wav");
+    Recorder.forceDownload(e, "musisionSong.wav");
   });
 }
 
