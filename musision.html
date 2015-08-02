@@ -18,7 +18,7 @@
   	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
   	<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
   	<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.12/jquery.mousewheel.min.js'></script>
-  	<!--<script src = "/bower_components/Recorderjs/recorder.js"></script>--->
+  	
 	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
   	  Don't need this link yet for javascript cookies-->
 	
@@ -28,9 +28,11 @@
 	<!-- Wad is a Javascript library for manipulating audio using the new HTML5 Web Audio API -->
 	<script src="wad-master/src/wad.js"></script>
 	<script src="introJs/intro.js"></script>
-	<script src="Recorderjs/recorder.js"></script>
-	<script src="Recorderjs/recorderWorker.js"></script>
-	<script type="text/javascript" src="MP3RecorderJS-master/js/mp3recorder.js"></script>
+	<script src="bower_components/Recorderjs/recorder.js">
+    </script>
+    <script src="app.js"></script>
+
+	<!---<script type="text/javascript" src="MP3RecorderJS-master/js/mp3recorder.js"></script>
 	<!-- Own Custom scripts in local directory-->
 	<script src="instruments.js"></script>
 	<script src="gridSystem.js"></script>
@@ -101,8 +103,8 @@
 			<!--- <div class="recorder"> Recorder
                     <button id="startRec" class="start"> Record </button>
                      <button id="stopRec"  class="stop"> Stop </button>
-             </div>--->       
-            </div>
+             </div>      
+            </div>---> 
 			   <button id="startRec" onclick="record()">Record</button>
                <button id="stopRec" onclick="stop()">Stop</button>
 			</div> 

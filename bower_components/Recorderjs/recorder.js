@@ -5,17 +5,15 @@
   var Recorder = function(source, cfg){
     var config = cfg || {};
     var bufferLen = config.bufferLen || 4096;
-    var numChannels = config.numChannels || 2;
     this.context = source.context;
     this.node = (this.context.createScriptProcessor ||
                  this.context.createJavaScriptNode).call(this.context,
-                 bufferLen, numChannels, numChannels);
+                                                         bufferLen, 2, 2);
     var worker = new Worker(config.workerPath || WORKER_PATH);
     worker.postMessage({
       command: 'init',
       config: {
-        sampleRate: this.context.sampleRate,
-        numChannels: numChannels
+        sampleRate: this.context.sampleRate
       }
     });
     var recording = false,
@@ -23,13 +21,12 @@
 
     this.node.onaudioprocess = function(e){
       if (!recording) return;
-      var buffer = [];
-      for (var channel = 0; channel < numChannels; channel++){
-          buffer.push(e.inputBuffer.getChannelData(channel));
-      }
       worker.postMessage({
         command: 'record',
-        buffer: buffer
+        buffer: [
+          e.inputBuffer.getChannelData(0),
+          e.inputBuffer.getChannelData(1)
+        ]
       });
     }
 

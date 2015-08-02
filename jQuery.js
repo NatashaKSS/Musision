@@ -438,6 +438,12 @@ function loopAll(){
 	}
 }
 
+function exportAudio(){
+    record();
+	playAllSequences();
+}
+
+
 // Adds a track to user composition and updates user interface
 // respectively
 function addTrack(numTracks) {
@@ -635,9 +641,15 @@ $(document).ready(function() {
 			writeSaveData();
 			$(this).html("Saved!");
 		});
-		
-     
+		/*
+        $("startRec").on("click", function(){
+		    exportAudio();
+		});
 
+		$("stopRec").on("click", function(){
+		    stop();
+		});
+		*/
 		// Selecting the octaves for show less view
 		$("#octave-num li a").on("click", function() {
 			var octaveDisplaySelector = $("#dropdown-selection");
@@ -1043,19 +1055,11 @@ $(document).ready(function() {
 		});
 	}
 	
+	
+	
 //https://truongtx.me/2014/08/09/record-and-export-audio-video-files-in-browser-using-web-audio-api/	
-	var navigator = window.navigator;
-    
-	navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
 
-    var Context = window.AudioContext || window.webkitAudioContext;
-    
-	var context = new Context();
-   //	$("#saveData").on("click", function(){
-	     // we need these variables for later use with the stop function
-    var mediaStream;
-    var rec;
-
+/*
     function record() {
      // ask for permission and start recording
       navigator.getUserMedia({audio: true}, function(localMediaStream){
@@ -1078,7 +1082,8 @@ $(document).ready(function() {
            console.log('Browser not supported');
         });
    }
-
+   */
+/*
 
     function stop() {
        // stop the media stream
@@ -1093,7 +1098,7 @@ $(document).ready(function() {
        Recorder.forceDownload(e, "musision.wav");
        });
 	   */
-	   
+/*	   
 	function upload(blobOrFile) {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', '/upload.aspx', true);
@@ -1103,10 +1108,10 @@ $(document).ready(function() {
 
         xhr.send(blobOrFile);
     }
-
+*/
 // stop recording function calls the upload method
 // I am using recorder.js
-
+/*
         rec.exportWAV(function (blob) {
             var url = URL.createObjectURL(blob);
             audio.src = url;
@@ -1115,14 +1120,11 @@ $(document).ready(function() {
             hf.href = url;
             hf.download = new Date().toISOString() + '.wav';
             upload(blob);   
-        });   
-	   
-	   
-	   
-	   
+        });
+		
  }	
 //});
-	
+*/
 	
 	
 	/*

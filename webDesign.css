@@ -438,10 +438,14 @@ a {
 	border-radius: 30%;
 }
 
-/*
-.displayInstrument:hover > ul.instrumentMenu{
+.startRec{
     position: absolute;
-	display: block;
-	background : crimson;
+    margin-left: 100px;
+    margin-top: 50px;
+    
 }
-*/
+
+.stopRec{
+    position: relative;
+    margin-left: 20px;	
+}
