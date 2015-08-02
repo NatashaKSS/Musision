@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- The HTML 4.01 Transitional DOCTYPE declaration-->
+<!-- above set at the top of the file will set     -->
+<!-- the browser's rendering engine into           -->
+<!-- "Quirks Mode". Replacing this declaration     -->
+<!-- with a "Standards Mode" doctype is supported, -->
+<!-- but may lead to some differences in layout.   -->
+
+<!DOCTYPE html>
+<head>
+ <meta charset="ISO-8859-1">
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+ <title>Mission Control 3 - jQuery</title>
+
+</head>
+
+<script>
+
+$(document).ready(function(){
+   $("#butt1").click(function(){
+       $("#speaker").load("Hungry.txt");
+   });
+   
+   $("#butt2").click(function() {
+	   $.ajax({url: "AJAXcall.txt", success: function(result) {
+ 			$("#AJAXcall").html(result);
+	   }});
+   });
+});
+
+</script>
+
+<body>
+ 
+ <h2>We are Musision!</h2>
+ 
+ <div id="speaker">Click to find out what I'm feeling now!</div>
+
+ <button id="butt1"> Click here </button>
+ 
+ <div id="AJAXcall">AJAX call</div>
+
+ <button id="butt2"> Click here for an AJAX call </button>
+
+</body>
+
+</html>

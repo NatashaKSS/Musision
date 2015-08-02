@@ -1,0 +1,17 @@
+.carousel-inner img {
+	display: block;
+    margin-left: auto;
+    margin-right: auto;
+	width: 400px;
+	height: 500px;
+}
+
+.col {
+	display: inline-block;
+}
+
+form {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}

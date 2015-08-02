@@ -13,21 +13,28 @@ body {
 	user-select: none;	
 }
 
-.navbar {
-	font-family: "Trebuchet MS", Verdana, sans-serif;
-}
-
 a {
 	cursor: pointer;
 }
 
-/* Top Navbar settings */
-.container {
+
+/* Navigation bar settings */
+.navbar {
+	font-family: "Trebuchet MS", Verdana, sans-serif;
 }
 
 #bpm-input {
 	border-radius: 5px;
+	padding-bottom: 8px;
 	width: 3em;
+}
+
+#startRec {
+	background: #2c2c2c;
+}
+
+#stopRec {
+	background: #2c2c2c;
 }
 
 .btn {
@@ -37,6 +44,12 @@ a {
 
 .btn:hover{
     background-color: #e0e1ce;
+}
+
+/* Social Media Options */
+.fb-like {
+	margin-top: 5px;
+	margin-left: 45px;
 }
 
 /* Contains user workspace, timeline and everything else 
@@ -108,44 +121,6 @@ a {
 	background-color: #3d3d3d!important; 
 }
 
-/* Choose Instrucment button 
-.chooseInstrument {
-	margin: 3px 0px 0px 29px;
-	height: 25px;
-	width: 48.5px;
-	
-	font-size:12px;
-	font-family:arial, helvetica, sans-serif;
-	font-weight:bold; 
-	color: #FFFFFF;
-	text-shadow: -1px -1px 0 rgba(0,0,0,0.3);
-	background-color: #575757; 
-	border: 1px solid black;
-}
-
-.chooseInstrument:hover {
-	background-color: #3d3d3d;
-}
-*/
-/*
-.play-button {
-	position: relative;
-	width: 0; 
-	height: 0;
-	
-	border-top: 15px solid transparent;
-	border-bottom: 15px solid transparent;
-	border-left: 20px solid #004a95; dARKbLUE
-}
-
-.play-button:hover {
-	border-left: 20px solid #fbdf60; 
-}
-
-.play-button:active {
-	top: 3px;
-}
-*/
 
 /* Delete track button */
 .close-panel {
