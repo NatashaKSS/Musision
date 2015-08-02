@@ -23,7 +23,7 @@ var notes = ["C2","C#2","D2","D#2","E2","F2","F#2","G2","G#2","A2","A#2","B2",  
 /*
  * Variables Declaration
  */
-var beatDuration = 0.3;//Default duration of 1 beat
+var beatDuration = 0.5;//Default duration of 1 beat
 var enableLooping = false;
 var loopId = 0;
 var animationLoopId = 0;
@@ -255,6 +255,8 @@ function changeBPM(){
     		throw "empty.";
     	} else if (ans < 0) {
     		throw "negative. Please input a positive number."
+    	} else if (ans > 300) {
+    		throw "Whoa! That number is too huge! Please input a number less than 300."
     	} else {
     		beatDuration = beatDuration / (parseInt(ans)/120);
     	}
