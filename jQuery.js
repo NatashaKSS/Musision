@@ -255,8 +255,10 @@ function changeBPM(){
     		throw "empty.";
     	} else if (ans < 0) {
     		throw "negative. Please input a positive number."
+    	} else if (ans == 0) {
+    		throw "a little too small. Please input a number from 1 to 300";
     	} else if (ans > 300) {
-    		throw "Whoa! That number is too huge! Please input a number less than 300."
+    		throw "Whoa! Too huge! Please input a number from 1 to 300."
     	} else {
     		beatDuration = beatDuration / (parseInt(ans)/120);
     	}
