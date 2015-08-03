@@ -425,3 +425,38 @@ a {
     position: relative;
     margin-left: 20px;	
 }
+
+#slideshow { 
+    margin: 10px auto; 
+    position: relative; 
+    width: 1000px; 
+    height: 100px; 
+    padding: 10px; 
+    box-shadow: 0 0 20px rgba(0,0,0,0.4); 
+	font-family:Verdana;
+	width: 80%;
+	
+}
+
+#tips{
+    position: relative; 
+	margin-top:10px;  
+    margin-left: 600px;	
+	background-color: #696969;
+	border-radius: 20%;
+	color: white;
+	font-family:Verdana;
+	
+}
+
+#slideshow > div { 
+    position: absolute; 
+    top: 10px; 
+    left: 10px; 
+    right: 10px; 
+    bottom: 10px; 
+}
+
+.tip{
+    text-align: centre;
+}

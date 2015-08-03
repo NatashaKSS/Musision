@@ -524,6 +524,23 @@ function generateOctaveColour(colour) {
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
 $(document).ready(function() {
+    $("#tips").on("click", function(){
+	    $("#slideshow").toggle();
+	});
+	
+    $("#slideshow > div:gt(0)").hide();
+
+    setInterval(function() { 
+    $('#slideshow > div:first')
+    .fadeOut(1000)
+    .next()
+    .fadeIn(1000)
+    .end()
+    .appendTo('#slideshow');
+},  6000);
+
+
+
 	function initialize() {
 		initializeTrackSettings();
 		readSaveData();
