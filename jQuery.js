@@ -157,7 +157,7 @@ Note.prototype.getDuration = function() {
 }
 
 Note.prototype.setPitch = function(pitch) {
-	this.Pitch = pitch;
+	this.pitch = pitch;
 }
 
 Note.prototype.setDuration = function(dur) {
@@ -1397,6 +1397,7 @@ $(document).ready(function() {
 			$("#Instrument" + track).html(composition.instruments[track]);
 			
 			for (note = 0; note < composition.getTrack(track).length; note++) {
+				console.log("saving: " + composition.getTrack(track)[note]);
 				composition.getTrack(track)[note] = $.extend(new Note(), composition.getTrack(track)[note]);
 				// explicitly associates noteOnTrack with Note class for every note in the composition.
 				
@@ -1405,13 +1406,18 @@ $(document).ready(function() {
 				
 				var notePitch = noteOnTrack.getPitch();
 				var noteOpacity = 1.0;
+				var dataNoteParameter = "C4"; //Default data note parameter in case of error
 				
-				if (notePitch == "silence") {
+				if (notePitch == "silence" || notePitch == undefined) {
 					notePitch = "Rest";
 					noteOpacity = 0.5;
+					dataNoteParameter = -1;
+					composition.getTrack(track)[note].setPitch("silence");
+				} else {
+					dataNoteParameter = notes.indexOf(notePitch);
 				}
 				
-				var noteHTML = "<div class data-note='" + notes.indexOf(notePitch) + 
+				var noteHTML = "<div class data-note='" + dataNoteParameter + 
 							   "' style='opacity: " + noteOpacity + "; display: inline-block; width: 39.0625px; " +
 							   "height: 61px; z-index: 0; border: none; padding-top: 15px; " +
 							   "border-radius: 1em; vertical-align: top; text-align: center; " +
