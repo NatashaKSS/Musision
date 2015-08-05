@@ -1022,8 +1022,7 @@ $(document).ready(function() {
 						
 					} else {
 						var insertedSilence = new Note(ui.item.attr('data-note'));
-						// Pitch for silence is just "silence"
-						// ui.item.attr('data-note')) is just the string "silence"
+
 						composition.addNote(trackNumInSortable, insertedSilence);
 					}
 					
@@ -1411,7 +1410,7 @@ $(document).ready(function() {
 				if (notePitch == "silence" || notePitch == undefined) {
 					notePitch = "Rest";
 					noteOpacity = 0.5;
-					dataNoteParameter = -1;
+					dataNoteParameter = "silence";
 					composition.getTrack(track)[note].setPitch("silence");
 				} else {
 					dataNoteParameter = notes.indexOf(notePitch);
