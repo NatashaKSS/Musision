@@ -453,7 +453,7 @@ function updateTimelineNotes() {
 	
 	for (trackNum = 0; trackNum < numOfTracks; trackNum++) {
 		selector = trackSelector + trackNum + sortableDivSelector;
-		numOfNotes = composition.getTrack(trackNum).length;
+		numOfNotes = selector.length;
 		
 		// This structure does not get every 4 notes.
 		for (noteNum = 0; noteNum < numOfNotes; noteNum++) {
@@ -948,12 +948,15 @@ $(document).ready(function() {
 			        }
 				},
 				
+				stop: function() {
+					updateTimelineNotes();
+				},
+				
 				start: function(event, ui) {
 					var startPosition = ui.item.index(); //original index
 					ui.item.data('startPos', startPosition); //create data called startPos and set it to startPosition
 					
 					trackNumInSortable = parseInt(ui.item.parent().parent().attr("id").substring(5));
-					updateTimelineNotes();
 				},
 				
 				// Whenever user has stopped sorting and the DOM element (HTML) has changed
@@ -988,12 +991,10 @@ $(document).ready(function() {
 						});
 					}
 					
-					updateTimelineNotes();
 				},
 				
 				// Just before releasing dragging and item is outside timeline
 				beforeStop: function(event, ui) {
-	
 					inBeforeStop = true;
 					
 					// If a note is not swapped to another track or user decides
@@ -1001,21 +1002,13 @@ $(document).ready(function() {
 					if (!inBox) {
 						var startPosition = ui.item.data('startPos');
 						composition.getTrack(trackNumInSortable).splice(startPosition, 1);
-						ui.item.remove();		
+						ui.item.remove();
 					}
 					
 				},
 				
 				// When timeline receives the user-dragged note
 				receive: function(event, ui) {
-					
-					// Set style of notes on timeline
-					updateTimelineNotes();
-					$(".sortable-system div").not(".ui-sortable-placeholder").css({
-						"height": grid.noteHeight,
-						"width": grid.noteWidth
-					});	
-					
 					// Add correct note (and pitch) to tracks
 					if(ui.item.attr('data-note') != "silence"){
 			      		var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note'))]);
@@ -1026,6 +1019,13 @@ $(document).ready(function() {
 
 						composition.addNote(trackNumInSortable, insertedSilence);
 					}
+					
+					// Set style of notes on timeline
+					updateTimelineNotes();
+					$(".sortable-system div").not(".ui-sortable-placeholder").css({
+						"height": grid.noteHeight,
+						"width": grid.noteWidth
+					});	
 					
 					$(".sortable-system div").on("click", function(e){
 					    //$(".sortable-system div").css({ "border": "none" });    //comment this line first to allow choosing of starting and ending note
@@ -1071,7 +1071,6 @@ $(document).ready(function() {
 					});
 				
 				}
-				
 			}).disableSelection();
 				 
 			$(".col-md-1").draggable({
