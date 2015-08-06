@@ -453,9 +453,8 @@ function updateTimelineNotes() {
 	
 	for (trackNum = 0; trackNum < numOfTracks; trackNum++) {
 		selector = trackSelector + trackNum + sortableDivSelector;
-		numOfNotes = selector.length;
+		numOfNotes = composition.getTrack(trackNum).length;
 		
-		// This structure does not get every 4 notes.
 		for (noteNum = 0; noteNum < numOfNotes; noteNum++) {
 			alternate = parseInt(noteNum/4);
 			
