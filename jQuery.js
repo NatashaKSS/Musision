@@ -31,10 +31,14 @@ var startPlayingFrom = 0;
 var playUntil = -1;
 var pi = Math.PI;
 var songOfPi = [];  //to prepare for the song using PI's numbers
-var allInstruments = ["Piano", "Guitar", "Violin", "Flute", "Bell"];
 var goldenRatio = (1 + Math.sqrt(5))/2;
-console.log("PI= " + pi);
-console.log("PHI= " + goldenRatio);
+
+// Important! The Wad object in instrumentObjects array corresponds to 
+// the position of the corresponding string representation of that instrument obj
+// Please do not jumble sequence and always make sure it is parallel!
+var allInstruments = ["Piano", "Guitar", "Violin", "Flute", "Bell"];
+var instrumentObjects = [piano, synthGuitar, string, flute, bell];
+
 
 /*
  * User Tracks Constructor, named a composition
@@ -192,7 +196,6 @@ Animation.prototype.playAnimation = function(duration, wholeDuration, startIndex
 		// Change each div's colour as note plays
 		// Applies setTimeout function to every div in the timeline
 		this.elementsAnimated.map(function() {
-				
 			var that = $(this);
 			
 			this.currentAnimationOngoing = setTimeout(function() {
@@ -200,18 +203,13 @@ Animation.prototype.playAnimation = function(duration, wholeDuration, startIndex
 				   "background": "#80ffff" //change color to light blue
 				});
 			}, duration + offset);
-			 
 			
-				 
 			offset += duration;
-			
 		});
+		
 		this.revertAnimationOngoing = setTimeout(function () {
-		        $(".sortable-system div").css({ 
-		        	"background-color": "#109bce",
-		        	
-		        });
-		    }, wholeDuration);
+	        updateTimelineNotes();
+	    }, wholeDuration);
 		
 	});
 	
@@ -225,10 +223,11 @@ Animation.prototype.stopAnimation = function() {
 		clearTimeout(this.revertAnimationOngoing);
 	});
 	
-	$(".sortable-system div").css({ 
-		"background-color": "#109bce", 
+	$(".sortable-system div").css({
 		"border": "none"
 	});
+	
+	updateTimelineNotes();
 }
 
 /*------------------------------------------------*/
@@ -273,8 +272,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
     var noteDuration = (beatDuration) * 1000;
     var wholeDuration = (beatDuration) * 1000 * (Math.max(endIndex, playUntil) - startIndex + 1);
 
-    console.log("play Until " + playUntil);
-    // Whether this track (with the trackNumber) has enabled playing or not
+    //console.log("play Until " + playUntil);
     if(composition.isEnablePlaying(trackNumber)){
     	animation.playAnimation(noteDuration, wholeDuration, startIndex, endIndex, trackNumber);
 		console.log("start " + startIndex);
@@ -289,42 +287,16 @@ function playSequence(trackNumber, startIndex, endIndex) {
 		    if (composition.getTrack(trackNumber)[indx] != undefined) {	
 				var currentPitch = composition.getTrack(trackNumber)[indx].getPitch();
 				console.log("in composition " + currentPitch);
-	
-		    	if(currentPitch != "silence") {
+				
+				if(currentPitch != "silence") {
 					var inst = composition.getInstrument(trackNumber);
+					var instObject = instrumentObjects[allInstruments.indexOf(inst)];
 					
-					if(inst == "Piano"){
-			    		piano.play({ 
-			    			wait : (indx - startIndex) * beatDuration,
-			 			    pitch : currentPitch,
-			 				label : "playing" 
-			 		    });
-			 		  }  else if(inst == "Guitar"){
-			    		synthGuitar.play({ 
-			    			wait : (indx - startIndex) * beatDuration,
-			 			    pitch : currentPitch,
-			 				label : "playing" 
-			 		    });
-					  
-					  } else if(inst == "Violin"){
-			    		string.play({ 
-			    			wait : (indx - startIndex) * beatDuration,
-			 			    pitch : currentPitch,
-			 				label : "playing" 
-			 		    });
-					  }  else if(inst == "Flute"){
-			    		flute.play({ 
-			    			wait : (indx - startIndex) * beatDuration,
-			 			    pitch : currentPitch,
-			 				label : "playing" 
-			 		    });
-					  }  else if(inst == "Bell"){
-			    		bell.play({ 
-			    			wait : (indx - startIndex) * beatDuration,
-			 			    pitch : currentPitch,
-			 				label : "playing" 
-			 		    });
-					  }
+					instObject.play({
+						wait : (indx - startIndex) * beatDuration,
+		 			    pitch : currentPitch,
+		 				label : "playing"
+					});
 					
 		 		} else {
 		 			quarterRest.play({
@@ -335,8 +307,6 @@ function playSequence(trackNumber, startIndex, endIndex) {
 		    }
 	    }
 	}
-	$(".sortable-system div").css({ "border": "none" });
-
 }
 
 function findMaxLength(){
@@ -472,6 +442,47 @@ function addTrack(numTracks) {
 	
 }
 
+//Change the look of all notes on the timeline
+function updateTimelineNotes() {
+	var trackSelector = "#track";
+	var sortableDivSelector = " .sortable-system div";
+	var numOfTracks = composition.getAllTracks().length;
+	var numOfNotes = 0; // Default 0 notes
+	var alternate = 0;
+	var selector;
+	
+	for (trackNum = 0; trackNum < numOfTracks; trackNum++) {
+		selector = trackSelector + trackNum + sortableDivSelector;
+		numOfNotes = composition.getTrack(trackNum).length;
+		
+		// This structure does not get every 4 notes.
+		for (noteNum = 0; noteNum < numOfNotes; noteNum++) {
+			alternate = parseInt(noteNum/4);
+			
+			if (alternate % 2 == 0) { // even sections of 4 notes
+				$(selector).eq(noteNum).css({
+					"background": "#109bce"
+				});
+			} else { // odd sections of 4 notes
+				$(selector).eq(noteNum).css({
+					"background": "#0b6688"
+				});
+			}
+		}
+	}
+	
+	$(".sortable-system div").not(".ui-sortable-placeholder").removeClass().css({
+		"padding-top": "15px",
+		"border-radius": "1em",
+		"display": "inline-block",
+		"vertical-align": "top",
+		"text-align": "center",
+		"font-size": "20px",
+		"color": "#FFFFFF",
+		"text-shadow": "1px 1px 2px #000000"
+	});
+}
+
 
 /*--------------------------------------------------------*/
 /*-----------------Utility Functions----------------------*/
@@ -532,16 +543,14 @@ $(document).ready(function() {
 	
     $("#slideshow > div:gt(0)").hide();
 
-    setInterval(function() { 
-    $('#slideshow > div:first')
-    .fadeOut(1000)
-    .next()
-    .fadeIn(1000)
-    .end()
-    .appendTo('#slideshow');
-},  6000);
-
-
+    setInterval(function() {
+	    $('#slideshow > div:first')
+	    .fadeOut(1000)
+	    .next()
+	    .fadeIn(1000)
+	    .end()
+	    .appendTo('#slideshow');
+    },  6000);
 
 	function initialize() {
 		initializeTrackSettings();
@@ -742,8 +751,6 @@ $(document).ready(function() {
 			composition.setEnablePlaying(trackNum, !composition.isEnablePlaying(trackNum));
 			// Toggles whether a track is playing or not in composition's list of boolean values
 			// for each track
-					
-			console.log("track num: " + trackNum + " can play? " + composition.isEnablePlaying(trackNum));
 			
 			if (!composition.isEnablePlaying(trackNum)) {
 				// When users click to mute track.
@@ -778,13 +785,13 @@ $(document).ready(function() {
 	    $(".displayInstrument").unbind().on("click", function(){
 	        var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
 			var instrument = document.getElementById("Instrument" + trackNum);//current instrument at the specific track number
-		    console.log("this instrument " + "Instrument" + trackNum + " " + instrument.textContent);
+		    //console.log("this instrument " + "Instrument" + trackNum + " " + instrument.textContent);
 			var currentInstrument = instrument.textContent;
-		  //  console.log("current instrument " + $("#timeline-system").children().eq(trackNum).find(".displayInstrument").firstChild.data);
+			//console.log("current instrument " + $("#timeline-system").children().eq(trackNum).find(".displayInstrument").firstChild.data);
 			var currIndex = allInstruments.indexOf(currentInstrument);
 		    var nextInstrument = allInstruments[(currIndex + 1) % allInstruments.length];
-	        console.log("currIndex " + currIndex);
-			console.log("nextInstrumentIndex " + nextInstrument);
+	        //console.log("currIndex " + currIndex);
+			//console.log("nextInstrumentIndex " + nextInstrument);
 		    composition.setInstrument(trackNum, nextInstrument);
 		    instrument.textContent = nextInstrument;
       
@@ -819,7 +826,7 @@ $(document).ready(function() {
 					trackSystem.children().eq(trackIndex).children().eq(1).attr('id', "track" + trackIndex);
 				}
 			} else {
-				alert("Can't delete last remaining track");
+				alert("Can't delete last remaining track!");
 			}
 		});
 		
@@ -913,23 +920,6 @@ $(document).ready(function() {
 			}
 		}
 	}
-	
-	//Change the look of all notes on the timeline
-	function updateTimelineNotes() {
-		$(".sortable-system div").not(".ui-sortable-placeholder").removeClass().css({
-			"height": grid.noteHeight,
-			"width": grid.noteWidth,
-			"padding-top": "15px",
-			"background": "#109bce", //default light blue-ish #109bce
-			"border-radius": "1em",
-			"display": "inline-block",
-			"vertical-align": "top",
-			"text-align": "center",
-			"font-size": "20px",
-			"color": "#FFFFFF",
-			"text-shadow": "1px 1px 2px #000000"
-		});
-	}
 		
 	function setSortable() {	
 		$(function() {
@@ -963,11 +953,13 @@ $(document).ready(function() {
 					ui.item.data('startPos', startPosition); //create data called startPos and set it to startPosition
 					
 					trackNumInSortable = parseInt(ui.item.parent().parent().attr("id").substring(5));
+					updateTimelineNotes();
 				},
 				
 				// Whenever user has stopped sorting and the DOM element (HTML) has changed
 				update: function(event, ui) {
 					updateComposition();
+					updateTimelineNotes();
 					
 					$("#saveData").html("Save");
 				},
@@ -978,9 +970,10 @@ $(document).ready(function() {
 					inBeforeStop = false;
 					
 					ui.item.css({
-						"background-color":"#109bce", // Light blue
-						"border":"none"
+						"border":"none",
+						"opacity": 1.0
 					});
+					
 				},
 				 
 				// If item is dragged outside timeline OR if item is dropped
@@ -990,10 +983,12 @@ $(document).ready(function() {
 					
 					if (!inBeforeStop) {
 						ui.item.css({
-							"background-color":"red",
-							"border":"2px solid yellow"
+							"border": "5px solid red",
+							"opacity": 0.3
 						});
 					}
+					
+					updateTimelineNotes();
 				},
 				
 				// Just before releasing dragging and item is outside timeline
@@ -1007,15 +1002,21 @@ $(document).ready(function() {
 						var startPosition = ui.item.data('startPos');
 						composition.getTrack(trackNumInSortable).splice(startPosition, 1);
 						ui.item.remove();		
-					}		
-				
+					}
+					
 				},
 				
 				// When timeline receives the user-dragged note
 				receive: function(event, ui) {
 					
+					// Set style of notes on timeline
 					updateTimelineNotes();
+					$(".sortable-system div").not(".ui-sortable-placeholder").css({
+						"height": grid.noteHeight,
+						"width": grid.noteWidth
+					});	
 					
+					// Add correct note (and pitch) to tracks
 					if(ui.item.attr('data-note') != "silence"){
 			      		var insertedNote = new Note(notes[parseInt(ui.item.attr('data-note'))]);
 						composition.addNote(trackNumInSortable, insertedNote);
@@ -1030,23 +1031,33 @@ $(document).ready(function() {
 					    //$(".sortable-system div").css({ "border": "none" });    //comment this line first to allow choosing of starting and ending note
 						// To ensure if user clicks on more than 1 note, the prev note click
 						// will have its border color reverted.
-					    
-						piano.play({
-						    pitch : notes[parseInt($(e.target).attr('data-note'))]
-						});
+						var notePressed = $(e.target);
+						var trackNum = parseInt(notePressed.parent().parent().attr('id').substring(5));
+					    var noteDataAttribute = notePressed.attr('data-note');
 						
-						$(e.target).css({ 
+					    if (noteDataAttribute != "silence") {
+							var instrumentInThisTrackString = composition.getInstrument(trackNum);
+							var instrumentInThisTrackObj = instrumentObjects[allInstruments.indexOf(instrumentInThisTrackString)];
+					    	
+							instrumentInThisTrackObj.play({
+							    pitch : notes[parseInt(noteDataAttribute)]
+							});
+					    } else {
+					    	quarterRest.play({
+					    		label: "playing"
+					    	});
+					    }
+						
+					    notePressed.css({ 
 					        "background": "#80ffff" //change color to light blue
 					    });
+						
 						setTimeout(function(){
-						    $(e.target).css({ 
-					        "background": "#109bce" //change color back to original
-					    });
-	
+						    updateTimelineNotes(); //change back to original
 						}, 400);
 						
 						if(e.shiftKey){//Mouse Click+shift event to choose the first note to play
-							$(e.target).css({ "border": "1px solid red" });
+							notePressed.css({ "border": "1px solid red" });
 							startPlayingFrom = $(e.target).index();
 						}
 					});
@@ -1058,6 +1069,7 @@ $(document).ready(function() {
 						console.log("first note " + startPlayingFrom);
 						console.log("last note " + playUntil);
 					});
+				
 				}
 				
 			}).disableSelection();
@@ -1341,7 +1353,16 @@ $(document).ready(function() {
 			
 		   //console.log("after for loop");
 		   console.log("end at " + playUntil);
-		   songOfPi = [];	
+		   songOfPi = [];
+		   
+		   // For styling all random notes on timeline
+		   $(".sortable-system div").not(".ui-sortable-placeholder").css({
+				"height": grid.noteHeight,
+				"width": grid.noteWidth
+		   });
+		   
+		   updateTimelineNotes();
+		   
 	});
 
 	/*------------------------------------------------*/
@@ -1396,7 +1417,6 @@ $(document).ready(function() {
 			$("#Instrument" + track).html(composition.instruments[track]);
 			
 			for (note = 0; note < composition.getTrack(track).length; note++) {
-				console.log("saving: " + composition.getTrack(track)[note]);
 				composition.getTrack(track)[note] = $.extend(new Note(), composition.getTrack(track)[note]);
 				// explicitly associates noteOnTrack with Note class for every note in the composition.
 				
@@ -1426,7 +1446,7 @@ $(document).ready(function() {
 				// Mimics the style of a note on timeline
 				
 				$("#track" + track).children().eq(1).append(noteHTML);
-				
+			
 			}
 			
 		}
@@ -1458,6 +1478,7 @@ $(document).ready(function() {
 		initializeTrackSettings();
 		setSortable();
 		grid.resizeGrid();
+		updateTimelineNotes();
 		
 	}
 
