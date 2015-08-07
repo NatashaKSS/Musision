@@ -310,6 +310,11 @@ a {
 	cursor: pointer;
 }
 
+#colour-button {
+	background-color: #109bce;
+	cursor: pointer;
+}
+
 /* Show more view */
 
 .notes-buttons-holder {
@@ -325,7 +330,7 @@ a {
 .octave-holder {
 	position: relative;
 	overflow-x: scroll;
-	height: 88px;
+	height: 90px;
 	width: 100%;
 	white-space: nowrap;
 	padding-left: 10px;
@@ -396,13 +401,13 @@ a {
     text-decoration:none;
     text-transform:uppercase;
     text-align:center;
-    text-shadow:1px 1px 0px #07526e;
+    text-shadow:1px 1px 0px #000000;
     font-size:2em;
     font-weight:bold;
     color:#fff;
-    border: none;
+    border: 2px solid black;
     background: #109bce;/*default light blue-ish #109bce*/
-    border-radius: 1em;
+    border-radius: 10px;
     box-shadow: inset 0px 1px 0px #808080, 
     			0px 5px 0px 0px #000000, 
     			0px 5px 5px #999;
@@ -413,10 +418,9 @@ a {
 	top: 3px;
 	cursor:grab;
 	cursor:pointer;
-	background: #09536f;
-    box-shadow: inset 0px 1px 0px #2ab7ec, 
-    			0px 2px 0px 0px #07526e, 
-    			0px 5px 3px #999;
+    box-shadow: inset 0px 1px 0px #c0c0c0, 
+    			0px 2px 0px 0px #808080, 
+    			0px 5px 3px #000000;
 }
 
 .col-md-1:hover {

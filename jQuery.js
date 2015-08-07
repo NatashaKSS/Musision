@@ -23,7 +23,6 @@ var notes = ["C2","C#2","D2","D#2","E2","F2","F#2","G2","G#2","A2","A#2","B2",  
 /*
  * Variables Declaration
  */
-var beatDuration = 0.5;//Default duration of 1 beat
 var enableLooping = false;
 var loopId = 0;
 var animationLoopId = 0;
@@ -50,6 +49,12 @@ function Composition(track) {
 	// A track contains a song of some number of notes.
 	this.tracks = [track];
 	
+	// Default length of 1 note
+	this.beatDuration;
+	
+	// User's BPM input
+	this.BPM = parseInt($("#bpm-input").attr("placeholder"));
+	
 	// Default note sustain duration 0.015secs, which is Wad's
 	// hold attribute for piano
 	this.noteLength = 0.015;
@@ -58,11 +63,16 @@ function Composition(track) {
 	this.enablePlaying = [true];
 	
 	// Tracks number of tracks on timeline
-	this.numOfTracks = 1; // By Default, should have 1 track on timeline
+	this.numOfTracks = 1;
 	
+	// Instruments corresponding to each track
 	this.instruments = [];
 	
+	// Default instrument for first track is "Piano"
 	this.instruments[0] = "Piano";
+	
+	// User's colour gradient for notes palette
+	this.octaveColour = "blue"; 
 }
 
 // Gets the array of tracks a user has made
@@ -73,6 +83,22 @@ Composition.prototype.getAllTracks = function() {
 // Get one particular track a user has made
 Composition.prototype.getTrack = function(trackNum) {
 	return this.tracks[trackNum];
+}
+
+Composition.prototype.getBeatDuration = function() {
+	return this.beatDuration;
+}
+
+Composition.prototype.setBeatDuration = function(dur) {
+	this.beatDuration = dur;
+}
+
+Composition.prototype.getBPM = function() {
+	return this.BPM;
+}
+
+Composition.prototype.setBPM = function(bpm) {
+	this.BPM = bpm;
 }
 
 Composition.prototype.getAllInstruments = function() {
@@ -111,7 +137,7 @@ Composition.prototype.emptyTrack = function(trackNum) {
 	this.tracks[trackNum] = [];
 }
 
-//Empty all tracks 
+// Empty all tracks 
 Composition.prototype.emptyAllTracks = function(trackNum) {
 	var numOfTracks = this.tracks.length;
 	
@@ -121,7 +147,7 @@ Composition.prototype.emptyAllTracks = function(trackNum) {
 
 }
 
-//Gets the boolean value for whether a track has 'playing' enabled or not
+// Gets the boolean value for whether a track has 'playing' enabled or not
 Composition.prototype.isEnablePlaying = function(trackNum) {
 	return this.enablePlaying[trackNum];
 }
@@ -135,7 +161,26 @@ Composition.prototype.getNumTracks = function() {
 	return this.numOfTracks;
 }
 
+//Gets the string representation of colour, 
+//e.g. "blue", "green"...
+Composition.prototype.getOctaveColourString = function() {
+	return this.octaveColour;
+}
 
+// Gets the hexadecimal representation of the String colour, 
+// e.g. "blue" --> "#109bce" (gets this)
+Composition.prototype.getOctaveColour = function() {
+	var coloursList = ["blue", "green", "orange", "red", "white"];
+	var buttonColour = ["#109bce", "#248F24", "#E65C00", "#E60000", "#FFFFFF"];
+	
+	return buttonColour[coloursList.indexOf(this.octaveColour)];
+}
+
+// Sets new string representation of colour of notes palette octave
+// colour must be a string, like "blue", "red"...
+Composition.prototype.setOctaveColour = function(colour) {
+	this.octaveColour = colour;
+}
 
 /*
  * Note Object Constructor
@@ -243,11 +288,13 @@ var animation = new Animation();
 /*--------------------Main Functions----------------------*/
 /*--------------------------------------------------------*/
 function changeBPM(){
-	beatDuration = 0.5; // Flushes the previous values of beatDuration
+	var beatDuration = 0.5;
     var ans = document.getElementById("bpm-input").value;
 	
     // Input validation
     try {
+    	$("#bpm-input").val("");
+    	
     	if (isNaN(ans)) {
     		throw "not a number.";
     	} else if (ans == "") {
@@ -255,21 +302,30 @@ function changeBPM(){
     	} else if (ans < 0) {
     		throw "negative. Please input a positive number."
     	} else if (ans == 0) {
-    		throw "a little too small. Please input a number from 1 to 300";
+    		throw "a little too small. Please input a number from 1 to 300.";
     	} else if (ans > 300) {
-    		throw "Whoa! Too huge! Please input a number from 1 to 300."
+    		throw "...Whoa! Too huge! Please input a number from 1 to 300."
     	} else {
     		beatDuration = beatDuration / (parseInt(ans)/120);
+    		composition.setBeatDuration(beatDuration);
+    		composition.setBPM(parseInt(ans));
     	}
     } catch(error) {
     	alert("Input is " + error);
     }
+    
+    setBPMinput();
+}
+
+function setBPMinput() {
+	$("#bpm-input").attr("placeholder", composition.getBPM() + "");
 }
 
 //play notes consecutively at hard-coded intervals
 function playSequence(trackNumber, startIndex, endIndex) {
     //endIndex = Math.min(endIndex, findMaxLength());
-    var noteDuration = (beatDuration) * 1000;
+    var beatDuration = composition.getBeatDuration();
+	var noteDuration = (beatDuration) * 1000;
     var wholeDuration = (beatDuration) * 1000 * (Math.max(endIndex, playUntil) - startIndex + 1);
 
     //console.log("play Until " + playUntil);
@@ -367,7 +423,7 @@ function clearAllSound(){
 	
 	for (i = 0; i < numOfTracks; i++) {
 		composition.setEnablePlaying(i, true);
-    //set back to normal
+		//set back to normal
 	}
 	
 }
@@ -376,7 +432,9 @@ function clearAllSound(){
 
 function animateAll(){
 console.log("HEY!!!!!!!!!!!!!!!!!!!!!!!!!!!" + "numOfTracks= " + composition.getNumTracks());
-    for(trackIndx = 0; trackIndx < composition.getNumTracks(); trackIndx++){
+    var beatDuration = composition.getBeatDuration();
+	
+	for(trackIndx = 0; trackIndx < composition.getNumTracks(); trackIndx++){
 	console.log("ENABLEPLAYING " + composition.isEnablePlaying(trackIndx));
        if(composition.isEnablePlaying(trackIndx)){
 	        animation.playAnimation(beatDuration * 1000, beatDuration * (playUntil - startPlayingFrom + 1) * 1000, startPlayingFrom, playUntil, trackIndx);
@@ -385,6 +443,8 @@ console.log("HEY!!!!!!!!!!!!!!!!!!!!!!!!!!!" + "numOfTracks= " + composition.get
 }
 
 function loopAll(){
+	var beatDuration = composition.getBeatDuration();
+	
 	if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
     	enableLooping = true;
 	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
@@ -443,6 +503,7 @@ function addTrack(numTracks) {
 }
 
 //Change the look of all notes on the timeline
+//Also makes every 4 consecutive notes have a darker shade
 function updateTimelineNotes() {
 	var trackSelector = "#track";
 	var sortableDivSelector = " .sortable-system div";
@@ -508,11 +569,13 @@ function generateOctaveColour(colour) {
 	var coloursList = [["#005C99", "#007ACC", "#0099FF", "#33ADFF", "#66C2FF", "#99D6FF"], // Blue
 	                   ["#1A661A", "#248F24", "#2EB82E", "#47D147", "#70DB70", "#D1FFC2"], // Green
 	                   ["#B24700", "#E65C00", "#FF6600", "#FF8533", "#FFA366", "#FFB280"], // Orange
-	                   ["#B20000", "#E60000", "#FF0000", "#FF3333", "#FF4D4D", "#FF8080"]]; // Red
+	                   ["#B20000", "#E60000", "#FF0000", "#FF3333", "#FF4D4D", "#FF8080"], // Red
+	                   ["#FFFFFF"]]; // White
 	var numOfOctaves = 6;
 	var octaveHolder = $(".octave-holder");
 	var chosenColour = 0; //Blue by default
-
+	var flatsList = [1, 3, 6, 8, 10]; // Index of flats/sharps on each octave
+	
 	if (colour == "blue") {
 		chosenColour = 0;
 	} else if (colour == "green") {
@@ -521,12 +584,41 @@ function generateOctaveColour(colour) {
 		chosenColour = 2;
 	} else if (colour == "red") {
 		chosenColour = 3;
+	} else if (colour == "white") {
+		chosenColour = 4;
 	}
 	
 	for (octaveNum = 0; octaveNum < numOfOctaves; octaveNum++) {
-		octaveHolder.eq(octaveNum).find(".col-md-1").css({
-			"background": coloursList[chosenColour][octaveNum]
-		});
+		
+		if (chosenColour == 4) { // For white, almost like piano keys' colour
+			octaveHolder.eq(octaveNum).find(".col-md-1").css({
+				"background": "#FFFFFF",
+				"color": "black",
+				"box-shadow": "none",
+				"text-shadow": "none"
+			});
+		} else {
+			// All notes in the octave
+			octaveHolder.eq(octaveNum).find(".col-md-1").css({
+				"background": coloursList[chosenColour][octaveNum],
+				"color": "white",
+				"box-shadow": "inset 0px 1px 0px #808080, 0px 3px 0px 0px #000000, 0px 3px 3px #999",
+				"text-shadow": "1px 1px 0px #000000"
+			});
+		}
+		
+		// Style of flat/sharp notes
+		for (noteNum = 0; noteNum < 12; noteNum++) {
+			for (flatNum = 0; flatNum < 5; flatNum++) {
+				if (noteNum == flatsList[flatNum]) {
+					octaveHolder.eq(octaveNum).children().eq(noteNum).css({
+						"background": "black",
+						"color": "white",
+						"font-size": "22px"
+					});
+				}
+			}
+		}
 	}
 	
 }
@@ -589,30 +681,11 @@ $(document).ready(function() {
 			});
 		});
 		
-		$("#buttons").draggable({ 
-			axis: "y",
-			cursor: "row-resize",
-			containment: "body",
-			handle: "#move-vertical-button",
-			start: function(event, ui) {
-				$(this).animate({
-					opacity: '0.5'
-				});
-			},
-			stop: function(event, ui) {
-				$(this).animate({
-					opacity: '1.0'
-				});
-			}
-		});
-		
 		$("#all").on("click", function() {
 			playAllSequences();
 			startPlayingFrom = 0; //change back to default
 			playUntil = -1; //change back to default
 		});
-		
-	  
 		
 		$("#stop").on("click", function() {
 			enableLooping = false;
@@ -714,9 +787,46 @@ $(document).ready(function() {
 			
 		});
 		
+		// Notes Palette Left Toolbar options
+		$("#buttons").draggable({ 
+			axis: "y",
+			cursor: "row-resize",
+			containment: "body",
+			handle: "#move-vertical-button",
+			start: function(event, ui) {
+				$(this).animate({
+					opacity: '0.5'
+				});
+			},
+			stop: function(event, ui) {
+				$(this).animate({
+					opacity: '1.0'
+				});
+			}
+		});
+		
 		$("#show-button").on("click", function() {
 			$("#show-less-view").toggle();
 			$("#show-more-view").toggle();
+		});
+		
+		$("#colour-button").on("click", function() {
+			var coloursList = ["blue", "green", "orange", "red", "white"];
+			var buttonColour = ["#109bce", "#248F24", "#E65C00", "#E60000", "#FFFFFF"];
+			var currentColour = coloursList[buttonColour.indexOf(composition.getOctaveColour())];
+			var nextColour = coloursList[(coloursList.indexOf(currentColour) + 1) % coloursList.length];
+			
+			composition.setOctaveColour(nextColour);
+			generateOctaveColour(nextColour);
+			
+			$(this).css({
+				"background-color": composition.getOctaveColour()
+			});
+			
+			$("#show-less-octave-holder div").css({
+				"background-color": composition.getOctaveColour()
+			});
+			
 		});
 		
 	}
@@ -877,7 +987,7 @@ $(document).ready(function() {
 	setSortable();
 	initialize();
 	initializeTrackSettings();
-	generateOctaveColour("blue");
+	generateOctaveColour("blue"); // default, but save data may overwrite this later
 	$("#show-less-view").hide();
 	
 	
@@ -973,7 +1083,6 @@ $(document).ready(function() {
 					
 					ui.item.css({
 						"border":"none",
-						"opacity": 1.0
 					});
 					
 				},
@@ -986,7 +1095,7 @@ $(document).ready(function() {
 					if (!inBeforeStop) {
 						ui.item.css({
 							"border": "5px solid red",
-							"opacity": 0.3
+							"background": "red"
 						});
 					}
 					
@@ -1317,7 +1426,7 @@ $(document).ready(function() {
 	    	console.log(songOfPi[count]);
 	    	
 	    	piano.play({
-	    		wait : beatDuration * count,
+	    		wait : composition.getBeatDuration() * count,
 	    		pitch: songOfPi[count],
 				label: 'playing'
 	    	});
@@ -1340,7 +1449,7 @@ $(document).ready(function() {
 						   $("#track0").children().eq(1).append(tempNote);
 						   updateTimelineNotes();
 						   console.log("index " + tempNote.index());
-						   composition.getTrack(0).push(new Note(notes[parseInt(tempNote.attr('data-note'))], beatDuration));
+						   composition.getTrack(0).push(new Note(notes[parseInt(tempNote.attr('data-note'))], composition.getBeatDuration()));
 					   
 					   }
 					
@@ -1477,7 +1586,17 @@ $(document).ready(function() {
 		setSortable();
 		grid.resizeGrid();
 		updateTimelineNotes();
+		setBPMinput();
 		
+		// Reinitialise octave colours for users
+		generateOctaveColour(composition.getOctaveColourString());
+		$("#colour-button").css({
+			"background-color": composition.getOctaveColour()
+		});
+		
+		$("#show-less-octave-holder div").css({
+			"background-color": composition.getOctaveColour()
+		});
 	}
 
 	readSaveData(); // Should be put last after all user 
