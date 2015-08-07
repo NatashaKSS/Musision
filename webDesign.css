@@ -418,9 +418,6 @@ a {
 	top: 3px;
 	cursor:grab;
 	cursor:pointer;
-    box-shadow: inset 0px 1px 0px #c0c0c0, 
-    			0px 2px 0px 0px #808080, 
-    			0px 5px 3px #000000;
 }
 
 .col-md-1:hover {

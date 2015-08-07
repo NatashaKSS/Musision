@@ -50,7 +50,7 @@ function Composition(track) {
 	this.tracks = [track];
 	
 	// Default length of 1 note
-	this.beatDuration;
+	this.beatDuration = 0.5;
 	
 	// User's BPM input
 	this.BPM = parseInt($("#bpm-input").attr("placeholder"));
@@ -594,7 +594,6 @@ function generateOctaveColour(colour) {
 			octaveHolder.eq(octaveNum).find(".col-md-1").css({
 				"background": "#FFFFFF",
 				"color": "black",
-				"box-shadow": "none",
 				"text-shadow": "none"
 			});
 		} else {
@@ -602,7 +601,6 @@ function generateOctaveColour(colour) {
 			octaveHolder.eq(octaveNum).find(".col-md-1").css({
 				"background": coloursList[chosenColour][octaveNum],
 				"color": "white",
-				"box-shadow": "inset 0px 1px 0px #808080, 0px 3px 0px 0px #000000, 0px 3px 3px #999",
 				"text-shadow": "1px 1px 0px #000000"
 			});
 		}
