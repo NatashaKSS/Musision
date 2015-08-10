@@ -30,12 +30,15 @@
 	<script src="introJs/intro.js"></script>
 	<script src="bower_components/Recorderjs/recorder.js"></script>
     <script src="app.js"></script>
+	<script src="jsmidi-master/midi.js"></script>
+	
 
 	<!---<script type="text/javascript" src="MP3RecorderJS-master/js/mp3recorder.js"></script>
 	<!-- Own Custom scripts in local directory-->
 	<script src="instruments.js"></script>
 	<script src="gridSystem.js"></script>
 	<script src="jQuery.js"></script>
+	<script src="saveMidi.js"></script>
 	
 </head>
 
@@ -45,6 +48,23 @@
 		Here are the <a href="http://www.enable-javascript.com" target="_blank"> 
 		instructions how to enable JavaScript in your web browser</a>
 	</noscript>
+	
+<!---<object id="Jazz1" classid="CLSID:1ACE1618-1C7D-4561-AEE1-34842AA85E90" class="hidden">
+        <object id="Jazz2" type="audio/x-jazz" class="hidden">
+            <p style="visibility:visible;">This page requires <a href=http://jazz-soft.net>Jazz-Plugin</a> ...</p>
+        </object>
+    </object>
+	
+	<script>
+        var Jazz = document.getElementById("Jazz1"); if(!Jazz || !Jazz.isJazz) Jazz = document.getElementById("Jazz2");
+    </script>
+	
+	<script>
+        Jazz.MidiOut(0x90,60,120);
+    </script>
+	
+	--->
+	
 	
 	<div id="fb-root"></div>
 	<script>
@@ -127,11 +147,11 @@
                      <button id="stopRec"  class="stop"> Stop </button>
              </div>      
             </div>---> 
-               <button id="startRec" class="btn" onclick="record()">Record</button>
-               <button id="stopRec" class="btn" onclick="stop()"
+               <button id="download" class="btn" onclick="saveMIDI()">Download</button>
+              <!--- <button id="stopRec" class="btn" onclick="stop()"
                		   data-step="15" data-intro="Look out! These 2 greyed out buttons here are still under construction!" 
                		   data-position="right">Stop</button>
-			
+			--->
 			   <div class="fb-like" data-href="http://musision-0511.appspot.com" data-width="50" 
   	   				data-layout="button_count" data-action="like" data-show-faces="true" data-share="true">
   	   	 	   </div>

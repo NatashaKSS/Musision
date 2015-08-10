@@ -447,7 +447,7 @@ a {
 	border-radius: 30%;
 }
 
-.startRec{
+.download{
     position: absolute;
     margin-left: 100px;
     margin-top: 50px;
@@ -457,4 +457,16 @@ a {
 .stopRec{
     position: relative;
     margin-left: 20px;	
+}
+/*
+.hidden {
+ visibility: hidden;
+ width: 0px;
+ height: 0px;
+ margin: 0px;
+ padding: 0px;
+ border-style: none;
+ border-width: 0px;
+ max-width: 0px;
+ max-height: 0px;
 }

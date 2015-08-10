@@ -31,7 +31,7 @@ var playUntil = -1;
 var pi = Math.PI;
 var songOfPi = [];  //to prepare for the song using PI's numbers
 var goldenRatio = (1 + Math.sqrt(5))/2;
-
+var track0 = [];//for downloading
 // Important! The Wad object in instrumentObjects array corresponds to 
 // the position of the corresponding string representation of that instrument obj
 // Please do not jumble sequence and always make sure it is parallel!
@@ -123,6 +123,10 @@ Composition.prototype.addTrack = function(track) {
 // Adds a note to a specified track in a user's composition
 Composition.prototype.addNote = function(trackNum, note) {
 	this.tracks[trackNum].push(note);
+}
+
+Composition.prototype.getNote = function(trackNum, noteIndex) {
+	return this.tracks[trackNum][noteIndex];
 }
 
 // Removes a track from composition 
@@ -640,7 +644,8 @@ $(document).ready(function() {
 	    .end()
 	    .appendTo('#slideshow');
     },  6000);
-
+	
+	
 	function initialize() {
 		initializeTrackSettings();
 		readSaveData();
@@ -726,7 +731,7 @@ $(document).ready(function() {
 		    if(findMaxLength() > 0)loopAll();
 	    });	
 		
-		$("#addTrack").on("click", function() {
+		$("#addTrack").on("click", function() {		
 			//  First add a new track to our composition
 			composition.addTrack([]);
 			
@@ -740,7 +745,13 @@ $(document).ready(function() {
 		$("#saveData").on("click", function() {
 			writeSaveData();
 			$(this).html("Saved!");
-		});
+			setUpMIDI();
+			
+        });
+			
+			
+			//saveMIDI();
+		
 		/*
         $("startRec").on("click", function(){
 		    exportAudio();
@@ -1328,32 +1339,23 @@ $(document).ready(function() {
 
 
 	//from wad.js documentation
-	$("#saveData").on("click", function(){
-		var mixerTrack = new Wad.Poly({
-            recConfig : { // The Recorder configuration object. The only required property is 'workerPath'.
-            workerPath : 'Recorderjs/recorderWorker.js' // The path to the Recorder.js web worker script.
-            }
-        });
-		
-		mixerTrack.rec.record();
-        
-        playAllSequences();		
-		
-		setTimeout(function(){
-            mixerTrack.rec.stop();  
-		}, findMaxLength() * beatDuration * 1000);
-        
-		//mixerTrack.rec.createWad(); 
-		//mixerTrack.rec.recordings[0].play();
-        // export it to WAV
-            mixerTrack.rec.exportWAV(function(e){
-                mixerTrack.rec.clear();
-				//audio.src = window.URL.createObjectURL(e);
-                Recorder.forceDownload(e, "musision.wav");
-            });
-			
-			
-       // }		
+	var sine = new Wad({source : 'sine'})
+var mixerTrack = new Wad.Poly({
+    recConfig : { // The Recorder configuration object. The only required property is 'workerPath'.
+        workerPath : '/src/Recorderjs/recorderWorker.js' // The path to the Recorder.js web worker script.
+    }
+})
+mixerTrack.add(sine)
+
+mixerTrack.rec.record()             // Start recording output from this PolyWad.
+sine.play({pitch : 'C3'})           // Make some noise!
+mixerTrack.rec.stop()               // Take a break.
+mixerTrack.rec.record()             // Append to the same recording buffer.
+sine.play({pitch : 'G3'})
+mixerTrack.rec.stop()
+mixerTrack.rec.createWad()          // This method accepts the same arguments as the Wad constructor, except that the 'source' is implied, so it's fine to call this method with no arguments. 
+mixerTrack.rec.recordings[0].play() // The most recent recording is unshifted to the front of this array.
+mixerTrack.rec.clear()              // Clear the recording buffer when you're done with it, so you can record something else.	
 	});
 */
 	//end recorder.js
@@ -1424,7 +1426,7 @@ $(document).ready(function() {
 	    	console.log(songOfPi[count]);
 	    	
 	    	piano.play({
-	    		wait : composition.getBeatDuration() * count,
+	    		wait : composition.getBeatDuration() * (count - randomStart),
 	    		pitch: songOfPi[count],
 				label: 'playing'
 	    	});
