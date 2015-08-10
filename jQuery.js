@@ -475,12 +475,12 @@ function loopAll(){
 	
 	}
 }
-
+/*
 function exportAudio(){
     record();
 	playAllSequences();
 }
-
+*/
 
 // Adds a track to user composition and updates user interface
 // respectively

@@ -1,4 +1,5 @@
 function setUpMIDI(){
+    console.log("in setUpMIDI");
 	var trackSelector = "#track";
 	var sortableDivSelector = " .sortable-system div";
     var selector = trackSelector + 0 + sortableDivSelector;	
@@ -20,6 +21,7 @@ function saveMIDI() {
 	*/
 	//["C4", "D4", "E4", "F4", "G4"]
     var noteEvents = [];
+	
     ["C4", "D4", "E4", "F4", "G4"].forEach(function(note) {
         Array.prototype.push.apply(noteEvents, MidiEvent.createNote(note));
     });

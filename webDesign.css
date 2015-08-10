@@ -454,6 +454,13 @@ a {
     
 }
 
+.startRec{
+    position: absolute;
+    margin-left: 100px;
+    margin-top: 50px;
+    
+}
+
 .stopRec{
     position: relative;
     margin-left: 20px;	
