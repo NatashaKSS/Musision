@@ -1197,161 +1197,7 @@ $(document).ready(function() {
 	}
 	
 	
-	
-//https://truongtx.me/2014/08/09/record-and-export-audio-video-files-in-browser-using-web-audio-api/	
 
-/*
-    function record() {
-     // ask for permission and start recording
-      navigator.getUserMedia({audio: true}, function(localMediaStream){
-       mediaStream = localMediaStream;
-
-    // create a stream source to pass to Recorder.js
-       var mediaStreamSource = context.createMediaStreamSource(localMediaStream);
-
-    // create new instance of Recorder.js using the mediaStreamSource
-       rec = new Recorder(mediaStreamSource, {
-      // pass the path to recorderWorker.js file here
-        workerPath: 'Recorderjs/recorderWorker.js'
-       });
-
-    // start recording
-        rec.record();
-		playAllSequences();
-		
-      }, function(err){
-           console.log('Browser not supported');
-        });
-   }
-   */
-/*
-
-    function stop() {
-       // stop the media stream
-       mediaStream.stop();
-
-       // stop Recorder.js
-       rec.stop();
-/*
-       // export it to WAV
-       rec.exportWAV(function(e){
-       rec.clear();
-       Recorder.forceDownload(e, "musision.wav");
-       });
-	   */
-/*	   
-	function upload(blobOrFile) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/upload.aspx', true);
-        xhr.onload = function (e) {
-           var result = e.target.result;
-        };
-
-        xhr.send(blobOrFile);
-    }
-*/
-// stop recording function calls the upload method
-// I am using recorder.js
-/*
-        rec.exportWAV(function (blob) {
-            var url = URL.createObjectURL(blob);
-            audio.src = url;
-            audio.controls = true;
-            var hf = document.createElement('a');
-            hf.href = url;
-            hf.download = new Date().toISOString() + '.wav';
-            upload(blob);   
-        });
-		
- }	
-//});
-*/
-	
-	
-	/*
-	
-	$("#saveData").on("click", function(){
-	    var audio_context;
-
-        function __log(e, data) {
-          log.innerHTML += "\n" + e + " " + (data || '');
-        }
-
-        $(function() {
-
-            try {
-            // webkit shim
-                window.AudioContext = WINDOW.AudioContext || window.webkitAudioContext;
-                navigator.getUserMedia = ( navigator.getUserMedia ||
-                     navigator.webkitGetUserMedia ||
-                     navigator.mozGetUserMedia ||
-                     navigator.msGetUserMedia);
-                window.URL = window.URL || window.webkitURL;
-
-            var audio_context = new AudioContext;
-            __log('Audio context set up.');
-            __log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not  present!'));
-           } catch (e) {
-                alert('No web audio support in this browser!');
-           }
-
-        $('.recorder .start').on( 'CLICK', function() {
-            $this = $(this);
-            $recorder = $this.parent();
-
-            navigator.getUserMedia({audio: true}, function( STREAM) {
-            var recorderObject = new MP3Recorder(audio_context, STREAM, { statusContainer:  $recorder.find('.status'), statusMethod: 'replace' });
-            $recorder.data('recorderObject', recorderObject);
-
-            recorderObject.start();
-            }, function(e) { });
-        });
-
-        $('.recorder .stop').on( 'CLICK', function() {
-            $this = $(this);
-            $recorder = $this.parent();
-        
-            recorderObject = $recorder.data('recorderObject');
-            recorderObject.stop();
-        
-            recorderObject.exportMP3(function(base64_mp3_data) {
-                var url = 'data:audio/mp3;base64,' + base64_mp3_data;
-                var au  = document.createElement('audio');
-                au.controls = true;
-                au.src = url;
-                $recorder.append(au);
-          
-            recorderObject.logStatus('');
-            });
-
-        });
-
-    });
-});	
-	
-
-
-	//from wad.js documentation
-	var sine = new Wad({source : 'sine'})
-var mixerTrack = new Wad.Poly({
-    recConfig : { // The Recorder configuration object. The only required property is 'workerPath'.
-        workerPath : '/src/Recorderjs/recorderWorker.js' // The path to the Recorder.js web worker script.
-    }
-})
-mixerTrack.add(sine)
-
-mixerTrack.rec.record()             // Start recording output from this PolyWad.
-sine.play({pitch : 'C3'})           // Make some noise!
-mixerTrack.rec.stop()               // Take a break.
-mixerTrack.rec.record()             // Append to the same recording buffer.
-sine.play({pitch : 'G3'})
-mixerTrack.rec.stop()
-mixerTrack.rec.createWad()          // This method accepts the same arguments as the Wad constructor, except that the 'source' is implied, so it's fine to call this method with no arguments. 
-mixerTrack.rec.recordings[0].play() // The most recent recording is unshifted to the front of this array.
-mixerTrack.rec.clear()              // Clear the recording buffer when you're done with it, so you can record something else.	
-	});
-*/
-	//end recorder.js
 	
 	//Preparing for our random PI song	
 	
@@ -1740,6 +1586,163 @@ console.log(generateNotes());
 ----------CODE ON HOLD--------------
 ------------------------------------
 //RECORDING
+	
+//https://truongtx.me/2014/08/09/record-and-export-audio-video-files-in-browser-using-web-audio-api/	
+
+/*
+    function record() {
+     // ask for permission and start recording
+      navigator.getUserMedia({audio: true}, function(localMediaStream){
+       mediaStream = localMediaStream;
+
+    // create a stream source to pass to Recorder.js
+       var mediaStreamSource = context.createMediaStreamSource(localMediaStream);
+
+    // create new instance of Recorder.js using the mediaStreamSource
+       rec = new Recorder(mediaStreamSource, {
+      // pass the path to recorderWorker.js file here
+        workerPath: 'Recorderjs/recorderWorker.js'
+       });
+
+    // start recording
+        rec.record();
+		playAllSequences();
+		
+      }, function(err){
+           console.log('Browser not supported');
+        });
+   }
+   */
+/*
+
+    function stop() {
+       // stop the media stream
+       mediaStream.stop();
+
+       // stop Recorder.js
+       rec.stop();
+/*
+       // export it to WAV
+       rec.exportWAV(function(e){
+       rec.clear();
+       Recorder.forceDownload(e, "musision.wav");
+       });
+	   */
+/*	   
+	function upload(blobOrFile) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/upload.aspx', true);
+        xhr.onload = function (e) {
+           var result = e.target.result;
+        };
+
+        xhr.send(blobOrFile);
+    }
+*/
+// stop recording function calls the upload method
+// I am using recorder.js
+/*
+        rec.exportWAV(function (blob) {
+            var url = URL.createObjectURL(blob);
+            audio.src = url;
+            audio.controls = true;
+            var hf = document.createElement('a');
+            hf.href = url;
+            hf.download = new Date().toISOString() + '.wav';
+            upload(blob);   
+        });
+		
+ }	
+//});
+*/
+	
+	
+	/*
+	
+	$("#saveData").on("click", function(){
+	    var audio_context;
+
+        function __log(e, data) {
+          log.innerHTML += "\n" + e + " " + (data || '');
+        }
+
+        $(function() {
+
+            try {
+            // webkit shim
+                window.AudioContext = WINDOW.AudioContext || window.webkitAudioContext;
+                navigator.getUserMedia = ( navigator.getUserMedia ||
+                     navigator.webkitGetUserMedia ||
+                     navigator.mozGetUserMedia ||
+                     navigator.msGetUserMedia);
+                window.URL = window.URL || window.webkitURL;
+
+            var audio_context = new AudioContext;
+            __log('Audio context set up.');
+            __log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not  present!'));
+           } catch (e) {
+                alert('No web audio support in this browser!');
+           }
+
+        $('.recorder .start').on( 'CLICK', function() {
+            $this = $(this);
+            $recorder = $this.parent();
+
+            navigator.getUserMedia({audio: true}, function( STREAM) {
+            var recorderObject = new MP3Recorder(audio_context, STREAM, { statusContainer:  $recorder.find('.status'), statusMethod: 'replace' });
+            $recorder.data('recorderObject', recorderObject);
+
+            recorderObject.start();
+            }, function(e) { });
+        });
+
+        $('.recorder .stop').on( 'CLICK', function() {
+            $this = $(this);
+            $recorder = $this.parent();
+        
+            recorderObject = $recorder.data('recorderObject');
+            recorderObject.stop();
+        
+            recorderObject.exportMP3(function(base64_mp3_data) {
+                var url = 'data:audio/mp3;base64,' + base64_mp3_data;
+                var au  = document.createElement('audio');
+                au.controls = true;
+                au.src = url;
+                $recorder.append(au);
+          
+            recorderObject.logStatus('');
+            });
+
+        });
+
+    });
+});	
+	
+
+
+	//from wad.js documentation
+	var sine = new Wad({source : 'sine'})
+var mixerTrack = new Wad.Poly({
+    recConfig : { // The Recorder configuration object. The only required property is 'workerPath'.
+        workerPath : '/src/Recorderjs/recorderWorker.js' // The path to the Recorder.js web worker script.
+    }
+})
+mixerTrack.add(sine)
+
+mixerTrack.rec.record()             // Start recording output from this PolyWad.
+sine.play({pitch : 'C3'})           // Make some noise!
+mixerTrack.rec.stop()               // Take a break.
+mixerTrack.rec.record()             // Append to the same recording buffer.
+sine.play({pitch : 'G3'})
+mixerTrack.rec.stop()
+mixerTrack.rec.createWad()          // This method accepts the same arguments as the Wad constructor, except that the 'source' is implied, so it's fine to call this method with no arguments. 
+mixerTrack.rec.recordings[0].play() // The most recent recording is unshifted to the front of this array.
+mixerTrack.rec.clear()              // Clear the recording buffer when you're done with it, so you can record something else.	
+	});
+*/
+	//end recorder.js
+
+
 /*
 	//from p5.js  at http://p5js.org/examples/examples/Sound__Record_Save_Audio.php
 	
