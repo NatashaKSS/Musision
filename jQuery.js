@@ -743,14 +743,11 @@ $(document).ready(function() {
 		});
 		
 		$("#saveData").on("click", function() {
+			//setUpMIDI();
 			writeSaveData();
-			$(this).html("Saved!");
-			setUpMIDI();
-			
+			$(this).html("Saved!");	
         });
 			
-			
-			//saveMIDI();
 		
 		/*
         $("startRec").on("click", function(){
@@ -903,13 +900,9 @@ $(document).ready(function() {
 	    $(".displayInstrument").unbind().on("click", function(){
 	        var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
 			var instrument = document.getElementById("Instrument" + trackNum);//current instrument at the specific track number
-		    //console.log("this instrument " + "Instrument" + trackNum + " " + instrument.textContent);
 			var currentInstrument = instrument.textContent;
-			//console.log("current instrument " + $("#timeline-system").children().eq(trackNum).find(".displayInstrument").firstChild.data);
 			var currIndex = allInstruments.indexOf(currentInstrument);
 		    var nextInstrument = allInstruments[(currIndex + 1) % allInstruments.length];
-	        //console.log("currIndex " + currIndex);
-			//console.log("nextInstrumentIndex " + nextInstrument);
 		    composition.setInstrument(trackNum, nextInstrument);
 		    instrument.textContent = nextInstrument;
       
