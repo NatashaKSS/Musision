@@ -264,8 +264,22 @@ MidiEvent.createNote = function(note, channel) {
     }
 
     var events = [];
-    events.push(MidiEvent.noteOn(note, channel));
-
+    
+	if(note != "silence"){ 
+	    events.push(MidiEvent.noteOn(note, channel));
+	} else {
+	    var silence = new MidiEvent({
+                          time:  DEFAULT_DURATION,
+		                  //time: 0.5,
+                          type:    EVT_NOTE_ON,
+                          // channel: note.channel || DEFAULT_CHANNEL,
+	                      channel: channel,
+                          param1:  "C0",
+                          param2:  0
+                     });
+	    events.push(silence);
+	}
+     
     // If there is a |sustained| parameter, the note will keep playing until
     // a noteOff event is issued for it.
 	
@@ -296,12 +310,25 @@ MidiEvent.noteOn = function(note, channel) {
 		//time: 0.5,
         type:    EVT_NOTE_ON,
        // channel: note.channel || DEFAULT_CHANNEL,
-	   channel: channel,
+	    channel: channel,
         param1:  note,
         param2:  DEFAULT_VOLUME
     });
 };
 
+MidiEvent.setInst = function(channel, instrument) {
+    return new MidiEvent({
+        //time:  0,
+		//time: 0.5,
+        type:    EVT_PROGRAM_CHANGE,
+       // channel: note.channel || DEFAULT_CHANNEL,
+	    channel: channel,
+        param1:  instrument
+        //param2:  DEFAULT_VOLUME
+    });
+};
+
+//var playGuitar = new MidiEvent.setInst(0, 0x1A);
 /**
  * Returns an event of the type NOTE_OFF taking the values passed and falling
  * back to defaults if they are not specified.
@@ -313,7 +340,7 @@ MidiEvent.noteOn = function(note, channel) {
 
 MidiEvent.noteOff = function(note, channel) {
     return new MidiEvent({
-        time:    DEFAULT_DURATION,
+        time:    composition.getBeatDuration() * 275,
         type:    EVT_NOTE_OFF,
         channel: channel,
         param1:  note,

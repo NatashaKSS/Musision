@@ -31,12 +31,13 @@ var playUntil = -1;
 var pi = Math.PI;
 var songOfPi = [];  //to prepare for the song using PI's numbers
 var goldenRatio = (1 + Math.sqrt(5))/2;
-var track0 = [];//for downloading
+
 // Important! The Wad object in instrumentObjects array corresponds to 
 // the position of the corresponding string representation of that instrument obj
 // Please do not jumble sequence and always make sure it is parallel!
 var allInstruments = ["Piano", "Guitar", "Violin", "Flute", "Bell"];
 var instrumentObjects = [piano, synthGuitar, string, flute, bell];
+var GMinstruments = [0x00, 0x1D, 0x28, 0x4B, 0x0A];
 
 
 /*
@@ -644,6 +645,7 @@ $(document).ready(function() {
 	    .end()
 	    .appendTo('#slideshow');
     },  6000);
+	
 	
 	
 	function initialize() {
