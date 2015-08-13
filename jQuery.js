@@ -811,7 +811,7 @@ $(document).ready(function() {
 		$("#buttons").draggable({ 
 			axis: "y",
 			cursor: "row-resize",
-			containment: "body",
+			containment: ".workspace",
 			handle: "#move-vertical-button",
 			start: function(event, ui) {
 				$(this).animate({

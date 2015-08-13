@@ -1,3 +1,23 @@
+/*
+For Nat's reference:
+Icons:
+Random me! / Random!
+Play toggle to Stop
+Rec toggle to Stop
+Looping swirly icon toggle to Stop looping
+Download icon bootstrap
+
+Save: glyphicon glyphicon-floppy-disk/ glyphicon glyphicon-floppy-saved
+Play/Stop: glyphicon glyphicon-play-circle/ glyphicon glyphicon-stop
+Start Looping/ Stop Looping: glyphicon glyphicon-repeat/ glyphicon glyphicon-stop (Might need accompanying text)
+Add Track: glyphicon glyphicon-plus + "Track"
+Clear All: None
+PI song!: "Random!"
+Download: glyphicon glyphicon-download-alt
+Record/Stop: glyphicon glyphicon-record/ glyphicon glyphicon-stop(red colour)
+
+http://www.w3schools.com/bootstrap/bootstrap_ref_comp_glyphs.asp
+*/
 body {
 	font-family: "Trebuchet MS", Verdana, sans-serif;
 	margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px
@@ -42,7 +62,7 @@ a {
 	background-color: #b3b3b3;
 }
 
-.btn:hover{
+.btn:hover {
     background-color: #e0e1ce;
 }
 
@@ -53,35 +73,37 @@ a {
 }
 
 /* Basic tips section */
+#tips {
+    position: relative;
+	margin-top:10px;  
+    margin-left: 75%;
+	background-color: #b3b3b3;
+	color: black;
+	font-family: "Trebuchet MS", Verdana, sans-serif;
+}
+
+#tips:hover {
+	background-color: #e0e1ce;
+}
+
 #slideshow { 
-    margin: 10px auto; 
+    margin: 7px auto; 
     position: relative; 
     width: 1000px; 
     height: 100px; 
     padding: 10px; 
     box-shadow: 0 0 20px rgba(0,0,0,0.4); 
-	font-family:Verdana;
+	font-size: 1.2em;
+	font-family: "Trebuchet MS", Verdana, sans-serif;
 	width: 80%;
 }
 
-#tips {
-    position: relative; 
-	margin-top:10px;  
-    margin-left: 75%;	
-	color: black;
-	font-family: "Trebuchet MS", Verdana, sans-serif;
-}
-
-#slideshow > div { 
+.tip {
     position: absolute; 
     top: 10px; 
     left: 10px; 
     right: 10px; 
     bottom: 10px; 
-}
-
-.tip {
-    text-align: centre;
 }
 
 /* Contains user workspace, timeline and everything else 
@@ -104,18 +126,18 @@ a {
 }
 
 /* Triangular play button */
-.glyphicon-play {
-	font-size: 25px;
+.glyphicon-play-circle {
+	font-size: 28px;
 	margin: auto;
-	padding: 0px 0px 0px 2px;
+	padding: 0px 0px 0px 0px;
 	float: left;
 }
 
-.glyphicon-play:hover {
-	top: 4px;
-	box-shadow: 0px 2px 5px 0px yellow;
-	-webkit-box-shadow: 0px 2px 5px 0px yellow;
-	-moz-box-shadow: 0px 2px 5px 0px yellow;
+.glyphicon-play-circle:hover {
+	top: 3px;
+	box-shadow: 0px 2px 5px 0px #ffffff;
+	-webkit-box-shadow: 0px 2px 5px 0px #ffffff;
+	-moz-box-shadow: 0px 2px 5px 0px #ffffff;
 }
 
 .glyphicon:active {
