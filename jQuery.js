@@ -601,6 +601,12 @@ function generateOctaveColour(colour) {
 				"color": "black",
 				"text-shadow": "none"
 			});
+			
+			$("#show-less-octave-holder").children().css({
+				"color": "black",
+				"text-shadow": "none"
+			});
+			
 		} else {
 			// All notes in the octave
 			octaveHolder.eq(octaveNum).find(".col-md-1").css({
@@ -608,6 +614,12 @@ function generateOctaveColour(colour) {
 				"color": "white",
 				"text-shadow": "1px 1px 0px #000000"
 			});
+			
+			$("#show-less-octave-holder").children().css({
+				"color": "white",
+				"text-shadow": "1px 1px 0px #000000"
+			});
+			
 		}
 		
 		// Style of flat/sharp notes
@@ -1554,7 +1566,7 @@ function generateNotes() {
 	var octaveClassName = "octave-holder";
 	var numOfOctaves = 6;
 	var numOfNotesInOctave = 12;
-	var restDiv = "<div style='font-size: 20px;' class='col-md-1' data-note='silence'>Rest</div>";
+	//var restDiv = "<div style='font-size: 20px;' class='col-md-1' data-note='silence'>Rest</div>";
 	
 	for (octaveNum = 0; octaveNum < numOfOctaves; octaveNum++) {
 		
@@ -1567,7 +1579,7 @@ function generateNotes() {
 			allNotesDivs += generateNotesDivs(noteIndex, notes[noteIndex]);
 		}
 		
-		result += allNotesDivs + restDiv + "</div>";
+		result += allNotesDivs + "</div>";
 		
 	}
 	
