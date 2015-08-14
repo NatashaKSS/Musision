@@ -29,8 +29,8 @@ var animationLoopId = 0;
 var startPlayingFrom = 0;
 var playUntil = -1;
 var pi = Math.PI;
-var songOfPi = [];  //to prepare for the song using PI's numbers
-var goldenRatio = (1 + Math.sqrt(5))/2;
+var songOfPi = [];  //to prepare for the song using PI's numbers (added PHI but to change the name of the array is quite troublesome so i left it there
+var phi = (1 + Math.sqrt(5))/2;
 
 // Important! The Wad object in instrumentObjects array corresponds to 
 // the position of the corresponding string representation of that instrument obj
@@ -949,6 +949,8 @@ $(document).ready(function() {
 					trackSystem.children().eq(trackIndex).find(".play-button").attr('id', "play-track" + trackIndex);
 					// Change ID of each track
 					trackSystem.children().eq(trackIndex).children().eq(1).attr('id', "track" + trackIndex);
+					// Change ID of each track's instrument
+					trackSystem.children().eq(trackIndex).find(".displayInstrument").attr('id', "Instrument" + trackIndex);
 				}
 			} else {
 				alert("Can't delete last remaining track!");
@@ -1215,10 +1217,17 @@ $(document).ready(function() {
 	
 	//Preparing for our random PI song	
 	
-	//generating the song of PI
-	var piSong = function(pivot, numOfNotes){//num of notes to add on top of the pivot
-	    var timesTen = pi * Math.pow(10, numOfNotes - 1);
-		songOfPi.push(notes[pivot]);
+	//generating the song of PI/PHI
+	var randomSong = function(pivot, numOfNotes){//num of notes to add on top of the pivot
+	    songOfPi.push(notes[pivot]);
+		var timesTen = 0;
+		
+		if(Math.random() > 0.5 ){ 
+		    timesTen = pi * Math.pow(10, numOfNotes - 1);
+		} else {
+		    timesTen = phi * Math.pow(10, numOfNotes - 1);
+		}
+		
 		
 		for(count = numOfNotes; count >= 0; count--) {
 	        var div = Math.floor(timesTen / (Math.pow(10, count - 1)));
@@ -1231,7 +1240,7 @@ $(document).ready(function() {
 	}				
 	
 	var randomStart;
-		
+	 	
 	var playSongOfPi = function() {
 	    //initiate random variables
 	    var randomLength = function(){
@@ -1268,7 +1277,7 @@ $(document).ready(function() {
 	    }
 		
 		console.log("done choosing pivot");
-	    piSong(randomPivot(), randomLength());
+	    randomSong(randomPivot(), randomLength());
 		console.log(songOfPi.length);	
 	    //play out from any index of the song of PI	
 	    randomStart = Math.floor(Math.random() * 1099) % randomLength(); 
