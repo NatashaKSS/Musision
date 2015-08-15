@@ -25,6 +25,7 @@ var notes = ["C2","C#2","D2","D#2","E2","F2","F#2","G2","G#2","A2","A#2","B2",  
  */
 var enableLooping = false;
 var loopId = 0;
+var playId = 0;
 var animationLoopId = 0;
 var startPlayingFrom = 0;
 var playUntil = -1;
@@ -37,7 +38,7 @@ var phi = (1 + Math.sqrt(5))/2;
 // Please do not jumble sequence and always make sure it is parallel!
 var allInstruments = ["Piano", "Guitar", "Violin", "Flute", "Bell"];
 var instrumentObjects = [piano, synthGuitar, string, flute, bell];
-var GMinstruments = [0x00, 0x1D, 0x28, 0x4B, 0x0A];
+var GMinstruments = [0x00, 0x1D, 0x28, 0x4B, 0x0A];//the MIDI code number of each corresponding instrument
 
 
 /*
@@ -268,13 +269,14 @@ Animation.prototype.playAnimation = function(duration, wholeDuration, startIndex
 //Stops all animation regardless of whether setTimeout or setInterval has been set
 Animation.prototype.stopAnimation = function() {
 	
+	$(".sortable-system div").css({
+		"border": "none",
+		"background": "#109bce"
+	});
+	
 	$(".sortable-system div").map(function() {
 		clearTimeout(this.currentAnimationOngoing);
 		clearTimeout(this.revertAnimationOngoing);
-	});
-	
-	$(".sortable-system div").css({
-		"border": "none"
 	});
 	
 	updateTimelineNotes();
@@ -384,7 +386,9 @@ function findMaxLength(){
 }
 
 function playAllSequences() {
-
+    
+    playId = new Date();	
+	
     console.log("max length = "  + findMaxLength());
     console.log("start index = " + startPlayingFrom);
 		
@@ -404,6 +408,12 @@ function playAllSequences() {
 	}
 }
 
+function stopAllSounds(){
+    for(inst = 0; inst < instrumentObjects.length; inst++){
+	    instrumentObjects[inst].stop("playing");
+	}
+}
+
 //empty the note array    
 function clearAllSound(){
 	var numOfTracks = composition.getAllTracks().length;
@@ -413,17 +423,12 @@ function clearAllSound(){
 		composition.emptyAllTracks(); // Empties all tracks
 	}
 	
-	piano.stop("playing");
-    synthGuitar.stop("playing");
-	string.stop("playing");
-	flute.stop("playing");
-	bell.stop("playing");
+	stopAllSounds();
 	
     if(enableLooping){
 	    document.getElementById("startLoop").value = "Start Looping";
         document.getElementById("startLoop").innerHTML = "Start Looping";
 	    clearInterval(loopId);
-	
     }
 	
 	for (i = 0; i < numOfTracks; i++) {
@@ -476,12 +481,27 @@ function loopAll(){
 	
 	}
 }
-/*
-function exportAudio(){
-    record();
-	playAllSequences();
+//back to pause ;)
+
+function pause(){
+    startPlayingFrom = Math.floor((new Date() - playId)/(composition.getBeatDuration() * 1000)) - 1;
+	
+	console.log("paused at " + startPlayingFrom);
+	
+	stopAllSounds();
+	
+    clearInterval(loopId);
+	clearInterval(animationLoopId);	
 }
-*/
+
+function resume(){
+   
+    playAllSequences();
+	startPlayingFrom = 0;
+	playUntil = -1;
+	playId = 0;
+}
+
 
 // Adds a track to user composition and updates user interface
 // respectively
@@ -643,6 +663,8 @@ function generateOctaveColour(colour) {
 /*--------Document interaction with JQuery--------*/
 /*------------------------------------------------*/
 $(document).ready(function() {
+
+//tips for beginners
     $("#tips").on("click", function(){
 	    $("#slideshow").toggle();
 	});
@@ -707,21 +729,16 @@ $(document).ready(function() {
 		$("#stop").on("click", function() {
 			enableLooping = false;
 			
-		    piano.stop("playing");
-		    synthGuitar.stop("playing");
-			string.stop("playing");
-			flute.stop("playing");
-		    bell.stop("playing");
-			
-		    startPlayingFrom = 0;//change back to default
-			playUntil = - 1;//change back to default
+		    stopAllSounds();
 		    animation.stopAnimation();
 			    
 		    	document.getElementById("startLoop").value = "Start Looping";
 			    document.getElementById("startLoop").innerHTML = "Start Looping";
 		        clearInterval(loopId);
 				clearInterval(animationLoopId);
-			
+				
+			startPlayingFrom = 0;//change back to default
+			playUntil = - 1;//change back to default
 		});
 		
 		$("#clear").on("click", function() {
@@ -729,16 +746,32 @@ $(document).ready(function() {
 			$(".sortable-system div").remove(); //remove notes from the timeline
 		    enableLooping = false;
 			clearAllSound();
-			
 			animation.stopAnimation();
-			startPlayingFrom = 0;//change back to default
-			playUntil = - 1;//change back to default
+			
 			    document.getElementById("startLoop").value = "Start Looping";
 			    document.getElementById("startLoop").innerHTML = "Start Looping";
 		        clearInterval(loopId);
 				clearInterval(animationLoopId);
-			
+				
+			startPlayingFrom = 0;//change back to default
+			playUntil = - 1;//change back to default
 		});
+		
+		$("#pause").on("click", function(){
+		    if(document.getElementById("pause").value == "Pause"){//if currently playing and pause is clicked, enablePlaying = true, pause = true
+		    document.getElementById("pause").value = "Resume";
+			document.getElementById("pause").innerHTML = "Resume";
+
+			console.log("PAUSE NOW!!!!");
+			pause();
+			
+			} else {//want to resume
+			document.getElementById("pause").value = "Pause";
+			document.getElementById("pause").innerHTML = "Pause";
+			console.log("CONTINUE!!!!");
+		    resume();	
+			}
+		});//end pause
 		
 		$("#startLoop").on("click", function() {
 		    enableLooping = true;

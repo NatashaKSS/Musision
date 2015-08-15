@@ -95,6 +95,8 @@
 			 <button id="stop" class="btn" data-step="8" data-intro="Click here to stop playing everything." 
 			 		 data-position="right" TITLE="Stop playing"> Stop </button>
 			 
+			  <button id ="pause" class="btn"> Pause </button>
+			  
 			 <!--<li><a id="same" href="#" data-step="5" data-intro="Click here to play all notes on the timeline simultaneously" data-position="bottom">Play All</a></li>-->
 			 
 			 <!--  to loop all unmuted tracks -->
@@ -107,6 +109,7 @@
 			 <button id="addTrack" class="btn" data-step="10" data-intro="Click here to add a track to your composition."
 			  		 data-position="right"> Add Track </button>
 			 
+			
 			 <!--- to clear all notes from timeline --->
 			 <button id="clear" class="btn" data-step="11" data-intro="Click here to clear all notes from 
 			  		 all of your tracks" data-position="right" 
@@ -123,15 +126,10 @@
 			  <button id="bpm-button" class="btn" onclick=changeBPM() 
 			  		  TITLE="Type in a number and click here to set it as new BPM">Set BPM</button>
 			  
-			  <!--<button id ="pause" class="btn"> Pause </button>--->
 			  <button id ="randomPI" class="btn" TITLE="Click this button to hear what a melody programmed using the first few digits of PI or PHI may sound like!" 
 			   data-step="13" data-intro="Click this button to hear what a melody programmed using the first few digits of PI or PHI (Golden Ratio) may sound like!" data-position="right"> Randomize! </button>
 			  
-			<!--- <div class="recorder"> Recorder
-                    <button id="startRec" class="start"> Record </button>
-                     <button id="stopRec"  class="stop"> Stop </button>
-             </div>      
-            </div>---> 
+			
                <button id="download" class="btn" onclick="saveMIDI()">Download</button>
 			   <button id="startRec" class="btn" onclick="start()"> Record</button>
                <button id="stopRec" class="btn" onclick="stop()"
@@ -292,6 +290,15 @@
 		<div class="tip">
             Drag rests into random places after generating the random song and observe the random result! 
         </div>
+		
+		<div class="tip">
+            Guitar and violin have long release, while the rest are more bouncy. Combine the 2 types to spice up your song!
+        </div>
+		
+		<div class="tip">
+            Enter chords by having 3 tracks playing in parallel, loop the chords and start humming a melody! You can record your voice together with the music too!
+        </div>
+		
 		
      </div>
 	 
