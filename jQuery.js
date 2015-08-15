@@ -38,7 +38,7 @@ var phi = (1 + Math.sqrt(5))/2;
 // Please do not jumble sequence and always make sure it is parallel!
 var allInstruments = ["Piano", "Guitar", "Violin", "Flute", "Bell"];
 var instrumentObjects = [piano, synthGuitar, string, flute, bell];
-var GMinstruments = [0x00, 0x1D, 0x28, 0x4B, 0x0A];//the MIDI code number of each corresponding instrument
+var GMinstruments = [0x00, 0x1D, 0x28, 0x4B, 0x0A]; //the MIDI code number of each corresponding instrument
 
 
 /*
@@ -234,7 +234,7 @@ Animation.prototype.playAnimation = function(duration, wholeDuration, startIndex
 	
 		// This offset timing makes the animation smoother
 		var offset = -300;
-		var trackID = "#track" + trackNum + " "; // Space and # here to match CSS selector syntax
+		var trackID = "#track" + trackNum + " ";
 		
 		if (startIndex <= 0) { // User chose first note 
 			this.elementsAnimated = $(trackID + ".sortable-system div");
@@ -268,7 +268,6 @@ Animation.prototype.playAnimation = function(duration, wholeDuration, startIndex
 
 //Stops all animation regardless of whether setTimeout or setInterval has been set
 Animation.prototype.stopAnimation = function() {
-	
 	$(".sortable-system div").css({
 		"border": "none",
 		"background": "#109bce"
@@ -386,8 +385,8 @@ function findMaxLength(){
 }
 
 function playAllSequences() {
-    
-    playId = new Date();	
+
+	playId = new Date();
 	
     console.log("max length = "  + findMaxLength());
     console.log("start index = " + startPlayingFrom);
@@ -422,12 +421,10 @@ function clearAllSound(){
 		composition.setEnablePlaying(i, false);
 		composition.emptyAllTracks(); // Empties all tracks
 	}
-	
+
 	stopAllSounds();
 	
     if(enableLooping){
-	    document.getElementById("startLoop").value = "Start Looping";
-        document.getElementById("startLoop").innerHTML = "Start Looping";
 	    clearInterval(loopId);
     }
 	
@@ -437,8 +434,6 @@ function clearAllSound(){
 	}
 	
 }
-
-
 
 function animateAll(){
 console.log("HEY!!!!!!!!!!!!!!!!!!!!!!!!!!!" + "numOfTracks= " + composition.getNumTracks());
@@ -452,7 +447,41 @@ console.log("HEY!!!!!!!!!!!!!!!!!!!!!!!!!!!" + "numOfTracks= " + composition.get
 	}
 }
 
-function loopAll(){
+function loopAll(wantToLoop){
+	var beatDuration = composition.getBeatDuration();
+	
+	function startLooping() {
+		enableLooping = true;
+	   
+		playAllSequences();
+		//console.log("from " + startPlayingFrom + " to " + playUntil);
+		animateAll();
+		loopId = setInterval("playAllSequences()", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);  
+		animationLoopId= setInterval("animateAll()", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);
+		console.log("loopId" + loopId);
+		console.log("animationLoopId" + loopId);
+	}
+
+	function stopLooping() {
+		enableLooping = false;
+
+		clearInterval(loopId);
+	    clearInterval(animationLoopId);		
+		
+		startPlayingFrom = 0;//change back to default
+	    playUntil = -1;//change back to default
+	}
+	
+	if (wantToLoop) {
+		startLooping();
+	} else {
+		stopLooping();
+	}	
+
+}
+
+/* Temporary: former loopAll function
+ function loopAll(){
 	var beatDuration = composition.getBeatDuration();
 	
 	if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
@@ -481,6 +510,8 @@ function loopAll(){
 	
 	}
 }
+*/
+
 //back to pause ;)
 
 function pause(){
@@ -495,7 +526,6 @@ function pause(){
 }
 
 function resume(){
-   
     playAllSequences();
 	startPlayingFrom = 0;
 	playUntil = -1;
@@ -664,8 +694,8 @@ function generateOctaveColour(colour) {
 /*------------------------------------------------*/
 $(document).ready(function() {
 
-//tips for beginners
-    $("#tips").on("click", function(){
+	//tips for beginners
+	$("#tips").on("click", function(){
 	    $("#slideshow").toggle();
 	});
 	
@@ -680,8 +710,7 @@ $(document).ready(function() {
 	    .appendTo('#slideshow');
     },  6000);
 	
-	
-	
+    
 	function initialize() {
 		initializeTrackSettings();
 		readSaveData();
@@ -720,41 +749,107 @@ $(document).ready(function() {
 			});
 		});
 		
-		$("#all").on("click", function() {
+		function clickPlayAllButton() {
 			playAllSequences();
 			startPlayingFrom = 0; //change back to default
 			playUntil = -1; //change back to default
-		});
+		}
 		
-		$("#stop").on("click", function() {
+		function clickStopButton() {
+			var startLoopButton = $("#startLoop");
+			var icon = startLoopButton.children().eq(0);
+			var text = startLoopButton.children().eq(1);
 			enableLooping = false;
 			
 		    stopAllSounds();
 		    animation.stopAnimation();
-			    
-		    	document.getElementById("startLoop").value = "Start Looping";
-			    document.getElementById("startLoop").innerHTML = "Start Looping";
-		        clearInterval(loopId);
-				clearInterval(animationLoopId);
-				
+			
+		    clearInterval(loopId);
+			clearInterval(animationLoopId);
+			
 			startPlayingFrom = 0;//change back to default
-			playUntil = - 1;//change back to default
+			playUntil = - 1;//change back to default    
+		}
+		
+		// Toggles between clickPlayAllButton and clickStopButton
+		$("#playAndStop").on("click", function() {
+			var icon = $(this).children().eq(0);
+			var text = $(this).children().eq(1);
+			
+			if ($(this).data("checked") == "play") {
+				
+				icon.toggleClass("glyphicon-play-circle");
+				icon.toggleClass("glyphicon-stop");
+				text.html("Stop");
+				$(this).data("checked", "stop");
+				clickPlayAllButton();
+				
+			} else if ($(this).data("checked") == "stop") {
+				
+				icon.toggleClass("glyphicon-play-circle");
+				icon.toggleClass("glyphicon-stop");
+				text.html("Play");
+				$(this).data("checked", "play");
+				clickStopButton();
+				
+			} else { // In case of any html problems, alert user and stop track
+				alert("There seems to be a problem with the webpage. Please refresh your browser.");
+				clickStopButton();
+			}
 		});
 		
+		$("#startLoop").on("click", function() {
+		    var valueAttribute = $(this).data("checked");
+		    var icon = $(this).children().eq(0);
+		    var text = $(this).children().eq(1);
+		    var wantToLoop = true; // Just a flag
+			enableLooping = true;
+		    
+		    if (valueAttribute == "start looping") {
+		    	icon.toggleClass("glyphicon-repeat");
+		    	icon.toggleClass("glyphicon-stop");
+		    	text.html("Stop");
+		    	wantToLoop = true;
+		    	$(this).data("checked", "stop looping");
+		    	
+		    } else if (valueAttribute == "stop looping") {
+		    	icon.toggleClass("glyphicon-repeat");
+		    	icon.toggleClass("glyphicon-stop");
+		    	text.html("Loop");
+		    	wantToLoop = false;
+		    	$(this).data("checked", "start looping");
+		    	
+		    } else { // In case of any html problems, alert user.
+				alert("There seems to be a problem with the webpage. Please refresh your browser.");
+			}
+		    
+		    if(findMaxLength() > 0)loopAll(wantToLoop);
+		    
+	    });	
+	
 		$("#clear").on("click", function() {
+			var startLoopButton = $("#startLoop");
+			var icon = startLoopButton.children().eq(0);
+			var text = startLoopButton.children().eq(1);
 			
 			$(".sortable-system div").remove(); //remove notes from the timeline
 		    enableLooping = false;
 			clearAllSound();
+			
 			animation.stopAnimation();
 			
-			    document.getElementById("startLoop").value = "Start Looping";
-			    document.getElementById("startLoop").innerHTML = "Start Looping";
-		        clearInterval(loopId);
-				clearInterval(animationLoopId);
-				
+		    // Change style of Loop button to "Loop" since clearALL was clicked.
+	    	icon.toggleClass("glyphicon-repeat");
+	    	icon.toggleClass("glyphicon-stop");
+	    	text.html("Stop");
+	    	startLoopButton.data("checked", "stop looping");
+	    	
+	        clearInterval(loopId);
+			clearInterval(animationLoopId);
+			
 			startPlayingFrom = 0;//change back to default
 			playUntil = - 1;//change back to default
+			
 		});
 		
 		$("#pause").on("click", function(){
@@ -772,12 +867,7 @@ $(document).ready(function() {
 		    resume();	
 			}
 		});//end pause
-		
-		$("#startLoop").on("click", function() {
-		    enableLooping = true;
-		    if(findMaxLength() > 0)loopAll();
-	    });	
-		
+
 		$("#addTrack").on("click", function() {		
 			//  First add a new track to our composition
 			composition.addTrack([]);
@@ -791,20 +881,21 @@ $(document).ready(function() {
 		
 		$("#saveData").on("click", function() {
 			//setUpMIDI();
+			var text = $(this).children().eq(1);
+			
 			writeSaveData();
-			$(this).html("Saved!");	
+			text.html("Saved!");	
+			
         });
 			
-		
-		/*
-        $("startRec").on("click", function(){
+		$("startRec").on("click", function(){
 		    exportAudio();
 		});
 
 		$("stopRec").on("click", function(){
 		    stop();
 		});
-		*/
+		
 		// Selecting the octaves for show less view
 		$("#octave-num li a").on("click", function() {
 			var octaveDisplaySelector = $("#dropdown-selection");

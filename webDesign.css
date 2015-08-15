@@ -43,10 +43,68 @@ a {
 	font-family: "Trebuchet MS", Verdana, sans-serif;
 }
 
+/* playAndStop button with icons*/
+#playAndStop {
+	margin: 0px;
+	padding: 4px 5px 2px 5px;
+}
+
+#playAndStop .glyphicon-play-circle {
+	font-size: 30px;
+	color: #0a6081;
+}
+
+#playAndStop .glyphicon-stop {
+	padding: 0px 0px 3px 1px; 
+	font-size: 30px;
+	color: #d00000;
+}
+/* END playAndStop button with icons*/
+
+/* startLoop button with icons*/
+#startLoop {
+	margin: 0px;
+	padding: 4px 5px 3px 5px;
+}
+
+#startLoop .glyphicon-repeat {
+	padding: 5px 0px 3px 1px; 
+	font-size: 25px;
+	color: #0a6081;
+}
+
+#startLoop .glyphicon-stop {
+	padding: 0px 0px 3px 1px; 
+	font-size: 30px;
+	color: #d00000;
+}
+/* END startLoop button with icons*/
+
+/* addTrack button with icons*/
+#addTrack {
+	margin: 0px;
+	padding: 4px 5px 3px 5px;
+}
+
+#addTrack .glyphicon-plus {
+	padding: 5px 0px 3px 1px; 
+	font-size: 25px;
+}
+/* END addTrack button with icons*/
+
 #bpm-input {
+	margin-top: 15px;
 	border-radius: 5px;
 	padding-bottom: 8px;
 	width: 3em;
+}
+
+#randomPI {
+	
+}
+
+#randomPI:hover{
+    background: crimson;
 }
 
 #startRec {
@@ -57,8 +115,26 @@ a {
 	background-color: #525252;
 }
 
+#saveData {
+	margin: 0px;
+	padding: 9px 5px 3px 5px;
+}
+
+#saveData .glyphicon-floppy-disk{
+	font-size: 25px;
+}
+
+#download {
+	margin: 0px;
+	padding: 8px 5px 3px 5px;
+}
+
+#download .glyphicon-download-alt{
+	 font-size: 25px;
+}
+
 .btn {
-	margin-top: 5px;
+	margin: 5px 2px 0px 2px;
 	background-color: #b3b3b3;
 }
 
@@ -68,8 +144,7 @@ a {
 
 /* Social Media Options */
 .fb-like {
-	margin-top: 5px;
-	margin-left: 45px;
+	margin-left: 30px;
 }
 
 /* Basic tips section */
@@ -126,25 +201,30 @@ a {
 }
 
 /* Triangular play button */
-.glyphicon-play-circle {
-	font-size: 28px;
-	margin: auto;
-	padding: 0px 0px 0px 0px;
-	float: left;
+.play-button {
+	
 }
 
-.glyphicon-play-circle:hover {
+.play-button:hover {
 	top: 3px;
 	box-shadow: 0px 2px 5px 0px #ffffff;
 	-webkit-box-shadow: 0px 2px 5px 0px #ffffff;
 	-moz-box-shadow: 0px 2px 5px 0px #ffffff;
 }
 
-.glyphicon:active {
+.play-button:active {
 	box-shadow: 0px 2px 5px 0px #6a6a6a;
 	-webkit-box-shadow: 0px 2px 5px 0px #6a6a6a;
 	-moz-box-shadow: 0px 2px 5px 0px #6a6a6a;
 }
+
+.play-button.glyphicon-play-circle {
+	font-size: 28px;
+	margin: auto;
+	padding: 0px 0px 0px 0px;
+	float: left;
+}
+
 
 /* Mute Button */
 .muteButton {
@@ -166,7 +246,6 @@ a {
 	color: #FFFFFF;
 	
 	background-color: #575757; 
-	
 }
 
 .muteButton:hover {
@@ -452,10 +531,6 @@ a {
 	opacity: 0.5;
 }
 
-#randomPI:hover{
-    background: crimson;
-}
-
 .instrumentMenu{
     display: none;
 }
@@ -469,24 +544,6 @@ a {
 	border-radius: 30%;
 }
 
-.download{
-    position: absolute;
-    margin-left: 100px;
-    margin-top: 50px;
-    
-}
-
-.startRec{
-    position: absolute;
-    margin-left: 100px;
-    margin-top: 50px;
-    
-}
-
-.stopRec{
-    position: relative;
-    margin-left: 20px;	
-}
 /*
 .hidden {
  visibility: hidden;

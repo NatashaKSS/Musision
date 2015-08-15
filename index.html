@@ -75,70 +75,85 @@
 	  </div>
 	  <div>
 		<ul class="nav navbar-nav" style="display:inline;">
-		 <!--- To download composition --->
-		 <!-- <li><a id="download">Download</a></li> -->
-		 <li><a id="saveData" data-step="14" data-intro="Click here to save your entire composition. You can come back 
-		 	  and you'll continue from where you left off in your previous session. To delete your save data, delete your 
-		 	  browser's cookies and cached data." data-position="bottom">Save</a>
-  	   	 </li>
-		 
-		 <li>
+		  <li>
 		 	 <div class="navbar-form" 
 		 	  data-step="6" data-intro="Here, you can find your composition's settings." data-position="bottom">
 			 
-			 <!--- to play all notes --->
-			 <button id="all" class="btn" data-step="7" data-intro="Click here to play your entire song - 
+			 <!--- Toggle between playing all notes and stop --->
+			 <button id="playAndStop" class="btn" data-checked="play" data-step="7" data-intro="Click here to play your entire song - 
 			  		 all the tracks you've made and all the notes you've arranged." 
-			  		 data-position="right" TITLE="Play all notes"> Play </button>
-			 
-			 <!--- to stop all notes and go back to beginning--->
-			 <button id="stop" class="btn" data-step="8" data-intro="Click here to stop playing everything." 
-			 		 data-position="right" TITLE="Stop playing"> Stop </button>
-			 
-			  <button id ="pause" class="btn"> Pause </button>
-			  
-			 <!--<li><a id="same" href="#" data-step="5" data-intro="Click here to play all notes on the timeline simultaneously" data-position="bottom">Play All</a></li>-->
+			  		 data-position="right" TITLE="Play all notes">
+			  		 <div class="glyphicon glyphicon-play-circle"></div>
+			  		 <div>Play</div>
+			 </button>
 			 
 			 <!--  to loop all unmuted tracks -->
-			 <button id ="startLoop" class="btn" 
+			 <button id ="startLoop" class="btn" data-checked="start looping"
 			  		 data-step="9" data-intro="Click here to loop your entire composition. Loop a selection of notes by shift-clicking 
 			  		 on your chosen starting note and double-clicking on your chosen end note." 
-			  		 data-position="right" TITLE="Loop your entire composition, or a section (Shift click on chosen starting note, then double click on chosen end note)"> Start Looping </button>
+			  		 data-position="right" TITLE="Loop your entire composition, or a section (Shift click on chosen starting note, then double click on chosen end note)"> 
+			  		 <div class="glyphicon glyphicon-repeat"></div> 
+			  		 <div>Loop</div> 
+			 </button>
 			 
 			 <!--- to add a track --->
 			 <button id="addTrack" class="btn" data-step="10" data-intro="Click here to add a track to your composition."
-			  		 data-position="right"> Add Track </button>
+			  		 data-position="right"> 
+			  		 <div class="glyphicon glyphicon-plus"></div>
+			  		 <div>Track</div> 
+			 </button>
+			 
+			 <button id="saveData" class="btn" data-step="14" data-intro="Click here to save your entire composition. You can come back 
+			 	  and you'll continue from where you left off in your previous session. To delete your save data, delete your 
+			 	  browser's cookies and cached data." data-position="bottom">
+			 	  <div class="glyphicon glyphicon-floppy-disk"></div>
+			 	  <div>Save</div>
+	  	   	 </button>
+             
+             <button id="download" class="btn" onclick="saveMIDI()">
+             	  <div class="glyphicon glyphicon-download-alt"></div>
+               	  <div>Download</div>
+             </button>
+			 
+			 <button id ="pause" class="btn"> Pause </button>
+			
+			 <button id="startRec" class="btn" onclick="start()"> Record</button>
+             <button id="stopRec" class="btn" onclick="stop()"
+              		 data-step="15" data-intro="Look out! These 2 greyed out buttons here are still under construction!" 
+               		 data-position="right">Stop</button>
 			 
 			
-			 <!--- to clear all notes from timeline --->
-			 <button id="clear" class="btn" data-step="11" data-intro="Click here to clear all notes from 
-			  		 all of your tracks" data-position="right" 
-			  		 TITLE="Clear all notes from all tracks."> Clear All </button>
-			 
-			 </div>
 		 </li>	 
 		 <li>
 			<div class="navbar-form">
-			  <input id="bpm-input" type="text" class="input-small" placeholder="120" 
-				  	 data-step="12" data-intro="Type in your preferred BPM here and click on 'Set BPM' to change 
-				  	 your composition's beats per minute." data-position="right">
+			 
+	        	<input id="bpm-input" type="text" class="input-small" placeholder="120" 
+				   data-step="12" data-intro="Type in your preferred BPM here and click on 'Set BPM' to change 
+				   your composition's beats per minute." data-position="right">
 				  	 
-			  <button id="bpm-button" class="btn" onclick=changeBPM() 
-			  		  TITLE="Type in a number and click here to set it as new BPM">Set BPM</button>
+				<button id="bpm-button" class="btn" onclick=changeBPM() 
+			  		TITLE="Type in a number and click here to set it as new BPM">Set BPM
+				</button>
 			  
-			  <button id ="randomPI" class="btn" TITLE="Click this button to hear what a melody programmed using the first few digits of PI or PHI may sound like!" 
-			   data-step="13" data-intro="Click this button to hear what a melody programmed using the first few digits of PI or PHI (Golden Ratio) may sound like!" data-position="right"> Randomize! </button>
-			  
-			
-               <button id="download" class="btn" onclick="saveMIDI()">Download</button>
-			   <button id="startRec" class="btn" onclick="start()"> Record</button>
-               <button id="stopRec" class="btn" onclick="stop()"
-               		   data-step="15" data-intro="Look out! These 2 greyed out buttons here are still under construction!" 
-               		   data-position="right">Stop</button>
-			
-			   <div class="fb-like" data-href="http://musision-0511.appspot.com" data-width="50" 
+			    <button id ="randomPI" class="btn" TITLE="Click this button to hear what a melody programmed using the first few digits of PI or PHI may sound like!" 
+			   			data-step="13" data-intro="Click this button to hear what a melody programmed using the first few digits of PI or PHI (Golden Ratio) may sound like!" data-position="right"> 
+			   		    Randomize! 
+			    </button>
+			 
+			    <!--- to clear all notes from timeline --->
+			    <button id="clear" class="btn" data-step="11" data-intro="Click here to clear all notes from 
+			  		    all of your tracks" data-position="right" 
+			  		    TITLE="Clear all notes from all tracks."> 
+			  		    Clear All 
+			  	</button>
+			  	
+			  	<div class="fb-like" data-href="http://musision-0511.appspot.com" data-width="50" 
   	   				data-layout="button_count" data-action="like" data-show-faces="true" data-share="true">
-  	   	 	   </div>
+  	   	 	    </div>
+			 
+			 </div>
+			
+			   
 			</div> 
 	   </li> 
 	  </ul>
@@ -153,6 +168,7 @@
 	  
 	  <div class="track-settings" data-step="3" data-intro="Here's where you can play, 
 	   mute or change the instrument of your music track." data-position="right">
+	    
 	    <div id="play-track0" class="glyphicon glyphicon-play-circle play-button">
 	    
 	    </div>
@@ -290,16 +306,15 @@
 		<div class="tip">
             Drag rests into random places after generating the random song and observe the random result! 
         </div>
-		
-		<div class="tip">
-            Guitar and violin have long release, while the rest are more bouncy. Combine the 2 types to spice up your song!
+        
+        <div class="tip">
+            Guitar and violin have a long release, while the rest are more bouncy. Combine these 2 types to spice up your song!
         </div>
 		
 		<div class="tip">
-            Enter chords by having 3 tracks playing in parallel, loop the chords and start humming a melody! You can record your voice together with the music too!
+            Enter chords by having 3 tracks playing in parallel, loop the chords and start humming a melody! You can record your voice together with the music too! (Why not right!)
         </div>
-		
-		
+        
      </div>
 	 
 	 
