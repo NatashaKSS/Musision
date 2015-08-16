@@ -436,7 +436,7 @@ function clearAllSound(){
 }
 
 function animateAll(){
-console.log("HEY!!!!!!!!!!!!!!!!!!!!!!!!!!!" + "numOfTracks= " + composition.getNumTracks());
+
     var beatDuration = composition.getBeatDuration();
 	
 	for(trackIndx = 0; trackIndx < composition.getNumTracks(); trackIndx++){
@@ -480,57 +480,62 @@ function loopAll(wantToLoop){
 
 }
 
-/* Temporary: former loopAll function
- function loopAll(){
-	var beatDuration = composition.getBeatDuration();
-	
-	if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
-    	enableLooping = true;
-	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
-		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
-	
-		playAllSequences();
-		//console.log("from " + startPlayingFrom + " to " + playUntil);
-		animateAll();
-		loopId = setInterval("playAllSequences()", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);  
-		animationLoopId= setInterval("animateAll()", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);
-		console.log("loopId" + loopId);
-		console.log("animationLoopId" + loopId);
- 		
-	} else {//if we want to stop
-	
-	    enableLooping = false;
-	    document.getElementById("startLoop").value = "Start Looping";
-		document.getElementById("startLoop").innerHTML = "Start Looping";
-	    clearInterval(loopId);
-        clearInterval(animationLoopId);		
-		
-		startPlayingFrom = 0;//change back to default
-	    playUntil = -1;//change back to default
-	
-	}
-}
-*/
 
 //back to pause ;)
+//bugs: 
+//1) animation not following
+//2) The first time pressing Pause won't work properly
+//3) If clicking repeatedly only the first time will work
+
+var start = startPlayingFrom;
 
 function pause(){
-    startPlayingFrom = Math.floor((new Date() - playId)/(composition.getBeatDuration() * 1000)) - 1;
-	
-	console.log("paused at " + startPlayingFrom);
-	
+    animation.stopAnimation();
 	stopAllSounds();
-	
-    clearInterval(loopId);
+	clearInterval(loopId);
 	clearInterval(animationLoopId);	
+	
+    for(trackNum = 0; trackNum < composition.getNumTracks(); trackNum++){
+    var trackID = "#track" + trackNum + " ";
+    
+    startPlayingFrom = Math.ceil((new Date() - playId)/(composition.getBeatDuration() * 1000));
+	var elementsColored= $(trackID + ".sortable-system div").slice(start, startPlayingFrom);
+
+	elementsColored.each(function(){
+	    $(this).css({ 
+			"background": "#80ffff" //change color to light blue
+		}); 
+	});
+	}
+  
 }
 
 function resume(){
-    playAllSequences();
+    clearInterval(loopId);
+	clearInterval(animationLoopId);	
+    
+    if(playId > 0){
+	    for(trackNum = 0; trackNum < composition.getNumTracks(); trackNum++){
+            var trackID = "#track" + trackNum + " ";
+  
+	        var elementsColored= $(trackID + ".sortable-system div").slice(start, startPlayingFrom);
+
+	        elementsColored.each(function(){
+	            $(this).css({ 
+			        "background": "#80ffff" //change color to light blue
+		        }); 
+	        });
+	    }
+
+	    playAllSequences();
+		animateAll();
+	}	
+	
 	startPlayingFrom = 0;
 	playUntil = -1;
 	playId = 0;
-}
+	
+} //end pause
 
 
 // Adds a track to user composition and updates user interface
@@ -841,7 +846,7 @@ $(document).ready(function() {
 		    // Change style of Loop button to "Loop" since clearALL was clicked.
 	    	icon.toggleClass("glyphicon-repeat");
 	    	icon.toggleClass("glyphicon-stop");
-	    	text.html("Stop");
+	    	text.html("Loop");
 	    	startLoopButton.data("checked", "stop looping");
 	    	
 	        clearInterval(loopId);
@@ -1410,12 +1415,13 @@ $(document).ready(function() {
 	    console.log("random length " + randomLength());
 	    for(count = randomStart; count < songOfPi.length; count++){
 	    	console.log(songOfPi[count]);
-	    	
+	    	/*
 	    	piano.play({
 	    		wait : composition.getBeatDuration() * (count - randomStart),
 	    		pitch: songOfPi[count],
 				label: 'playing'
 	    	});
+			*/
 	    }
 	}
 			
@@ -1589,33 +1595,16 @@ $(document).ready(function() {
 					// interface DOM elements have been set up
 	
 });
+////////////////////////////////////////////////THIS IS THE END OF THE OFFICIAL MUSISION CODES =) /////////////////////////////////////////////////////////////////////////
+
+
+
+
+
 
 
 
 //ABORTED CODES
-
-   /*
-		//piano- guitar- violin
-		$(".chooseInstrument").click(function(){
-		    var trackNum = parseInt($(this).attr('id').substring(10));
-		   	
-				$(".chooseInstrument").each(function(){
-				    var self = $(this);
-		         console.log("check inside chooseInstrument " + $(self).attr('id'));
-				 });
-				 
-		            console.log("after check, in choose inst " + $(this).attr('id'));
-			        var currIndex = allInstruments.indexOf($(this).value);
-			        var nextInstrument = allInstruments[(currIndex + 1) % allInstruments.length];
-		
-			        instruments[trackNum] = nextInstrument;
-			        $(this).value = nextInstrument;
-			        $(this).innerHTML = nextInstrument;
-          
-		        
-		 });   
-		*/	   
-
 /*
 
 ////To pause and play again 
@@ -1664,27 +1653,6 @@ function Timer(func, delay) {
 		*/
 		
 
-/*  
-		//pause is not working properly
-		$("#pause").on("click", function(){
-		    if(document.getElementById("pause").value == "Pause"){//if currently playing and pause is clicked, enablePlaying = true, pause = true
-		    document.getElementById("pause").value = "Resume";
-			document.getElementById("pause").innerHTML = "Resume";
-			enablePlaying = true;
-			pause = true;
-			//console.log("PAUSE NOW!!!!");
-			//playingMusic.pause();
-			} else {//want to resume
-			document.getElementById("pause").value = "Pause";
-			document.getElementById("pause").innerHTML = "Pause";
-			enablePlaying = false;
-			pause = false;
-			//console.log("CONTINUE!!!!");
-		    //playingMusic.resume();	
-			}
-		});
-		*/
-		//end pause
 /*
  * How to use the below 2 functions for notes div generation:
  * Uncomment the "console.log(generateNotes);"
@@ -1732,6 +1700,38 @@ console.log(generateNotes());
 ------------------------------------
 ----------CODE ON HOLD--------------
 ------------------------------------
+
+/* Temporary: former loopAll function
+ function loopAll(){
+	var beatDuration = composition.getBeatDuration();
+	
+	if(document.getElementById("startLoop").value == "Start Looping"){//currently stop, now we want to start
+    	enableLooping = true;
+	    document.getElementById("startLoop").value = "Stop Looping";//change to stop
+		document.getElementById("startLoop").innerHTML = "Stop Looping";//change to stop
+	
+		playAllSequences();
+		//console.log("from " + startPlayingFrom + " to " + playUntil);
+		animateAll();
+		loopId = setInterval("playAllSequences()", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);  
+		animationLoopId= setInterval("animateAll()", beatDuration * (playUntil - startPlayingFrom + 1) * 1000);
+		console.log("loopId" + loopId);
+		console.log("animationLoopId" + loopId);
+ 		
+	} else {//if we want to stop
+	
+	    enableLooping = false;
+	    document.getElementById("startLoop").value = "Start Looping";
+		document.getElementById("startLoop").innerHTML = "Start Looping";
+	    clearInterval(loopId);
+        clearInterval(animationLoopId);		
+		
+		startPlayingFrom = 0;//change back to default
+	    playUntil = -1;//change back to default
+	
+	}
+}
+*/
 //RECORDING
 	
 //https://truongtx.me/2014/08/09/record-and-export-audio-video-files-in-browser-using-web-audio-api/	
