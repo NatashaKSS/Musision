@@ -30,7 +30,7 @@
 	<script src="introJs/intro.js"></script>
 	<script src="bower_components/Recorderjs/recorder.js"></script>
     <script src="app.js"></script>
-
+	
 	<!-- Own Custom scripts in local directory-->
 	<script src="instruments.js"></script>
 	<script src="gridSystem.js"></script>
@@ -61,14 +61,15 @@
 	</script>
 	
    <div class="workspace">
-	<nav class="navbar navbar-inverse" data-step="16" data-intro="Alright, you're all set to make your own music! 
+	<nav class="navbar navbar-inverse" data-step="17" data-intro="Alright, you're all set to make your own music! 
 	 Click me into oblivion!" data-position="bottom">
 	 <div class="container-fluid">
 	  <div class="navbar-header">
-		<a class="navbar-brand"
+		<a class="navbar-brand" id="musisionTitle"
 		   data-step="1" data-intro="Hi! Welcome to Musision, where you can be free to compose your own music! 
 		   Let's go on a tour of Musision, but you can click anywhere to skip this tutorial too. Our site uses
-		   JavaScript extensively so make sure that's enabled on you browser!" data-position="right">
+		   JavaScript extensively so make sure that's enabled on you browser!" data-position="right"
+		   TITLE="Made by Natasha Koh, Nguyen Tuong Van">
 		   Musision
 		</a>
 	  </div>
@@ -79,85 +80,89 @@
 		 	  data-step="6" data-intro="Here, you can find your composition's settings." data-position="bottom">
 			 
 			 <!--- Toggle between playing all notes and stop --->
-			 <button id="playAndStop" class="btn" data-checked="play" data-step="7" data-intro="Click here to play your entire song - 
-			  		 all the tracks you've made and all the notes you've arranged." 
-			  		 data-position="right" TITLE="Play all notes">
+			 <button id="playAndStop" class="btn" data-checked="play" data-step="8" 
+			 		 data-intro="Click here to play your entire music piece. Click again to stop." 
+			  		 data-position="right" TITLE="Play/Stop">
 			  		 <div class="glyphicon glyphicon-play-circle"></div>
 			  		 <div>Play</div>
 			 </button>
 			 
 			 <!--  to loop all unmuted tracks -->
 			 <button id ="startLoop" class="btn" data-checked="start looping"
-			  		 data-step="9" data-intro="Click here to loop your entire composition. Loop a selection of notes by shift-clicking 
-			  		 on your chosen starting note and double-clicking on your chosen end note." 
-			  		 data-position="right" TITLE="Loop your entire composition, or a section (Shift click on chosen starting note, then double click on chosen end note)"> 
+			  		 data-step="9" data-intro="Click here to loop your entire composition. To loop only a section, SHIFT-CLICK on the starting note and DOUBLE-CLICK on the end note." 
+			  		 data-position="right" TITLE="Loop your entire composition or Loop a section (SHIFT-CLICK on starting note then DOUBLE-CLICK on end note)"> 
 			  		 <div class="glyphicon glyphicon-repeat"></div> 
 			  		 <div>Loop</div> 
 			 </button>
 			 
 			 <!--- to add a track --->
 			 <button id="addTrack" class="btn" data-step="10" data-intro="Click here to add a track to your composition."
-			  		 data-position="right"> 
+			  		 data-position="right" TITLE="Add a track"> 
 			  		 <div class="glyphicon glyphicon-plus"></div>
 			  		 <div>Track</div> 
 			 </button>
 			 
 			 <button id="saveData" class="btn" data-step="14" data-intro="Click here to save your entire composition. You can come back 
-			 	  and you'll continue from where you left off in your previous session. To delete your save data, delete your 
-			 	  browser's cookies and cached data." data-position="bottom">
-			 	  <div class="glyphicon glyphicon-floppy-disk"></div>
-			 	  <div>Save</div>
+			 	  	 and you'll continue from where you left off in your previous session. To delete your save data, delete your 
+			 	  	 browser's cookies and cached data." data-position="bottom"
+			 	  	 TITLE="Save progress. Delete your save data by deleting browser cookies and cached data.">
+			 	  	 <div class="glyphicon glyphicon-floppy-disk"></div>
+			 	  	 <div>Save</div>
 	  	   	 </button>
              
-             <button id="download" class="btn" onclick="saveMIDI()">
-             	  <div class="glyphicon glyphicon-download-alt"></div>
-               	  <div>Download</div>
+             <button id="download" class="btn" onclick="saveMIDI()"
+             		 data-step="15" data-intro="Download your music piece as a .mid file here! 
+             		 Playing it with Windows Media Player or Quicktime Media Player is recommended." data-position="bottom">
+             	     <div class="glyphicon glyphicon-download-alt"></div>
+               	     <div>Download</div>
              </button>
+             
+             <button id="startRec" class="btn" data-checked="record"
+             		 data-step="16" data-intro="Feel like grooving to your track? Click here to record your voice through your
+             		 computer's mic. Click again to stop recording and download your awesome song! 
+             		 (Remember not to allow mic access for our webpage!)" data-position="bottom">
+			 	     <div class="glyphicon glyphicon-record"></div>
+			 	     <div>Record</div>
+			 </button>
+			 
+			 <!-- 
+			 <button id="stopRec" class="btn">Stop</button>
+			 -->
 			 
 			 <button id ="pause" class="btn"> Pause </button>
-			
-			 <button id="startRec" class="btn" onclick="start()"> Record</button>
-             <button id="stopRec" class="btn" onclick="stop()"
-              		 data-step="15" data-intro="Look out! These 2 greyed out buttons here are still under construction!" 
-               		 data-position="right">Stop</button>
-			 
 			
 		 </li>	 
 		 <li>
 			<div class="navbar-form">
 			 
 	        	<input id="bpm-input" type="text" class="input-small" placeholder="120" 
-				   data-step="12" data-intro="Type in your preferred BPM here and click on 'Set BPM' to change 
+				   data-step="11" data-intro="Type in your preferred BPM here and click on 'Set BPM' to change 
 				   your composition's beats per minute." data-position="right">
 				  	 
 				<button id="bpm-button" class="btn" onclick=changeBPM() 
-			  		TITLE="Type in a number and click here to set it as new BPM">Set BPM
+			  		TITLE="Set new BPM">Set BPM
 				</button>
 			  
-			    <button id ="randomPI" class="btn" TITLE="Click this button to hear what a melody programmed using the first few digits of PI or PHI may sound like!" 
-			   			data-step="13" data-intro="Click this button to hear what a melody programmed using the first few digits of PI or PHI (Golden Ratio) may sound like!" data-position="right"> 
+			    <button id ="randomPI" class="btn" TITLE="Listen to what a melody programmed using the first few digits of PI or PHI may sound like!" 
+			   			data-step="12" data-intro="Click here to listen to what a melody programmed using the first few digits of PI or PHI (Golden Ratio) may sound like!" data-position="right"> 
 			   		    Randomize! 
 			    </button>
 			 
 			    <!--- to clear all notes from timeline --->
-			    <button id="clear" class="btn" data-step="11" data-intro="Click here to clear all notes from 
-			  		    all of your tracks" data-position="right" 
-			  		    TITLE="Clear all notes from all tracks."> 
+			    <button id="clear" class="btn" 
+			    		data-step="13" data-intro="Click here to clear ALL notes from ALL of your tracks" data-position="right" 
+			  		    TITLE="Clear ALL notes from ALL tracks"> 
 			  		    Clear All 
 			  	</button>
 			  	
 			  	<div class="fb-like" data-href="http://musision-0511.appspot.com" data-width="50" 
-  	   				data-layout="button_count" data-action="like" data-show-faces="true" data-share="true">
+  	   				data-layout="button_count" data-action="like" data-show-faces="true" data-share="true"
+  	   				data-step="18" data-intro="Hint hint...you might wanna click on this too...yeah? *wink* *wink*" data-position="bottom">
   	   	 	    </div>
 			 
 			 </div>
-			
-			   
-			</div> 
-	   </li> 
-	  </ul>
+	  </div> 
 	 </div> 	 
-	</div>
    </nav>
 	
 	<!-- Container class Enabled by bootstrap -->
@@ -216,18 +221,21 @@
 	  <!-- Notes left sidebar -->
 	  <div id="move-vertical-button" class="toolbar-button"> 
 	   <span class="glyphicon glyphicon-resize-vertical" data-step="4" 
-	    data-intro="You can drag this entire notes-frame around too." data-position="right"></span>
+	    data-intro="You can drag your entire notes palette up and down too." data-position="right"></span>
 	  </div>
 	  <div id="show-button" class="toolbar-button" 
 	   data-step="5" data-intro="If you don't like the clutter of all the octaves you see in this view, 
-	   you can always change the view by clicking here!" data-position="right">
+	   you can always 'show less' by clicking here!" data-position="right">
 	   View
 	  </div>
-	  <div id="colour-button" class="toolbar-button">
+	  <div id="colour-button" class="toolbar-button"
+	   data-step="6" data-intro="Click here to change the colour of your notes palette!" data-position="right">
 	   
 	  </div>
 	  <div id="rest-button" class="toolbar-button col-md-1" data-note='silence'
-	  	   style="height: 60px; width: 36px; bottom: 0px; padding: 17px 0px 0px 0px; font-size: 14px;"> Rest
+	   data-step="7" data-intro="This is a 'rest' note. Drag it to the timeline above easily from here." data-position="right"
+	   style="height: 60px; width: 36px; bottom: 0px; padding: 17px 0px 0px 0px; font-size: 14px;"> Rest
+	  
 	  </div>
 	 </div>
 	 
@@ -279,7 +287,7 @@
      <div id="slideshow"> 
 	    
         <div class="tip">
-            Between B and C, E and F there is no sharp or flat notes. Their interval is the smallest possible between any 2 adjacent notes.
+            Between B and C, E and F there is no sharp or flat note. Their interval is the smallest possible between any 2 adjacent notes.
         </div>
 		
         <div class="tip">

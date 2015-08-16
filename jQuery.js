@@ -436,8 +436,7 @@ function clearAllSound(){
 }
 
 function animateAll(){
-
-    var beatDuration = composition.getBeatDuration();
+	var beatDuration = composition.getBeatDuration();
 	
 	for(trackIndx = 0; trackIndx < composition.getNumTracks(); trackIndx++){
 	console.log("ENABLEPLAYING " + composition.isEnablePlaying(trackIndx));
@@ -480,7 +479,6 @@ function loopAll(wantToLoop){
 
 }
 
-
 //back to pause ;)
 //bugs: 
 //1) animation not following
@@ -496,16 +494,16 @@ function pause(){
 	clearInterval(animationLoopId);	
 	
     for(trackNum = 0; trackNum < composition.getNumTracks(); trackNum++){
-    var trackID = "#track" + trackNum + " ";
-    
-    startPlayingFrom = Math.ceil((new Date() - playId)/(composition.getBeatDuration() * 1000));
-	var elementsColored= $(trackID + ".sortable-system div").slice(start, startPlayingFrom);
-
-	elementsColored.each(function(){
-	    $(this).css({ 
-			"background": "#80ffff" //change color to light blue
-		}); 
-	});
+	    var trackID = "#track" + trackNum + " ";
+	    
+	    startPlayingFrom = Math.ceil((new Date() - playId)/(composition.getBeatDuration() * 1000));
+		var elementsColored= $(trackID + ".sortable-system div").slice(start, startPlayingFrom);
+	
+		elementsColored.each(function(){
+		    $(this).css({ 
+				"background": "#80ffff" //change color to light blue
+			}); 
+		});
 	}
   
 }
@@ -535,8 +533,12 @@ function resume(){
 	playUntil = -1;
 	playId = 0;
 	
-} //end pause
+} //end 
 
+function exportAudio(){ // Some problems here!
+    record();
+	playAllSequences();
+}
 
 // Adds a track to user composition and updates user interface
 // respectively
@@ -814,15 +816,15 @@ $(document).ready(function() {
 		    	icon.toggleClass("glyphicon-repeat");
 		    	icon.toggleClass("glyphicon-stop");
 		    	text.html("Stop");
-		    	wantToLoop = true;
 		    	$(this).data("checked", "stop looping");
+		    	wantToLoop = true;
 		    	
 		    } else if (valueAttribute == "stop looping") {
 		    	icon.toggleClass("glyphicon-repeat");
 		    	icon.toggleClass("glyphicon-stop");
 		    	text.html("Loop");
-		    	wantToLoop = false;
 		    	$(this).data("checked", "start looping");
+		    	wantToLoop = false;
 		    	
 		    } else { // In case of any html problems, alert user.
 				alert("There seems to be a problem with the webpage. Please refresh your browser.");
@@ -844,10 +846,10 @@ $(document).ready(function() {
 			animation.stopAnimation();
 			
 		    // Change style of Loop button to "Loop" since clearALL was clicked.
-	    	icon.toggleClass("glyphicon-repeat");
-	    	icon.toggleClass("glyphicon-stop");
+	    	icon.addClass("glyphicon-repeat");
+	    	icon.removeClass("glyphicon-stop");
 	    	text.html("Loop");
-	    	startLoopButton.data("checked", "stop looping");
+	    	startLoopButton.data("checked", "start looping");
 	    	
 	        clearInterval(loopId);
 			clearInterval(animationLoopId);
@@ -889,16 +891,38 @@ $(document).ready(function() {
 			var text = $(this).children().eq(1);
 			
 			writeSaveData();
-			text.html("Saved!");	
-			
+			text.html("Saved!");
         });
 			
-		$("startRec").on("click", function(){
-		    exportAudio();
-		});
-
-		$("stopRec").on("click", function(){
-		    stop();
+		$("#startRec").on("click", function(){
+			var valueAttribute = $(this).data("checked");
+		    var icon = $(this).children().eq(0);
+		    var text = $(this).children().eq(1);
+		    
+		    if (valueAttribute == "record") {
+		    	
+		    	exportAudio();
+		    	
+		    	// Update style of button
+		    	icon.toggleClass("glyphicon-record");
+		    	icon.toggleClass("glyphicon-stop");
+		    	text.html("Stop");
+		    	$(this).data("checked", "stop");
+				
+		    } else if (valueAttribute = "stop") {
+		    	
+		    	stop();
+		    	
+		    	// Update style of button
+		    	icon.toggleClass("glyphicon-record");
+		    	icon.toggleClass("glyphicon-stop");
+		    	text.html("Record");
+		    	$(this).data("checked", "record");
+		    	
+		    } else {
+		    	alert("There seems to be a problem with the webpage. Please refresh your browser.");
+		    }
+		    
 		});
 		
 		// Selecting the octaves for show less view
@@ -1000,7 +1024,6 @@ $(document).ready(function() {
 			startPlayingFrom = 0;//change back to default
 			playUntil = - 1;//change back to default
 			
-			
 		});
 		
 		$(".muteButton").unbind().on("click", function() {
@@ -1048,7 +1071,6 @@ $(document).ready(function() {
 		    var nextInstrument = allInstruments[(currIndex + 1) % allInstruments.length];
 		    composition.setInstrument(trackNum, nextInstrument);
 		    instrument.textContent = nextInstrument;
-      
 	    });
 		
 		$(".close-panel").unbind().hover(function(event) {
@@ -1220,7 +1242,7 @@ $(document).ready(function() {
 					updateComposition();
 					updateTimelineNotes();
 					
-					$("#saveData").html("Save");
+					$("#saveData").children().eq(1).html("Save");
 				},
 				
 				// If item is hovering over timeline
@@ -1258,6 +1280,7 @@ $(document).ready(function() {
 						var startPosition = ui.item.data('startPos');
 						composition.getTrack(trackNumInSortable).splice(startPosition, 1);
 						ui.item.remove();
+						$("#saveData").children().eq(1).html("Save");
 					}
 					
 				},
@@ -1415,13 +1438,14 @@ $(document).ready(function() {
 	    console.log("random length " + randomLength());
 	    for(count = randomStart; count < songOfPi.length; count++){
 	    	console.log(songOfPi[count]);
+	    	
 	    	/*
 	    	piano.play({
 	    		wait : composition.getBeatDuration() * (count - randomStart),
 	    		pitch: songOfPi[count],
 				label: 'playing'
 	    	});
-			*/
+	    	*/
 	    }
 	}
 			
@@ -1598,12 +1622,6 @@ $(document).ready(function() {
 ////////////////////////////////////////////////THIS IS THE END OF THE OFFICIAL MUSISION CODES =) /////////////////////////////////////////////////////////////////////////
 
 
-
-
-
-
-
-
 //ABORTED CODES
 /*
 
@@ -1630,29 +1648,28 @@ function Timer(func, delay) {
 
 
 /*
-		    $(".displayInstrument").unbind().hover(function(event){
-			    console.log("YAHA!");
-				var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
-			    $("#timeline-system").children().eq(trackNum).find(".instrumentMenu").stop().animate({
-				height: event.type=="mouseenter" ? 50: 0,
-				//fontSize: event.type=="mouseenter" ? "15px": 0
-			}, 100);
-			});
-		*/
-		
-		/*
-		    $(".track-settings ul.instrumentMenu li a").unbind().on("click", function(){
-			    console.log($(this).attr('id'));
-				var trackNum = parseInt($(this).parent().prev().prev().attr('id').substring(10));
-				$("#timeline-system").children().eq(trackNum).find(".displayInstrument").value = $(this).attr('id');
-			    $("#timeline-system").children().eq(trackNum).find(".displayInstrument").innerHTML = $(this).attr('id');
-                instruments[trackNum] = $(this).attr('id');				
-				//});
-		    });
-		
-		*/
-		
+    $(".displayInstrument").unbind().hover(function(event){
+	    console.log("YAHA!");
+		var trackNum = parseInt($(this).prev().prev().attr('id').substring(10));
+	    $("#timeline-system").children().eq(trackNum).find(".instrumentMenu").stop().animate({
+		height: event.type=="mouseenter" ? 50: 0,
+		//fontSize: event.type=="mouseenter" ? "15px": 0
+	}, 100);
+	});
+*/
 
+/*
+    $(".track-settings ul.instrumentMenu li a").unbind().on("click", function(){
+	    console.log($(this).attr('id'));
+		var trackNum = parseInt($(this).parent().prev().prev().attr('id').substring(10));
+		$("#timeline-system").children().eq(trackNum).find(".displayInstrument").value = $(this).attr('id');
+	    $("#timeline-system").children().eq(trackNum).find(".displayInstrument").innerHTML = $(this).attr('id');
+        instruments[trackNum] = $(this).attr('id');				
+		//});
+    });
+
+*/
+		
 /*
  * How to use the below 2 functions for notes div generation:
  * Uncomment the "console.log(generateNotes);"
@@ -1918,125 +1935,12 @@ mixerTrack.rec.clear()              // Clear the recording buffer when you're do
   // create an empty sound file that we will use to playback the recording
         soundFile = new p5.SoundFile();
    // }
-	
-	
-
-
-
-(BEFORE DRAGGABLES & SORTABLES HEADING)
-//Aborted functions
-function findIndex(element, count){
-    for(child = 1; child <= count; child++){//go down each column
-	    var col = ($("element:nth-child(child)").position().left - $(".timeline").position().left)/noteWidth;
-		var row = ($("element:nth-child(child)").position().top - $(".timeline").position().top)/noteHeight;
-		var index = row * numOfDivisions + col;
-		
-		    if(parseInt($("element:nth-child(child)").attr('data-note')) > 0){
-		        arr[index] = notes[parseInt($("element:nth-child(child)").attr('data-note')) - 12];
-		    } else {
-			    arr[index] = 'silence';
-		    }
-	}
-}
-
-function updateArray(){
-    for(child = 1; child <= numOfDivisions; child++){
-	    console.log($("#grid-system : nth-child(child)"));//hmm debugging here but nothing came out
-	    findIndex($("#grid-system : nth-child(child)"), 3);
-	}
-}
-
-
-(IN BEFORESTOP IN SORTABLE FUNCTION)
-//now index is no longer preserved =(  
-// arr.splice(index, 1);			
-	    
-		/*aborted parts
-		if(parseInt(ui.item.attr('data-note')) > 12){//this now still has a bug: it removes everything that has the same name as the note dragged out
-		    removeNote(notes[parseInt(ui.item.attr('data-note')) - 12]);
-		    numOfNotes--;
-		} else {
-		    removeNote("silence");//the rest inserted here
-		}
-		//end of aborted parts
-
-(IN RECEIVE IN SORTABLE FUNCTION)
-var col = (ui.item.position().left - $(".timeline").position().left)/grid.noteWidth;
-var row = (ui.item.position().top - $(".timeline").position().top)/grid.noteHeight;
-var index = row * numOfDivisions + col;
-
-if (parseInt(ui.item.attr('data-note')) > 0) {
-    arr.splice(index, 0, notes[parseInt(ui.item.attr('data-note')) - 12]);
-} else {
-    arr.splice(index, 0, 'silence');
-}
-	
-numOfNotes++;
 
 ------------------------------------
 ------END CODE ON HOLD--------------
 ------------------------------------
 
-Unused code Section 1.0: Supposedly debug code which made things worse
-
-// Bug fixer for instance when notes flicker on timeline when sorting 
-sort: function (event, ui) {
-    var that = $(this);
-    var w = ui.helper.outerWidth(); // Width of a note on timeline
-    var	h = ui.helper.outerHeight(); // Height of a note on timeline
-    
-    that.children().each(function () {
-        if ($(this).hasClass('ui-sortable-helper') || $(this).hasClass('ui-sortable-placeholder')) 
-            return true;
-        
-        // If user mouse overlap is more than half of the dragged item
-        var distX = Math.abs(ui.position.left - $(this).position().left),
-            before = ui.position.left > $(this).position().left;
-            
-        if ((w - distX) > (w / 2) && (distX < w)) {
-            if (before) // dragged item is to the left of thing to sort with
-                $('.ui-sortable-placeholder', that).insertBefore($(this));
-            else // dragged item is to the right of thing to sort with
-                $('.ui-sortable-placeholder', that).insertAfter($(this));
-            return false;
-        }
-        
-     // If user mouse overlap is more than half of the dragged item
-        var distY = Math.abs(ui.position.left - $(this).position().left),
-            before = ui.position.top > $(this).position().top;
-            
-        if ((h - distY) > (h / 2) && (distY < h)) {
-            if (before) // dragged item is to the top of thing to sort with
-                $('.ui-sortable-placeholder', that).insertBefore($(this));
-            else // dragged item is to the btm of thing to sort with
-                $('.ui-sortable-placeholder', that).insertAfter($(this));
-            return false;
-        }
-    });
-		    },
-		    
-Unused code Section 1.1: Web Audio ADSR implementation.
-var numOfNotes = arr.length;
-
-// Procedurally generates more rows if the user has almost filled up timeline with
-// notes. 
-// ((numOfNotes == (3 * numOfDivisions - 1)) checks if the user has only 1 note left to
-// fully fill the timeline to generate 1 row.
-// ((numOfNotes > (3 * numOfDivisions)) && (numOfNotes % numOfDivisions == 0)) checks
-// if the user, after filling up the first (3 * numOfDivisions - 1) slots --> In this case it is 
-// the first 3 rows, and everytime he almost fills up the next row, generate another following row.
-if ((numOfNotes == (3 * numOfDivisions - 1)) ||
-	((numOfNotes > (3 * numOfDivisions)) && (numOfNotes % numOfDivisions == 0))) {
-	// Append a row of grid-squares
-	$(".grid-col-holder").append(generateDivs(1, "grid-square", ""));
-	
-	// Ensure grid-squares are of correct height
-	$(".grid-square").css({
-		"height": grid.noteHeight // height of each grid square
-	});
-}
-				 
-Unused code Section 1.2: Web Audio ADSR implementation.
+Unused code Section 1.0: Web Audio ADSR implementation.
 var context = new AudioContext();
 var arr = [];
 
@@ -2156,40 +2060,6 @@ function playSound(midiNum) {
 		return source;
 	}
 }
-
-//added notes to play all pressed notes in sequence
-function add(noteNum){
-	arr.push(noteNum);
-}
-
-
-function playAllSound(){
-    for (i = 0; i < arr.length; i++){
-	    playSound(arr[i]);
-    }
-}
-    
-function clearAllSound(){
-    arr = [];
-}
-
-//------------------------------------------------/
-//--------Document interaction with JQuery--------/
-//------------------------------------------------/
-$(document).ready(function() {
-	$(".col-md-1").on("click", function() {
-		playSound(parseInt($(this).attr('data-note')));
-	});
-	
-	$("#all").on("click", function() {
-		playAllSound();
-	});
-	
-	$("#clear").on("click", function() {
-		clearAllSound();
-	});
-});
-
 
 -End of Section 1.1-
 

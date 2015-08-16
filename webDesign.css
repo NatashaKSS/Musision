@@ -43,10 +43,28 @@ a {
 	font-family: "Trebuchet MS", Verdana, sans-serif;
 }
 
+#musisionTitle {
+	font-size: 22px;
+	color: white;
+}
+
+/* Button classes */
+.btn {
+	height: 58px;
+	width: 72px;
+	padding: 0px;
+	margin: 5px 2px 0px 2px;
+	background-color: #b3b3b3;
+}
+
+.btn:hover {
+    background-color: #e0e1ce;
+}
+
 /* playAndStop button with icons*/
 #playAndStop {
+	padding: 0px;
 	margin: 0px;
-	padding: 4px 5px 2px 5px;
 }
 
 #playAndStop .glyphicon-play-circle {
@@ -55,7 +73,6 @@ a {
 }
 
 #playAndStop .glyphicon-stop {
-	padding: 0px 0px 3px 1px; 
 	font-size: 30px;
 	color: #d00000;
 }
@@ -63,18 +80,17 @@ a {
 
 /* startLoop button with icons*/
 #startLoop {
+	padding: 0px;
 	margin: 0px;
-	padding: 4px 5px 3px 5px;
 }
 
 #startLoop .glyphicon-repeat {
-	padding: 5px 0px 3px 1px; 
-	font-size: 25px;
+	font-size: 30px;
 	color: #0a6081;
 }
 
 #startLoop .glyphicon-stop {
-	padding: 0px 0px 3px 1px; 
+	padding: 0px;
 	font-size: 30px;
 	color: #d00000;
 }
@@ -83,15 +99,16 @@ a {
 /* addTrack button with icons*/
 #addTrack {
 	margin: 0px;
-	padding: 4px 5px 3px 5px;
+	padding: 0px;
 }
 
 #addTrack .glyphicon-plus {
-	padding: 5px 0px 3px 1px; 
-	font-size: 25px;
+	padding: 0px;
+	font-size: 30px;
 }
 /* END addTrack button with icons*/
 
+/* BPM, Randomize, Clear buttons with icons*/
 #bpm-input {
 	margin-top: 15px;
 	border-radius: 5px;
@@ -99,41 +116,66 @@ a {
 	width: 3em;
 }
 
-
-#startRec {
-	background-color: #525252;
+#bpm-button {
+	height: 35px;
+	width: 80px;
 }
 
-#stopRec {
-	background-color: #525252;
+#randomPI {
+	height: 35px;
+	width: 100px;
+}
+
+#randomPI:hover{
+    background: crimson;
+}
+
+#clear {
+	height: 35px;
+	width: 85px;
+}
+/* END BPM, Randomize and CLear buttons with icons*/
+
+/* Rec, Save and Download buttons with icons */
+#startRec {
+	margin: 0px;
+	padding: 0px;
+	/*background-color: #525252;*/
+}
+
+#startRec .glyphicon-record {
+	font-size: 30px;
+	color: #d00000;
+}
+
+#startRec .glyphicon-stop {
+	padding: 0px;
+	font-size: 30px;
+	color: #d00000;
 }
 
 #saveData {
 	margin: 0px;
-	padding: 9px 5px 3px 5px;
+	padding: 0px;
 }
 
 #saveData .glyphicon-floppy-disk{
-	font-size: 25px;
+	font-size: 30px;
 }
 
 #download {
 	margin: 0px;
-	padding: 8px 5px 3px 5px;
+	padding: 0px;
+}
+
+#download:nth-child(1) {
+	font-size: 10px;
 }
 
 #download .glyphicon-download-alt{
-	 font-size: 25px;
+	 font-size: 30px;
 }
-
-.btn {
-	margin: 5px 2px 0px 2px;
-	background-color: #b3b3b3;
-}
-
-.btn:hover {
-    background-color: #e0e1ce;
-}
+/* END Rec, Save and Download buttons with icons */
 
 /* Social Media Options */
 .fb-like {
@@ -143,6 +185,8 @@ a {
 /* Basic tips section */
 #tips {
     position: relative;
+    height: 35px;
+    width: 150px;
 	margin-top:10px;  
     margin-left: 75%;
 	background-color: #b3b3b3;
@@ -373,6 +417,9 @@ a {
 	margin-right: 2px;
 	
 	border: 1px solid #c0c0c0;
+	background: -webkit-linear-gradient(#aaaaaa, #e9e9e9);
+	background: -o-linear-gradient(#aaaaaa, #e9e9e9);
+	background: -moz-linear-gradient(#aaaaaa, #e9e9e9);
 	background: linear-gradient(#aaaaaa, #e9e9e9);
 }
 
@@ -430,6 +477,9 @@ a {
 	padding-left: 10px;
 	padding-right: 10px;
 	
+	background: -webkit-linear-gradient(#333333, #444444);
+	background: -o-linear-gradient(#333333, #444444);
+	background: -moz-linear-gradient(#333333, #444444);
 	background: linear-gradient(#333333, #444444);
 	border: 5px solid black;
 }
