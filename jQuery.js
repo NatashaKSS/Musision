@@ -258,8 +258,22 @@ Animation.prototype.playAnimation = function(duration, wholeDuration, startIndex
 			offset += duration;
 		});
 		
+		// Section to control process of reverting animation to original style
+		var playButton = $("#playAndStop");
+		var playButtonIcon = playButton.children().eq(0);
+		var playButtonText = playButton.children().eq(1);
+		var loopButton = $("#startLoop");
+		
 		this.revertAnimationOngoing = setTimeout(function () {
-	        updateTimelineNotes();
+	        // Ensure style of notes is updated after animation plays
+			updateTimelineNotes();
+	        
+			// Ensure play button is toggled back to play at end of animation
+			playButtonIcon.removeClass("glyphicon-stop");
+			playButtonIcon.addClass("glyphicon-play-circle");
+			playButtonText.html("Play");
+			playButton.data("checked", "play");
+	       
 	    }, wholeDuration);
 		
 	});
@@ -343,7 +357,7 @@ function playSequence(trackNumber, startIndex, endIndex) {
 		
 		setTimeout(function(){
 		    animation.stopAnimation();
-			}, wholeDuration);
+		}, wholeDuration);
 		
         for(indx = startIndex; indx <= endIndex; indx++) {
 		    if (composition.getTrack(trackNumber)[indx] != undefined) {	
@@ -535,10 +549,12 @@ function resume(){
 	
 } //end 
 
+/*
 function exportAudio(){ // Some problems here!
     record();
 	playAllSequences();
 }
+*/
 
 // Adds a track to user composition and updates user interface
 // respectively
@@ -739,21 +755,28 @@ $(document).ready(function() {
 		// On drag start for a note, prevent the window from annoyingly
 		// scrolling as user drags note.
 		$(".col-md-1").unbind("mousedown").on("mousedown",function() {
+			
 			$(".notes-buttons-holder").css({
-				"overflow": "hidden"
+				"overflow": "hidden",
+				"padding-right": "57px"
 			});
 			
 			// On drag stop, revert back to the scrollbar
 			$(this).on("dragstop", function() {
+				
 				$(".notes-buttons-holder").css({
-					"overflow": "auto"
+					"overflow": "auto",
+					"padding-right": "40px"
 				});
 			});
 			
 		}).on("mouseup", function() {
+			
 			$(".notes-buttons-holder").css({
-				"overflow": "auto"
+				"overflow": "auto",
+				"padding-right": "40px"
 			});
+			
 		});
 		
 		function clickPlayAllButton() {
@@ -813,16 +836,21 @@ $(document).ready(function() {
 			enableLooping = true;
 		    
 		    if (valueAttribute == "start looping") {
-		    	icon.toggleClass("glyphicon-repeat");
-		    	icon.toggleClass("glyphicon-stop");
+		    	var stopLoopButton = '<div id="stopLoopButton" class="glyphicon glyphicon-stop">';
+		    	
+		    	$(stopLoopButton).insertAfter($("#startLoopButton"));
+		    	
+		    	icon.css({ "color": "#d00000" });
 		    	text.html("Stop");
 		    	$(this).data("checked", "stop looping");
 		    	wantToLoop = true;
 		    	
 		    } else if (valueAttribute == "stop looping") {
-		    	icon.toggleClass("glyphicon-repeat");
-		    	icon.toggleClass("glyphicon-stop");
-		    	text.html("Loop");
+		    	
+		    	$("#stopLoopButton").remove();
+		    	
+		    	$(this).children().eq(1).html("Loop");
+		    	icon.css({ "color": "#0a6081" });
 		    	$(this).data("checked", "start looping");
 		    	wantToLoop = false;
 		    	
@@ -835,27 +863,31 @@ $(document).ready(function() {
 	    });	
 	
 		$("#clear").on("click", function() {
-			var startLoopButton = $("#startLoop");
-			var icon = startLoopButton.children().eq(0);
-			var text = startLoopButton.children().eq(1);
+			if (confirm("Are you sure you want to delete all notes from all of your tracks?")) {
+				$(".sortable-system div").remove(); //remove notes from the timeline
+			    enableLooping = false;
+				clearAllSound();
+				
+				animation.stopAnimation();
+				
+			    // Change style of Loop button to "Loop" since clearALL was clicked.
+				var startLoopButton = $("#startLoop");
+				var icon = startLoopButton.children().eq(0);
+				var text = startLoopButton.children().eq(1);
+				
+				icon.addClass("glyphicon-repeat");
+		    	icon.removeClass("glyphicon-stop");
+		    	text.html("Loop");
+		    	startLoopButton.data("checked", "start looping");
+		    	
+		    	// Clear animation intervals and reset variables
+		        clearInterval(loopId);
+				clearInterval(animationLoopId);
+				
+				startPlayingFrom = 0;//change back to default
+				playUntil = - 1;//change back to default
 			
-			$(".sortable-system div").remove(); //remove notes from the timeline
-		    enableLooping = false;
-			clearAllSound();
-			
-			animation.stopAnimation();
-			
-		    // Change style of Loop button to "Loop" since clearALL was clicked.
-	    	icon.addClass("glyphicon-repeat");
-	    	icon.removeClass("glyphicon-stop");
-	    	text.html("Loop");
-	    	startLoopButton.data("checked", "start looping");
-	    	
-	        clearInterval(loopId);
-			clearInterval(animationLoopId);
-			
-			startPlayingFrom = 0;//change back to default
-			playUntil = - 1;//change back to default
+			}
 			
 		});
 		
@@ -875,15 +907,20 @@ $(document).ready(function() {
 			}
 		});//end pause
 
-		$("#addTrack").on("click", function() {		
-			//  First add a new track to our composition
-			composition.addTrack([]);
-			
-			addTrack(composition.getNumTracks());
-			
-			// Must reinitialise the sortables
-			setSortable();
-			initializeTrackSettings();
+		$("#addTrack").on("click", function() {
+			if (composition.getAllTracks().length < 8) {
+				//  First add a new track to our composition
+				composition.addTrack([]);
+				
+				addTrack(composition.getNumTracks());
+				
+				// Must reinitialise the sortables
+				setSortable();
+				initializeTrackSettings();
+			} else {
+				alert("You have exceeded the maximum number of tracks available!" +
+					  " Please do not exceed 8 tracks.");
+			}
 		});
 		
 		$("#saveData").on("click", function() {
@@ -901,7 +938,7 @@ $(document).ready(function() {
 		    
 		    if (valueAttribute == "record") {
 		    	
-		    	exportAudio();
+		    	record();
 		    	
 		    	// Update style of button
 		    	icon.toggleClass("glyphicon-record");

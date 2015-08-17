@@ -76,7 +76,7 @@
 	  <div>
 		<ul class="nav navbar-nav" style="display:inline;">
 		  <li>
-		 	 <div class="navbar-form" 
+		 	 <div class="navbar-form" style="padding: 4px 38px 4px 12px;"  
 		 	  data-step="6" data-intro="Here, you can find your composition's settings." data-position="bottom">
 			 
 			 <!--- Toggle between playing all notes and stop --->
@@ -91,7 +91,8 @@
 			 <button id ="startLoop" class="btn" data-checked="start looping"
 			  		 data-step="9" data-intro="Click here to loop your entire composition. To loop only a section, SHIFT-CLICK on the starting note and DOUBLE-CLICK on the end note." 
 			  		 data-position="right" TITLE="Loop your entire composition or Loop a section (SHIFT-CLICK on starting note then DOUBLE-CLICK on end note)"> 
-			  		 <div class="glyphicon glyphicon-repeat"></div> 
+			  		 <div id="startLoopButton" class="glyphicon glyphicon-repeat"></div>
+			  		 
 			  		 <div>Loop</div> 
 			 </button>
 			 
@@ -102,9 +103,9 @@
 			  		 <div>Track</div> 
 			 </button>
 			 
-			 <button id="saveData" class="btn" data-step="14" data-intro="Click here to save your entire composition. You can come back 
-			 	  	 and you'll continue from where you left off in your previous session. To delete your save data, delete your 
-			 	  	 browser's cookies and cached data." data-position="bottom"
+			 <button id="saveData" class="btn" data-step="14" data-intro="Click here to save your entire composition to your browser. 
+			 		 To delete your save data, delete your browser's cookies and cached data." 
+			 		 data-position="bottom"
 			 	  	 TITLE="Save progress. Delete your save data by deleting browser cookies and cached data.">
 			 	  	 <div class="glyphicon glyphicon-floppy-disk"></div>
 			 	  	 <div>Save</div>
@@ -120,17 +121,15 @@
              <button id="startRec" class="btn" data-checked="record"
              		 data-step="16" data-intro="Feel like grooving to your track? Click here to record your voice through your
              		 computer's mic. Click again to stop recording and download your awesome song! 
-             		 (Remember not to allow mic access for our webpage!)" data-position="bottom">
+             		 (Remember to allow Musision access to your mic!)" data-position="bottom">
 			 	     <div class="glyphicon glyphicon-record"></div>
 			 	     <div>Record</div>
 			 </button>
 			 
 			 <!-- 
-			 <button id="stopRec" class="btn">Stop</button>
+			 <button id ="pause" class="btn"> Pause </button>
 			 -->
 			 
-			 <button id ="pause" class="btn"> Pause </button>
-			
 		 </li>	 
 		 <li>
 			<div class="navbar-form">

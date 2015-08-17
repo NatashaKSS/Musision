@@ -45,7 +45,7 @@ a {
 
 #musisionTitle {
 	font-size: 22px;
-	color: white;
+	color: #ffffff;
 }
 
 /* Button classes */
@@ -64,7 +64,7 @@ a {
 /* playAndStop button with icons*/
 #playAndStop {
 	padding: 0px;
-	margin: 0px;
+	margin: 0px 0px 3px 0px;
 }
 
 #playAndStop .glyphicon-play-circle {
@@ -80,8 +80,8 @@ a {
 
 /* startLoop button with icons*/
 #startLoop {
-	padding: 0px;
-	margin: 0px;
+	padding: 2px;
+	margin: 0px 0px 3px 0px;
 }
 
 #startLoop .glyphicon-repeat {
@@ -94,11 +94,23 @@ a {
 	font-size: 30px;
 	color: #d00000;
 }
+
+#stopLoopButton {
+	position: absolute;
+	left: 99px;
+	top: 14px;
+	height: 20px;
+	width: 20px;
+}
+
+#stopLoopButton.glyphicon-stop {
+	font-size: 18px;
+}
 /* END startLoop button with icons*/
 
 /* addTrack button with icons*/
 #addTrack {
-	margin: 0px;
+	margin: 0px 0px 3px 0px;
 	padding: 0px;
 }
 
@@ -179,7 +191,8 @@ a {
 
 /* Social Media Options */
 .fb-like {
-	margin-left: 30px;
+	margin-top: 4px;
+	margin-left: 48px;
 }
 
 /* Basic tips section */
@@ -205,7 +218,7 @@ a {
     height: 100px; 
     padding: 10px; 
     box-shadow: 0 0 20px rgba(0,0,0,0.4); 
-	font-size: 1.2em;
+	font-size: 1.05em;
 	font-family: "Trebuchet MS", Verdana, sans-serif;
 	width: 80%;
 }
@@ -239,7 +252,7 @@ a {
 
 /* Triangular play button */
 .play-button {
-	
+	cursor: pointer;
 }
 
 .play-button:hover {
@@ -439,6 +452,7 @@ a {
 	border: 1px solid black;
 	font-size: 12px;
 	color: black;
+	cursor: pointer;
 }
 
 .glyphicon-resize-vertical {
@@ -542,6 +556,7 @@ a {
     
     max-width: 100px;
     
+	cursor: pointer;
     text-decoration:none;
     text-transform:uppercase;
     text-align:center;
@@ -558,16 +573,14 @@ a {
     				
 }
 
-.col-md-1:active {
-	top: 3px;
-	cursor:grab;
-	cursor:pointer;
+.col-md-1:hover {
+    box-shadow: inset 0px 1px 0px #ffff7b, 
+    			0px 2px 0px 0px #ffff7b, 
+    			0px 2px 1px #ffff7b;
 }
 
-.col-md-1:hover {
-    background: #004080;
-    cursor:grab;
-    cursor:pointer;
+.col-md-1:active {
+	top: 3px;
 }
 
 [data-note="silence"] {
