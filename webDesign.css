@@ -343,7 +343,7 @@ a {
 /* Sortable-system */
 .sortable-system {
 	position: relative;
-	padding-right: 100px;
+	padding-right: 230px;
 	overflow-x: auto;
 	overflow-y: hidden;
 	white-space: nowrap;

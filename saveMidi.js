@@ -48,7 +48,6 @@ function saveMIDI() {
  //   alert("Song is going to be saved in base64 with string representation " + song.b64);
 
     song.save();
-			
 }
 
 //ABORTED CODES

@@ -200,7 +200,7 @@ var MidiWriter = function(config) {
             save: function() {
                 window.open("data:audio/midi;base64," + this.b64,
                             "JSMidi generated output",
-                            "resizable=yes,scrollbars=no,status=no");
+                            "resizable=yes,scrollbars=no,status=no").resizeTo(450, 300);
             }
         };
 
